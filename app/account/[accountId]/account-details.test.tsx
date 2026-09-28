@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AccountsList } from "../../accounts-list";
 import { DataProvider } from "../../data-provider";
 import { AccountDetails } from "./account-details";
 
@@ -52,7 +53,7 @@ describe("AccountDetails", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("shows the happy path and reuses cached account data", async () => {
+  it("shows balances and toggles deleted pots", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
       return url.endsWith("/balance")
@@ -60,7 +61,7 @@ describe("AccountDetails", () => {
         : jsonResponse({ pots: [activePot, deletedPot] });
     });
 
-    const view = render(accountDetails());
+    render(accountDetails());
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
@@ -70,11 +71,99 @@ describe("AccountDetails", () => {
 
     expect(screen.getByText("Old pot")).toBeInTheDocument();
 
-    view.rerender(<DataProvider>{null}</DataProvider>);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("reuses the balance loaded by the account list", async () => {
+    fetchMock.mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/accounts") {
+        return jsonResponse({
+          accounts: [
+            {
+              id: "acc_123",
+              description: "Current Account",
+              created: "2026-01-02T03:04:05Z",
+              balance_details: balance,
+            },
+          ],
+        });
+      }
+
+      return url.endsWith("/balance")
+        ? jsonResponse(balance)
+        : jsonResponse({ pots: [] });
+    });
+
+    const view = render(
+      <DataProvider>
+        <AccountsList />
+      </DataProvider>,
+    );
+
+    expect(await screen.findByText("£173.45")).toBeInTheDocument();
+
     view.rerender(accountDetails());
 
-    expect(screen.getByText("Holiday")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText("No pots found.")).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.filter(([input]) =>
+        String(input).endsWith("/balance"),
+      ),
+    ).toHaveLength(0);
+
+    view.rerender(
+      <DataProvider>
+        <AccountsList />
+      </DataProvider>,
+    );
+
+    expect(await screen.findByText("Current Account")).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.filter(([input]) => String(input) === "/api/accounts"),
+    ).toHaveLength(1);
+  });
+
+  it("retries a missing enriched balance on demand", async () => {
+    fetchMock.mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/accounts") {
+        return jsonResponse({
+          accounts: [
+            {
+              id: "acc_123",
+              description: "Current Account",
+              created: "2026-01-02T03:04:05Z",
+              balance_details: null,
+            },
+          ],
+        });
+      }
+
+      return jsonResponse(balance);
+    });
+
+    render(
+      <DataProvider>
+        <AccountsList />
+      </DataProvider>,
+    );
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "Retry total balance for Current Account",
+      }),
+    );
+
+    expect(await screen.findByText("£173.45")).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.filter(([input]) =>
+        String(input).endsWith("/balance"),
+      ),
+    ).toHaveLength(1);
   });
 
   it("handles an empty pots response", async () => {

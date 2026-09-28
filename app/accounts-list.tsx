@@ -1,12 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import useSWR from "swr";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import {
+  type Balance,
+  fetchBalance,
+  formatMoney,
+  getBalanceKey,
+  getBalanceLoadedAtKey,
+  isBalance,
+} from "./account-data";
 
 type Account = {
   id: string;
   description: string;
   created: string;
+  balance_details: Balance | null;
 };
 
 class AccessNotApprovedError extends Error {}
@@ -31,7 +41,9 @@ function isAccount(value: unknown): value is Account {
     typeof value.description === "string" &&
     "created" in value &&
     typeof value.created === "string" &&
-    Boolean(value.created.trim())
+    Boolean(value.created.trim()) &&
+    "balance_details" in value &&
+    (value.balance_details === null || isBalance(value.balance_details))
   );
 }
 
@@ -70,10 +82,79 @@ async function fetchAccounts(url: string): Promise<Account[]> {
   return accounts;
 }
 
+function AccountCard({ account }: { account: Account }) {
+  const encodedAccountId = encodeURIComponent(account.id);
+  const {
+    data: balance,
+    isValidating,
+    mutate,
+  } = useSWR(getBalanceKey(account.id), fetchBalance, {
+    fallbackData: account.balance_details ?? undefined,
+    revalidateOnMount: false,
+  });
+
+  return (
+    <li className="account">
+      <Link className="account-link" href={`/account/${encodedAccountId}`}>
+        <h3>{account.description || "Unnamed account"}</h3>
+        <dl>
+          <div>
+            <dt>ID</dt>
+            <dd>{account.id}</dd>
+          </div>
+          <div>
+            <dt>Created</dt>
+            <dd>{account.created}</dd>
+          </div>
+        </dl>
+      </Link>
+      <div className="account-total" aria-live="polite">
+        <span>Total balance</span>
+        {balance ? (
+          <strong>{formatMoney(balance.total_balance, balance.currency)}</strong>
+        ) : (
+          <button
+            className="balance-retry"
+            type="button"
+            aria-label={`Retry total balance for ${account.description || account.id}`}
+            disabled={isValidating}
+            onClick={() => void mutate()}
+          >
+            {isValidating ? "Retrying…" : "Retry"}
+          </button>
+        )}
+      </div>
+    </li>
+  );
+}
+
 export function AccountsList() {
+  const { mutate } = useSWRConfig();
+  const fetchAccountsAndCacheBalances = useCallback(
+    async (url: string) => {
+      const loadedAccounts = await fetchAccounts(url);
+
+      await Promise.all(
+        loadedAccounts.map((account) => {
+          if (!account.balance_details) {
+            return undefined;
+          }
+
+          return Promise.all([
+            mutate(getBalanceKey(account.id), account.balance_details, false),
+            mutate(getBalanceLoadedAtKey(account.id), Date.now(), false),
+          ]);
+        }),
+      );
+
+      return loadedAccounts;
+    },
+    [mutate],
+  );
   const { data: accounts, error, isLoading } = useSWR(
     "/api/accounts",
-    fetchAccounts,
+    fetchAccountsAndCacheBalances,
+    { revalidateIfStale: false },
   );
 
   if (isLoading || (!accounts && !error)) {
@@ -101,24 +182,7 @@ export function AccountsList() {
       ) : (
         <ul className="account-list">
           {accounts.map((account) => (
-            <li className="account" key={account.id}>
-              <Link
-                className="account-link"
-                href={`/account/${encodeURIComponent(account.id)}`}
-              >
-                <h3>{account.description || "Unnamed account"}</h3>
-                <dl>
-                  <div>
-                    <dt>ID</dt>
-                    <dd>{account.id}</dd>
-                  </div>
-                  <div>
-                    <dt>Created</dt>
-                    <dd>{account.created}</dd>
-                  </div>
-                </dl>
-              </Link>
-            </li>
+            <AccountCard account={account} key={account.id} />
           ))}
         </ul>
       )}

@@ -5,7 +5,34 @@ type Account = {
   id: string;
   description: string;
   created: string;
+  balance_details: Balance | null;
 };
+
+type Balance = {
+  balance: number;
+  total_balance: number;
+  currency: string;
+  spend_today: number;
+};
+
+function isBalance(value: unknown): value is Balance {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "balance" in value &&
+    typeof value.balance === "number" &&
+    Number.isInteger(value.balance) &&
+    "total_balance" in value &&
+    typeof value.total_balance === "number" &&
+    Number.isInteger(value.total_balance) &&
+    "currency" in value &&
+    typeof value.currency === "string" &&
+    value.currency.length === 3 &&
+    "spend_today" in value &&
+    typeof value.spend_today === "number" &&
+    Number.isInteger(value.spend_today)
+  );
+}
 
 function isAccount(value: unknown): value is Account {
   return (
@@ -18,7 +45,9 @@ function isAccount(value: unknown): value is Account {
     typeof value.description === "string" &&
     "created" in value &&
     typeof value.created === "string" &&
-    Boolean(value.created.trim())
+    Boolean(value.created.trim()) &&
+    "balance_details" in value &&
+    (value.balance_details === null || isBalance(value.balance_details))
   );
 }
 
@@ -41,7 +70,7 @@ export async function GET() {
   }
 
   try {
-    const backendResponse = await fetch(`${baseUrl}/accounts`, {
+    const backendResponse = await fetch(`${baseUrl}/accounts-with-balances`, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -86,11 +115,21 @@ export async function GET() {
       );
     }
 
-    const accounts = payload.accounts.map(({ id, description, created }) => ({
-      id,
-      description,
-      created,
-    }));
+    const accounts = payload.accounts.map(
+      ({ id, description, created, balance_details }) => ({
+        id,
+        description,
+        created,
+        balance_details: balance_details
+          ? {
+              balance: balance_details.balance,
+              total_balance: balance_details.total_balance,
+              currency: balance_details.currency,
+              spend_today: balance_details.spend_today,
+            }
+          : null,
+      }),
+    );
     const response = NextResponse.json({ accounts });
     response.headers.set("Cache-Control", "no-store");
     return response;

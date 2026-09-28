@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import useSWR from "swr";
-
-type Balance = {
-  balance: number;
-  total_balance: number;
-  currency: string;
-  spend_today: number;
-};
+import {
+  BALANCE_CACHE_WINDOW_MS,
+  fetchBalance,
+  formatMoney,
+  getBalanceKey,
+  getBalanceLoadedAtKey,
+} from "../../account-data";
 
 type Pot = {
   id: string;
@@ -20,25 +20,6 @@ type Pot = {
   updated: string;
   deleted: boolean;
 };
-
-function isBalance(value: unknown): value is Balance {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "balance" in value &&
-    typeof value.balance === "number" &&
-    Number.isInteger(value.balance) &&
-    "total_balance" in value &&
-    typeof value.total_balance === "number" &&
-    Number.isInteger(value.total_balance) &&
-    "currency" in value &&
-    typeof value.currency === "string" &&
-    value.currency.length === 3 &&
-    "spend_today" in value &&
-    typeof value.spend_today === "number" &&
-    Number.isInteger(value.spend_today)
-  );
-}
 
 function isPot(value: unknown): value is Pot {
   return (
@@ -80,28 +61,6 @@ function getPots(value: unknown): Pot[] | null {
   return value.pots;
 }
 
-function formatMoney(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-    }).format(amount / 100);
-  } catch {
-    return `${amount} ${currency}`;
-  }
-}
-
-async function fetchBalance(url: string): Promise<Balance> {
-  const response = await fetch(url, { cache: "no-store" });
-  const payload: unknown = await response.json();
-
-  if (!response.ok || !isBalance(payload)) {
-    throw new Error("Balance response was invalid");
-  }
-
-  return payload;
-}
-
 async function fetchPots(url: string): Promise<Pot[]> {
   const response = await fetch(url, { cache: "no-store" });
   const payload: unknown = await response.json();
@@ -115,17 +74,29 @@ async function fetchPots(url: string): Promise<Pot[]> {
 }
 
 export function AccountDetails({ accountId }: { accountId: string }) {
-  const encodedAccountId = encodeURIComponent(accountId);
+  const balanceKey = getBalanceKey(accountId);
+  const { data: balanceLoadedAt } = useSWR<number>(
+    getBalanceLoadedAtKey(accountId),
+    null,
+  );
+  const hasFreshEnrichedBalance =
+    balanceLoadedAt !== undefined &&
+    Date.now() - balanceLoadedAt < BALANCE_CACHE_WINDOW_MS;
   const {
     data: balance,
     error: balanceError,
     isLoading: isBalanceLoading,
-  } = useSWR(`/api/accounts/${encodedAccountId}/balance`, fetchBalance);
+  } = useSWR(balanceKey, fetchBalance, {
+    revalidateOnMount: !hasFreshEnrichedBalance,
+  });
   const {
     data: pots,
     error: potsError,
     isLoading: isPotsLoading,
-  } = useSWR(`/api/accounts/${encodedAccountId}/pots`, fetchPots);
+  } = useSWR(
+    `/api/accounts/${encodeURIComponent(accountId)}/pots`,
+    fetchPots,
+  );
   const [hideDeletedPots, setHideDeletedPots] = useState(true);
   const visiblePots = pots?.filter((pot) => !hideDeletedPots || !pot.deleted) ?? [];
 

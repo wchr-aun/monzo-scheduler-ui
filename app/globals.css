@@ -100,6 +100,7 @@ body {
 }
 
 .account {
+  position: relative;
   border: 1px solid #dce1e8;
   border-radius: 8px;
   background: #fff;
@@ -107,7 +108,8 @@ body {
 
 .account-link {
   display: block;
-  padding: 16px;
+  min-height: 132px;
+  padding: 16px 176px 16px 16px;
   border-radius: inherit;
   color: inherit;
   text-decoration: none;
@@ -148,6 +150,56 @@ body {
 .account dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.account-total {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  gap: 4px;
+  pointer-events: none;
+  text-align: right;
+}
+
+.account-total span {
+  color: #526178;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.account-total strong {
+  color: #14233c;
+  font-size: 1.25rem;
+}
+
+.balance-retry {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #14233c;
+  border-radius: 6px;
+  color: #14233c;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.balance-retry:hover:not(:disabled) {
+  color: #fff;
+  background: #14233c;
+}
+
+.balance-retry:focus-visible {
+  outline: 3px solid #5cc6c6;
+  outline-offset: 3px;
+}
+
+.balance-retry:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .account-screen {
