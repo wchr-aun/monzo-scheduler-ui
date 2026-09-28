@@ -1,0 +1,51 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Environment variables and local secrets
+.env*
+!.env.example
+
+# Hosting and local tooling metadata
+.vercel/
+.idea/
+.vscode/settings.json
+
+# Package-manager credentials and conflicting lockfiles
+.npmrc
+.pnpmrc
+.yarnrc.yml
+package-lock.json
+
+# Private keys, signing material, and credential exports
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+credentials.json
+credentials.*.json
+service-account*.json
+serviceAccountKey.json
+firebase-adminsdk-*.json
+.aws/
+.gcloud/
+.netrc
+.secrets/
+secrets/
+*.secret
+*.secrets
+*.tfvars
+*.tfvars.json
+
+# OS and debug files
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
