@@ -70,7 +70,7 @@ export async function GET() {
   }
 
   try {
-    const backendResponse = await fetch(`${baseUrl}/accounts-with-balances`, {
+    const backendResponse = await fetch(`${baseUrl}/accounts-with-balances?account_type=uk_retail`, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
