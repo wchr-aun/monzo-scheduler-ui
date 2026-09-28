@@ -15,6 +15,7 @@ Use pnpm exclusively. Do not create or commit `package-lock.json` or `yarn.lock`
 ```bash
 pnpm install
 pnpm dev
+pnpm test
 pnpm typecheck
 pnpm build
 ```
@@ -56,9 +57,14 @@ Do not rename `BASE_URL` to a `NEXT_PUBLIC_*` variable. Backend configuration mu
 After meaningful changes, run:
 
 ```bash
+pnpm test
 pnpm typecheck
 pnpm build
 ```
+
+Keep tests lean and behavior-focused. Prioritize important happy paths, empty
+responses, and graceful handling of backend failures. Do not test incidental DOM
+hierarchy, styling details, or framework behavior.
 
 For authentication changes, also test:
 

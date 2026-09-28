@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Account = {
@@ -120,17 +121,22 @@ export function AccountsList() {
         <ul className="account-list">
           {state.accounts.map((account) => (
             <li className="account" key={account.id}>
-              <h3>{account.description || "Unnamed account"}</h3>
-              <dl>
-                <div>
-                  <dt>ID</dt>
-                  <dd>{account.id}</dd>
-                </div>
-                <div>
-                  <dt>Created</dt>
-                  <dd>{account.created}</dd>
-                </div>
-              </dl>
+              <Link
+                className="account-link"
+                href={`/account/${encodeURIComponent(account.id)}`}
+              >
+                <h3>{account.description || "Unnamed account"}</h3>
+                <dl>
+                  <div>
+                    <dt>ID</dt>
+                    <dd>{account.id}</dd>
+                  </div>
+                  <div>
+                    <dt>Created</dt>
+                    <dd>{account.created}</dd>
+                  </div>
+                </dl>
+              </Link>
             </li>
           ))}
         </ul>
