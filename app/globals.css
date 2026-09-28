@@ -57,6 +57,82 @@ body {
   text-align: center;
 }
 
+.logged-in-status {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.logged-in-content {
+  display: grid;
+  width: min(100%, 640px);
+  gap: 32px;
+}
+
+.user-id {
+  margin: 0;
+  color: #526178;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.accounts h2 {
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.accounts-message {
+  margin: 0;
+  color: #526178;
+  text-align: center;
+}
+
+.accounts-error {
+  color: #a22626;
+}
+
+.account-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.account {
+  padding: 16px;
+  border: 1px solid #dce1e8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.account h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.account dl,
+.account dl div {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.account dl {
+  gap: 8px;
+}
+
+.account dt {
+  color: #526178;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.account dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .callback-status {
   display: grid;
   justify-items: center;
