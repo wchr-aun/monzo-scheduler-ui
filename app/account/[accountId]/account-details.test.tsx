@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AccountsList } from "../../accounts-list";
 import { DataProvider } from "../../data-provider";
@@ -53,6 +53,78 @@ describe("AccountDetails", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
+  it("keeps the balance cards visible while their values load", () => {
+    fetchMock.mockImplementation(() => new Promise<Response>(() => undefined));
+
+    render(accountDetails());
+
+    const loadingBalance = screen.getByRole("status", {
+      name: "Loading balance",
+    });
+
+    expect(within(loadingBalance).getByText("Balance")).toBeInTheDocument();
+    expect(within(loadingBalance).getByText("Total balance")).toBeInTheDocument();
+    expect(within(loadingBalance).getByText("Spent today")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Loading pots" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Loading balance…")).not.toBeInTheDocument();
+    expect(screen.queryByText("Loading pots…")).not.toBeInTheDocument();
+    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
+  });
+
+  it("uses indicators while accounts load and a balance retries", async () => {
+    let resolveAccounts!: (response: Response) => void;
+    const accountsResponse = new Promise<Response>((resolve) => {
+      resolveAccounts = resolve;
+    });
+
+    fetchMock.mockImplementation((input) =>
+      String(input) === "/api/accounts"
+        ? accountsResponse
+        : new Promise<Response>(() => undefined),
+    );
+
+    render(
+      <DataProvider>
+        <AccountsList />
+      </DataProvider>,
+    );
+
+    expect(
+      screen.getByRole("status", { name: "Loading accounts" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Loading accounts…")).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveAccounts(
+        jsonResponse({
+          accounts: [
+            {
+              id: "acc_123",
+              description: "Current Account",
+              created: "2026-01-02T03:04:05Z",
+              balance_details: null,
+            },
+          ],
+        }),
+      );
+    });
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "Retry balance for Current Account",
+      }),
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Retrying balance for Current Account",
+      }),
+    ).toBeDisabled();
+    expect(screen.queryByText("Retrying…")).not.toBeInTheDocument();
+  });
+
   it("shows balances and toggles deleted pots", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
@@ -102,7 +174,9 @@ describe("AccountDetails", () => {
       </DataProvider>,
     );
 
-    expect(await screen.findByText("£173.45")).toBeInTheDocument();
+    expect(await screen.findByText("Available balance")).toBeInTheDocument();
+    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(screen.getByText("Total balance: £173.45")).toBeInTheDocument();
 
     view.rerender(accountDetails());
 
@@ -154,11 +228,12 @@ describe("AccountDetails", () => {
 
     fireEvent.click(
       await screen.findByRole("button", {
-        name: "Retry total balance for Current Account",
+        name: "Retry balance for Current Account",
       }),
     );
 
-    expect(await screen.findByText("£173.45")).toBeInTheDocument();
+    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText("Total balance: £173.45")).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(([input]) =>
         String(input).endsWith("/balance"),

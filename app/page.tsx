@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cookies } from "next/headers";
 import { AccountsList } from "./accounts-list";
 
@@ -54,7 +55,14 @@ export default async function HomePage() {
         <p className="status">Login is not configured.</p>
       ) : (
         <a className="button" href={loginUrl} target="_blank" rel="noopener noreferrer">
-          Log in
+          <Image
+            className="button-logo"
+            src="/monzo-logo.png"
+            alt=""
+            width={30}
+            height={30}
+          />
+          <span>Login with Monzo</span>
         </a>
       )}
     </main>

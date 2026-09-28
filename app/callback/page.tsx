@@ -15,9 +15,8 @@ export default function CallbackPage() {
 
 function Loading() {
   return (
-    <div className="callback-status">
-      <span className="spinner" aria-hidden="true" />
-      <p>Finishing up…</p>
+    <div className="callback-status" role="status" aria-label="Finishing login">
+      <span className="loading-indicator" aria-hidden="true" />
     </div>
   );
 }

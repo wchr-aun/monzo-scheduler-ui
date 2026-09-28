@@ -109,19 +109,34 @@ function AccountCard({ account }: { account: Account }) {
         </dl>
       </Link>
       <div className="account-total" aria-live="polite">
-        <span>Total balance</span>
         {balance ? (
-          <strong>{formatMoney(balance.total_balance, balance.currency)}</strong>
+          <>
+            <span>Available balance</span>
+            <strong>{formatMoney(balance.balance, balance.currency)}</strong>
+            <small className="account-total-secondary">
+              Total balance: {formatMoney(balance.total_balance, balance.currency)}
+            </small>
+          </>
         ) : (
-          <button
-            className="balance-retry"
-            type="button"
-            aria-label={`Retry total balance for ${account.description || account.id}`}
-            disabled={isValidating}
-            onClick={() => void mutate()}
-          >
-            {isValidating ? "Retrying…" : "Retry"}
-          </button>
+          <>
+            <span>Available balance</span>
+            <button
+              className="balance-retry"
+              type="button"
+              aria-label={`${isValidating ? "Retrying" : "Retry"} balance for ${account.description || account.id}`}
+              disabled={isValidating}
+              onClick={() => void mutate()}
+            >
+              {isValidating ? (
+                <span
+                  className="loading-indicator loading-indicator-small"
+                  aria-hidden="true"
+                />
+              ) : (
+                "Retry"
+              )}
+            </button>
+          </>
         )}
       </div>
     </li>
@@ -158,7 +173,11 @@ export function AccountsList() {
   );
 
   if (isLoading || (!accounts && !error)) {
-    return <p className="accounts-message">Loading accounts…</p>;
+    return (
+      <div className="accounts-message" role="status" aria-label="Loading accounts">
+        <span className="loading-indicator" aria-hidden="true" />
+      </div>
+    );
   }
 
   if (error instanceof AccessNotApprovedError) {

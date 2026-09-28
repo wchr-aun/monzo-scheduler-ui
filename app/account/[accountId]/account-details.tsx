@@ -73,6 +73,15 @@ async function fetchPots(url: string): Promise<Pot[]> {
   return pots;
 }
 
+function BalanceLoadingIndicator() {
+  return (
+    <span
+      className="loading-indicator loading-indicator-small"
+      aria-hidden="true"
+    />
+  );
+}
+
 export function AccountDetails({ accountId }: { accountId: string }) {
   const balanceKey = getBalanceKey(accountId);
   const { data: balanceLoadedAt } = useSWR<number>(
@@ -99,38 +108,50 @@ export function AccountDetails({ accountId }: { accountId: string }) {
   );
   const [hideDeletedPots, setHideDeletedPots] = useState(true);
   const visiblePots = pots?.filter((pot) => !hideDeletedPots || !pot.deleted) ?? [];
+  const balanceIsLoading = isBalanceLoading || !balance;
 
   return (
     <div className="account-details">
       <section className="detail-section" aria-labelledby="balance-heading">
         <h2 id="balance-heading">Balance</h2>
-        {isBalanceLoading || (!balance && !balanceError) ? (
-          <p className="accounts-message">Loading balance…</p>
-        ) : balanceError || !balance ? (
+        {balanceError ? (
           <p className="accounts-message accounts-error" role="alert">
             Could not load the balance.
           </p>
         ) : (
-          <dl className="balance-grid">
+          <dl
+            className="balance-grid"
+            aria-busy={balanceIsLoading}
+            aria-label={balanceIsLoading ? "Loading balance" : undefined}
+            role={balanceIsLoading ? "status" : undefined}
+          >
             <div>
               <dt>Balance</dt>
-              <dd>{formatMoney(balance.balance, balance.currency)}</dd>
+              <dd>
+                {balance ? (
+                  formatMoney(balance.balance, balance.currency)
+                ) : (
+                  <BalanceLoadingIndicator />
+                )}
+              </dd>
             </div>
             <div>
               <dt>Total balance</dt>
               <dd>
-                {formatMoney(
-                  balance.total_balance,
-                  balance.currency,
+                {balance ? (
+                  formatMoney(balance.total_balance, balance.currency)
+                ) : (
+                  <BalanceLoadingIndicator />
                 )}
               </dd>
             </div>
             <div>
               <dt>Spent today</dt>
               <dd>
-                {formatMoney(
-                  balance.spend_today,
-                  balance.currency,
+                {balance ? (
+                  formatMoney(balance.spend_today, balance.currency)
+                ) : (
+                  <BalanceLoadingIndicator />
                 )}
               </dd>
             </div>
@@ -152,7 +173,9 @@ export function AccountDetails({ accountId }: { accountId: string }) {
           </label>
         </div>
         {isPotsLoading || (!pots && !potsError) ? (
-          <p className="accounts-message">Loading pots…</p>
+          <div className="accounts-message" role="status" aria-label="Loading pots">
+            <span className="loading-indicator" aria-hidden="true" />
+          </div>
         ) : potsError || !pots ? (
           <p className="accounts-message accounts-error" role="alert">
             Could not load pots.
