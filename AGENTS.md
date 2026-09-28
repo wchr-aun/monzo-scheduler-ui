@@ -50,6 +50,8 @@ Do not rename `BASE_URL` to a `NEXT_PUBLIC_*` variable. Backend configuration mu
 - Use strict TypeScript and validate untrusted JSON at runtime.
 - Keep server-only environment access in Server Components or Route Handlers.
 - Keep browser APIs and React hooks in Client Components marked with `"use client"`.
+- Use the shared SWR cache for authenticated client-side reads so identical requests
+  are deduplicated across navigation. Do not persist authenticated data in browser storage.
 - Preserve accessible status messaging and reduced-motion behavior.
 
 ## Verification

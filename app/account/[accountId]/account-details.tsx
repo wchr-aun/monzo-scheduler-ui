@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 
 type Balance = {
   balance: number;
@@ -19,11 +20,6 @@ type Pot = {
   updated: string;
   deleted: boolean;
 };
-
-type ResourceState<T> =
-  | { status: "loading" }
-  | { status: "loaded"; value: T }
-  | { status: "error" };
 
 function isBalance(value: unknown): value is Balance {
   return (
@@ -95,73 +91,51 @@ function formatMoney(amount: number, currency: string) {
   }
 }
 
+async function fetchBalance(url: string): Promise<Balance> {
+  const response = await fetch(url, { cache: "no-store" });
+  const payload: unknown = await response.json();
+
+  if (!response.ok || !isBalance(payload)) {
+    throw new Error("Balance response was invalid");
+  }
+
+  return payload;
+}
+
+async function fetchPots(url: string): Promise<Pot[]> {
+  const response = await fetch(url, { cache: "no-store" });
+  const payload: unknown = await response.json();
+  const pots = getPots(payload);
+
+  if (!response.ok || !pots) {
+    throw new Error("Pots response was invalid");
+  }
+
+  return pots;
+}
+
 export function AccountDetails({ accountId }: { accountId: string }) {
-  const [balance, setBalance] = useState<ResourceState<Balance>>({
-    status: "loading",
-  });
-  const [pots, setPots] = useState<ResourceState<Pot[]>>({ status: "loading" });
+  const encodedAccountId = encodeURIComponent(accountId);
+  const {
+    data: balance,
+    error: balanceError,
+    isLoading: isBalanceLoading,
+  } = useSWR(`/api/accounts/${encodedAccountId}/balance`, fetchBalance);
+  const {
+    data: pots,
+    error: potsError,
+    isLoading: isPotsLoading,
+  } = useSWR(`/api/accounts/${encodedAccountId}/pots`, fetchPots);
   const [hideDeletedPots, setHideDeletedPots] = useState(true);
-  const visiblePots =
-    pots.status === "loaded"
-      ? pots.value.filter((pot) => !hideDeletedPots || !pot.deleted)
-      : [];
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const encodedAccountId = encodeURIComponent(accountId);
-
-    async function loadBalance() {
-      try {
-        const response = await fetch(
-          `/api/accounts/${encodedAccountId}/balance`,
-          { cache: "no-store", signal: controller.signal },
-        );
-        const payload: unknown = await response.json();
-
-        if (!response.ok || !isBalance(payload)) {
-          throw new Error("Balance response was invalid");
-        }
-
-        setBalance({ status: "loaded", value: payload });
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setBalance({ status: "error" });
-        }
-      }
-    }
-
-    async function loadPots() {
-      try {
-        const response = await fetch(`/api/accounts/${encodedAccountId}/pots`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        const payload: unknown = await response.json();
-        const loadedPots = getPots(payload);
-
-        if (!response.ok || !loadedPots) {
-          throw new Error("Pots response was invalid");
-        }
-
-        setPots({ status: "loaded", value: loadedPots });
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setPots({ status: "error" });
-        }
-      }
-    }
-
-    void Promise.all([loadBalance(), loadPots()]);
-    return () => controller.abort();
-  }, [accountId]);
+  const visiblePots = pots?.filter((pot) => !hideDeletedPots || !pot.deleted) ?? [];
 
   return (
     <div className="account-details">
       <section className="detail-section" aria-labelledby="balance-heading">
         <h2 id="balance-heading">Balance</h2>
-        {balance.status === "loading" ? (
+        {isBalanceLoading || (!balance && !balanceError) ? (
           <p className="accounts-message">Loading balance…</p>
-        ) : balance.status === "error" ? (
+        ) : balanceError || !balance ? (
           <p className="accounts-message accounts-error" role="alert">
             Could not load the balance.
           </p>
@@ -169,14 +143,14 @@ export function AccountDetails({ accountId }: { accountId: string }) {
           <dl className="balance-grid">
             <div>
               <dt>Balance</dt>
-              <dd>{formatMoney(balance.value.balance, balance.value.currency)}</dd>
+              <dd>{formatMoney(balance.balance, balance.currency)}</dd>
             </div>
             <div>
               <dt>Total balance</dt>
               <dd>
                 {formatMoney(
-                  balance.value.total_balance,
-                  balance.value.currency,
+                  balance.total_balance,
+                  balance.currency,
                 )}
               </dd>
             </div>
@@ -184,8 +158,8 @@ export function AccountDetails({ accountId }: { accountId: string }) {
               <dt>Spent today</dt>
               <dd>
                 {formatMoney(
-                  balance.value.spend_today,
-                  balance.value.currency,
+                  balance.spend_today,
+                  balance.currency,
                 )}
               </dd>
             </div>
@@ -206,15 +180,15 @@ export function AccountDetails({ accountId }: { accountId: string }) {
             <span>Hide deleted pots</span>
           </label>
         </div>
-        {pots.status === "loading" ? (
+        {isPotsLoading || (!pots && !potsError) ? (
           <p className="accounts-message">Loading pots…</p>
-        ) : pots.status === "error" ? (
+        ) : potsError || !pots ? (
           <p className="accounts-message accounts-error" role="alert">
             Could not load pots.
           </p>
         ) : visiblePots.length === 0 ? (
           <p className="accounts-message">
-            {hideDeletedPots && pots.value.length > 0
+            {hideDeletedPots && pots.length > 0
               ? "No active pots found."
               : "No pots found."}
           </p>

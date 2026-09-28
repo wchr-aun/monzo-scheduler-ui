@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 type Account = {
   id: string;
@@ -9,11 +9,7 @@ type Account = {
   created: string;
 };
 
-type AccountsState =
-  | { status: "loading" }
-  | { status: "loaded"; accounts: Account[] }
-  | { status: "access-not-approved" }
-  | { status: "error" };
+class AccessNotApprovedError extends Error {}
 
 function isAccessNotApproved(value: unknown): boolean {
   return (
@@ -53,57 +49,38 @@ function getAccounts(value: unknown): Account[] | null {
   return value.accounts;
 }
 
+async function fetchAccounts(url: string): Promise<Account[]> {
+  const response = await fetch(url, { cache: "no-store" });
+  const payload: unknown = await response.json();
+
+  if (response.status === 403 && isAccessNotApproved(payload)) {
+    throw new AccessNotApprovedError();
+  }
+
+  if (!response.ok) {
+    throw new Error(`Accounts request failed with status ${response.status}`);
+  }
+
+  const accounts = getAccounts(payload);
+
+  if (!accounts) {
+    throw new Error("Accounts response was invalid");
+  }
+
+  return accounts;
+}
+
 export function AccountsList() {
-  const [state, setState] = useState<AccountsState>({ status: "loading" });
+  const { data: accounts, error, isLoading } = useSWR(
+    "/api/accounts",
+    fetchAccounts,
+  );
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadAccounts() {
-      try {
-        const response = await fetch("/api/accounts", {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-
-        const payload: unknown = await response.json();
-
-        if (response.status === 403 && isAccessNotApproved(payload)) {
-          setState({ status: "access-not-approved" });
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`Accounts request failed with status ${response.status}`);
-        }
-
-        const accounts = getAccounts(payload);
-
-        if (!accounts) {
-          throw new Error("Accounts response was invalid");
-        }
-
-        setState({ status: "loaded", accounts });
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setState({ status: "error" });
-        }
-      }
-    }
-
-    void loadAccounts();
-    return () => controller.abort();
-  }, []);
-
-  if (state.status === "loading") {
+  if (isLoading || (!accounts && !error)) {
     return <p className="accounts-message">Loading accounts…</p>;
   }
 
-  if (state.status === "error") {
-    return <p className="accounts-message">Could not load accounts.</p>;
-  }
-
-  if (state.status === "access-not-approved") {
+  if (error instanceof AccessNotApprovedError) {
     return (
       <p className="accounts-message accounts-error" role="alert">
         You have not yet allowed access to your data. Please allow access to your
@@ -112,14 +89,18 @@ export function AccountsList() {
     );
   }
 
+  if (error || !accounts) {
+    return <p className="accounts-message">Could not load accounts.</p>;
+  }
+
   return (
     <section className="accounts" aria-labelledby="accounts-heading">
       <h2 id="accounts-heading">Accounts</h2>
-      {state.accounts.length === 0 ? (
+      {accounts.length === 0 ? (
         <p className="accounts-message">No accounts found.</p>
       ) : (
         <ul className="account-list">
-          {state.accounts.map((account) => (
+          {accounts.map((account) => (
             <li className="account" key={account.id}>
               <Link
                 className="account-link"

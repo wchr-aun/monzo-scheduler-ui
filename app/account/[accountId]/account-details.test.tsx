@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DataProvider } from "../../data-provider";
 import { AccountDetails } from "./account-details";
 
 const balance = {
@@ -35,6 +36,14 @@ function jsonResponse(body: unknown, options?: { ok?: boolean; status?: number }
   } as Response;
 }
 
+function accountDetails() {
+  return (
+    <DataProvider>
+      <AccountDetails accountId="acc_123" />
+    </DataProvider>
+  );
+}
+
 describe("AccountDetails", () => {
   const fetchMock = vi.fn<typeof fetch>();
 
@@ -43,7 +52,7 @@ describe("AccountDetails", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("shows the balance and active pots, then reveals deleted pots", async () => {
+  it("shows the happy path and reuses cached account data", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
       return url.endsWith("/balance")
@@ -51,7 +60,7 @@ describe("AccountDetails", () => {
         : jsonResponse({ pots: [activePot, deletedPot] });
     });
 
-    render(<AccountDetails accountId="acc_123" />);
+    const view = render(accountDetails());
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
@@ -60,6 +69,11 @@ describe("AccountDetails", () => {
     fireEvent.click(screen.getByRole("switch", { name: "Hide deleted pots" }));
 
     expect(screen.getByText("Old pot")).toBeInTheDocument();
+
+    view.rerender(<DataProvider>{null}</DataProvider>);
+    view.rerender(accountDetails());
+
+    expect(screen.getByText("Holiday")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
@@ -70,7 +84,7 @@ describe("AccountDetails", () => {
         : jsonResponse({ pots: [] }),
     );
 
-    render(<AccountDetails accountId="acc_123" />);
+    render(accountDetails());
 
     expect(await screen.findByText("No pots found.")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -79,7 +93,7 @@ describe("AccountDetails", () => {
   it("shows errors without throwing when requests fail", async () => {
     fetchMock.mockRejectedValue(new Error("Backend unavailable"));
 
-    render(<AccountDetails accountId="acc_123" />);
+    render(accountDetails());
 
     expect(await screen.findByText("Could not load the balance.")).toBeInTheDocument();
     expect(await screen.findByText("Could not load pots.")).toBeInTheDocument();
