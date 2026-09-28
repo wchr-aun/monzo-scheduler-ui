@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import {useCallback} from "react";
+import useSWR, {useSWRConfig} from "swr";
 import {
   type Balance,
   fetchBalance,
@@ -94,9 +94,9 @@ function AccountCard({ account }: { account: Account }) {
   });
 
   return (
-    <li className="account">
-      <Link className="account-link" href={`/account/${encodedAccountId}`}>
-        <h3>{account.description || "Unnamed account"}</h3>
+    <Link className="account" href={`/account/${encodedAccountId}`}>
+      <h3>{account.description || "Unnamed account"}</h3>
+      <li className="account-link">
         <dl>
           <div>
             <dt>ID</dt>
@@ -107,39 +107,39 @@ function AccountCard({ account }: { account: Account }) {
             <dd>{account.created}</dd>
           </div>
         </dl>
-      </Link>
-      <div className="account-total" aria-live="polite">
-        {balance ? (
-          <>
-            <span>Available balance</span>
-            <strong>{formatMoney(balance.balance, balance.currency)}</strong>
-            <small className="account-total-secondary">
-              Total balance: {formatMoney(balance.total_balance, balance.currency)}
-            </small>
-          </>
-        ) : (
-          <>
-            <span>Available balance</span>
-            <button
-              className="balance-retry"
-              type="button"
-              aria-label={`${isValidating ? "Retrying" : "Retry"} balance for ${account.description || account.id}`}
-              disabled={isValidating}
-              onClick={() => void mutate()}
-            >
-              {isValidating ? (
-                <span
-                  className="loading-indicator loading-indicator-small"
-                  aria-hidden="true"
-                />
-              ) : (
-                "Retry"
-              )}
-            </button>
-          </>
-        )}
-      </div>
-    </li>
+        <div className="account-total" aria-live="polite">
+          {balance ? (
+            <>
+              <span>Available balance</span>
+              <strong>{formatMoney(balance.balance, balance.currency)}</strong>
+              <small className="account-total-secondary">
+                Total balance: {formatMoney(balance.total_balance, balance.currency)}
+              </small>
+            </>
+          ) : (
+            <>
+              <span>Available balance</span>
+              <button
+                className="balance-retry"
+                type="button"
+                aria-label={`${isValidating ? "Retrying" : "Retry"} balance for ${account.description || account.id}`}
+                disabled={isValidating}
+                onClick={() => void mutate()}
+              >
+                {isValidating ? (
+                  <span
+                    className="loading-indicator loading-indicator-small"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  "Retry"
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      </li>
+    </Link>
   );
 }
 
