@@ -19,18 +19,18 @@ footer {
   justify-content: center;
   align-items: center;
   padding-bottom: 2rem;
+  min-height: 55px;
 }
 footer a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: inherit;
   padding-left: 0.5ch;
 }
 
-body {
-  min-height: 100vh;
-}
-
 .screen {
-  min-height: 100vh;
+  min-height: calc(100vh - 55px);
   display: grid;
   place-items: center;
   padding: 24px;

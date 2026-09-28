@@ -1,5 +1,5 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import {cookies} from "next/headers";
+import {NextResponse} from "next/server";
 
 type Account = {
   id: string;
