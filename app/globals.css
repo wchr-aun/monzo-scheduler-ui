@@ -344,6 +344,21 @@ footer a {
   background: #fff;
 }
 
+.pot {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pot:hover {
+  background: #f0f4f8;
+}
+
+.pot:focus-visible {
+  outline: 3px solid #5cc6c6;
+  outline-offset: 3px;
+}
+
 .balance-grid dt,
 .pot dt {
   color: #526178;
@@ -414,6 +429,165 @@ footer a {
   font-weight: 700;
 }
 
+.scheduled-transfer-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.scheduled-transfer {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #dce1e8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.scheduled-transfer h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.scheduled-transfer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.danger-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #a22626;
+  border-radius: 6px;
+  color: #a22626;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-button:hover:not(:disabled) {
+  color: #fff;
+  background: #a22626;
+}
+
+.danger-button:focus-visible {
+  outline: 3px solid #5cc6c6;
+  outline-offset: 3px;
+}
+
+.danger-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.scheduled-transfer dl,
+.scheduled-transfer dl div {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.scheduled-transfer dl {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.scheduled-transfer dt {
+  color: #526178;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.scheduled-transfer dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.secondary-button,
+.primary-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #14233c;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button {
+  color: #14233c;
+  background: #fff;
+}
+
+.primary-button {
+  width: fit-content;
+  color: #fff;
+  background: #14233c;
+}
+
+.secondary-button:hover,
+.primary-button:hover:not(:disabled) {
+  color: #fff;
+  background: #24456f;
+}
+
+.secondary-button:focus-visible,
+.primary-button:focus-visible,
+.scheduled-transfer-form input:focus-visible,
+.scheduled-transfer-form select:focus-visible {
+  outline: 3px solid #5cc6c6;
+  outline-offset: 3px;
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.scheduled-transfer-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #dce1e8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.scheduled-transfer-form label {
+  display: grid;
+  gap: 6px;
+  color: #526178;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.scheduled-transfer-form input,
+.scheduled-transfer-form select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #9aa6b5;
+  border-radius: 6px;
+  color: #14233c;
+  background: #fff;
+  font: inherit;
+}
+
+.form-message {
+  margin: 0;
+}
+
+.form-success {
+  color: #116b57;
+}
+
 .callback-status {
   display: grid;
   justify-items: center;
@@ -445,5 +619,16 @@ footer a {
 
   .toggle-control input::after {
     transition: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .detail-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scheduled-transfer-form {
+    grid-template-columns: 1fr;
   }
 }

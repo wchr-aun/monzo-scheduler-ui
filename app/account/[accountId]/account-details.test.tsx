@@ -137,6 +137,10 @@ describe("AccountDetails", () => {
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
+      "href",
+      "/account/acc_123/pot/pot_active",
+    );
     expect(screen.queryByText("Old pot")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("switch", { name: "Hide deleted pots" }));

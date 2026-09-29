@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 import {
@@ -189,28 +190,33 @@ export function AccountDetails({ accountId }: { accountId: string }) {
         ) : (
           <ul className="pot-list">
             {visiblePots.map((pot) => (
-              <li className="pot" key={pot.id}>
-                <div className="pot-heading">
-                  <h3>{pot.name || "Unnamed pot"}</h3>
-                  {pot.deleted ? <span className="deleted-label">Deleted</span> : null}
-                </div>
-                <p className="pot-balance">
-                  {formatMoney(pot.balance, pot.currency)}
-                </p>
-                <dl>
-                  <div>
-                    <dt>Style</dt>
-                    <dd>{pot.style || "Not specified"}</dd>
+              <li key={pot.id}>
+                <Link
+                  className="pot"
+                  href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
+                >
+                  <div className="pot-heading">
+                    <h3>{pot.name || "Unnamed pot"}</h3>
+                    {pot.deleted ? <span className="deleted-label">Deleted</span> : null}
                   </div>
-                  <div>
-                    <dt>Created</dt>
-                    <dd>{pot.created}</dd>
-                  </div>
-                  <div>
-                    <dt>Updated</dt>
-                    <dd>{pot.updated}</dd>
-                  </div>
-                </dl>
+                  <p className="pot-balance">
+                    {formatMoney(pot.balance, pot.currency)}
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>Style</dt>
+                      <dd>{pot.style || "Not specified"}</dd>
+                    </div>
+                    <div>
+                      <dt>Created</dt>
+                      <dd>{pot.created}</dd>
+                    </div>
+                    <div>
+                      <dt>Updated</dt>
+                      <dd>{pot.updated}</dd>
+                    </div>
+                  </dl>
+                </Link>
               </li>
             ))}
           </ul>
