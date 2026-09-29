@@ -362,13 +362,20 @@ footer a {
   text-decoration: none;
 }
 
-.pot:hover {
+.pot:not(.pot-disabled):hover {
   background: #f0f4f8;
 }
 
 .pot:focus-visible {
   outline: 3px solid #5cc6c6;
   outline-offset: 3px;
+}
+
+.pot-disabled {
+  color: #526178;
+  background: #f1f3f5;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .balance-grid dt,
@@ -547,7 +554,7 @@ footer a {
 }
 
 .scheduled-transfer dl {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: minmax(260px, 2.5fr) repeat(3, minmax(100px, 1fr));
   gap: 12px;
 }
 
@@ -565,6 +572,13 @@ footer a {
 .scheduled-transfer-times {
   display: grid;
   gap: 4px;
+}
+
+.scheduled-transfer-setup-id {
+  margin: 0;
+  color: #526178;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 .pagination {
@@ -713,5 +727,15 @@ footer a {
 
   .scheduled-transfer-form {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .scheduled-transfer dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scheduled-transfer dl > div:first-child {
+    grid-column: 1 / -1;
   }
 }

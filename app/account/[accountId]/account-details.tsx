@@ -10,7 +10,7 @@ import {
   getBalanceKey,
   getBalanceLoadedAtKey,
 } from "../../account-data";
-import { fetchPots, getPotsKey } from "../../pot-data";
+import { fetchPots, getPotsKey, type Pot } from "../../pot-data";
 
 function BalanceLoadingIndicator() {
   return (
@@ -18,6 +18,32 @@ function BalanceLoadingIndicator() {
       className="loading-indicator loading-indicator-small"
       aria-hidden="true"
     />
+  );
+}
+
+function PotSummary({ pot }: { pot: Pot }) {
+  return (
+    <>
+      <div className="pot-heading">
+        <h3>{pot.name || "Unnamed pot"}</h3>
+        {pot.deleted ? <span className="deleted-label">Deleted</span> : null}
+      </div>
+      <p className="pot-balance">{formatMoney(pot.balance, pot.currency)}</p>
+      <dl>
+        <div>
+          <dt>Style</dt>
+          <dd>{pot.style || "Not specified"}</dd>
+        </div>
+        <div>
+          <dt>Created</dt>
+          <dd>{pot.created}</dd>
+        </div>
+        <div>
+          <dt>Updated</dt>
+          <dd>{pot.updated}</dd>
+        </div>
+      </dl>
+    </>
   );
 }
 
@@ -129,32 +155,18 @@ export function AccountDetails({ accountId }: { accountId: string }) {
           <ul className="pot-list">
             {visiblePots.map((pot) => (
               <li key={pot.id}>
-                <Link
-                  className="pot"
-                  href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
-                >
-                  <div className="pot-heading">
-                    <h3>{pot.name || "Unnamed pot"}</h3>
-                    {pot.deleted ? <span className="deleted-label">Deleted</span> : null}
+                {pot.deleted ? (
+                  <div className="pot pot-disabled" aria-disabled="true">
+                    <PotSummary pot={pot} />
                   </div>
-                  <p className="pot-balance">
-                    {formatMoney(pot.balance, pot.currency)}
-                  </p>
-                  <dl>
-                    <div>
-                      <dt>Style</dt>
-                      <dd>{pot.style || "Not specified"}</dd>
-                    </div>
-                    <div>
-                      <dt>Created</dt>
-                      <dd>{pot.created}</dd>
-                    </div>
-                    <div>
-                      <dt>Updated</dt>
-                      <dd>{pot.updated}</dd>
-                    </div>
-                  </dl>
-                </Link>
+                ) : (
+                  <Link
+                    className="pot"
+                    href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
+                  >
+                    <PotSummary pot={pot} />
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

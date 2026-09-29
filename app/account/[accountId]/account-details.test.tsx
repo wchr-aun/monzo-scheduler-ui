@@ -146,6 +146,11 @@ describe("AccountDetails", () => {
     fireEvent.click(screen.getByRole("switch", { name: "Hide deleted pots" }));
 
     expect(screen.getByText("Old pot")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Old pot/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Old pot").closest(".pot")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });

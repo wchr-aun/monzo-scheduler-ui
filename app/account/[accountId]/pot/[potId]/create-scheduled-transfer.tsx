@@ -280,6 +280,7 @@ export function CreateScheduledTransfer({
               id="scheduled-transfer-amount"
               name="amount"
               type="text"
+              autoComplete="off"
               inputMode="numeric"
               pattern="[0-9]*"
               value={amount}

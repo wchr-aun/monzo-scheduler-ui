@@ -229,6 +229,7 @@ describe("CreateScheduledTransfer", () => {
       }),
     );
     const amount = screen.getByLabelText("Amount (pence)");
+    expect(amount).toHaveAttribute("autocomplete", "off");
 
     fireEvent.change(amount, { target: { value: "25" } });
     expect(amount).toHaveValue("25");

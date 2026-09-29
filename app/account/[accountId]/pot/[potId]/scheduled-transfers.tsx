@@ -105,8 +105,12 @@ async function fetchScheduledTransfers(url: string): Promise<ScheduledTransfersP
   return transfers;
 }
 
-function formatScheduledDate(date: Date, timeZone?: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function formatScheduledDate(
+  date: Date,
+  timeZone?: string,
+  includeTimeZoneName = true,
+) {
+  const options: Intl.DateTimeFormatOptions = {
     timeZone,
     year: "numeric",
     month: "short",
@@ -114,8 +118,13 @@ function formatScheduledDate(date: Date, timeZone?: string) {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-    timeZoneName: "short",
-  }).format(date);
+  };
+
+  if (includeTimeZoneName) {
+    options.timeZoneName = "short";
+  }
+
+  return new Intl.DateTimeFormat("en-US", options).format(date);
 }
 
 function ScheduledFor({ value }: { value: string }) {
@@ -126,7 +135,7 @@ function ScheduledFor({ value }: { value: string }) {
   }
 
   const localDate = formatScheduledDate(date);
-  const ukDate = formatScheduledDate(date, "Europe/London");
+  const ukDate = formatScheduledDate(date, "Europe/London", false);
 
   return (
     <span className="scheduled-transfer-times">
@@ -315,11 +324,10 @@ export function ScheduledTransfers({
                   <dt>Type</dt>
                   <dd>{transfer.type}</dd>
                 </div>
-                <div>
-                  <dt>Setup ID</dt>
-                  <dd>{transfer.setup_id}</dd>
-                </div>
               </dl>
+              <p className="scheduled-transfer-setup-id">
+                Setup ID: {transfer.setup_id}
+              </p>
             </li>
           ))}
         </ul>

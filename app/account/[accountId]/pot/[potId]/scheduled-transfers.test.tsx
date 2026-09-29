@@ -84,9 +84,13 @@ describe("ScheduledTransfers", () => {
     const ukDate = new Intl.DateTimeFormat("en-US", {
       ...dateOptions,
       timeZone: "Europe/London",
+      timeZoneName: undefined,
     }).format(scheduledDate);
     expect(screen.getByLabelText(`Local: ${localDate}`)).toBeInTheDocument();
     expect(screen.getByLabelText(`UK: ${ukDate}`)).toBeInTheDocument();
+    expect(screen.getByText("Setup ID: setup_1")).toHaveClass(
+      "scheduled-transfer-setup-id",
+    );
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
       { cache: "no-store" },
