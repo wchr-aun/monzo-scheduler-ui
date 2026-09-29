@@ -31,6 +31,7 @@ footer a {
 
 .screen {
   min-height: calc(100vh - 55px);
+  min-height: calc(100dvh - 55px);
   display: grid;
   place-items: center;
   padding: 24px;
@@ -229,7 +230,8 @@ footer a {
 }
 
 .account-screen {
-  min-height: 100vh;
+  min-height: calc(100vh - 55px);
+  min-height: calc(100dvh - 55px);
   padding: 40px 24px;
 }
 
