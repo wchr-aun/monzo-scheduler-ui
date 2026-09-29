@@ -20,12 +20,10 @@ import styles from "./create-scheduled-transfer.module.css";
 export function CreateScheduledTransfer({
   accountId,
   potId,
-  balance,
   currency,
 }: {
   accountId: string;
   potId: string;
-  balance: number;
   currency: string;
 }) {
   const { mutate } = useSWRConfig();
@@ -93,11 +91,6 @@ export function CreateScheduledTransfer({
       return;
     }
 
-    if (amountInPence > balance) {
-      setMessage({ kind: "error", text: "Amount cannot exceed the pot balance." });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -140,6 +133,7 @@ export function CreateScheduledTransfer({
   }
 
   const ukDateTime = getUkDateTime(selectedDateTime);
+  const amountInPounds = formatMoney(Number(amount || 0), currency);
 
   return (
     <Section
@@ -211,29 +205,31 @@ export function CreateScheduledTransfer({
 
           <div className={styles.field}>
             <label htmlFor="scheduled-transfer-amount">Amount (pence)</label>
-            <input
-              id="scheduled-transfer-amount"
-              name="amount"
-              type="text"
-              autoComplete="off"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={amount}
-              onChange={(event) => {
-                if (
-                  /^\d*$/.test(event.target.value) &&
-                  (event.target.value === "" || Number(event.target.value) <= balance)
-                ) {
-                  setAmount(event.target.value);
-                }
-              }}
-              aria-describedby="scheduled-transfer-amount-limit"
-              required
-            />
-            <span className={styles.hint} id="scheduled-transfer-amount-limit">
-              Maximum: {formatMoney(balance, currency)} ({balance.toLocaleString()}{" "}
-              pence)
-            </span>
+            <div className={styles.amountControl}>
+              <input
+                id="scheduled-transfer-amount"
+                name="amount"
+                type="text"
+                autoComplete="off"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={amount}
+                onChange={(event) => {
+                  if (/^\d*$/.test(event.target.value)) {
+                    setAmount(event.target.value);
+                  }
+                }}
+                required
+              />
+              <output
+                className={styles.amountValue}
+                htmlFor="scheduled-transfer-amount"
+                aria-label={`Value in pounds: ${amountInPounds}`}
+                aria-live="polite"
+              >
+                {amountInPounds}
+              </output>
+            </div>
           </div>
 
           <Button variant="primary" type="submit" disabled={isSubmitting}>

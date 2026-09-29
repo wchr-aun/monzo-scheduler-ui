@@ -14,7 +14,6 @@ function createScheduledTransfer() {
       <CreateScheduledTransfer
         accountId="acc_123"
         potId="pot_456"
-        balance={5_000}
         currency="GBP"
       />
     </DataProvider>
@@ -186,7 +185,6 @@ describe("CreateScheduledTransfer", () => {
         <CreateScheduledTransfer
           accountId="acc_123"
           potId="pot_456"
-          balance={5_000}
           currency="GBP"
         />
         <ScheduledTransfers accountId="acc_123" potId="pot_456" />
@@ -220,7 +218,8 @@ describe("CreateScheduledTransfer", () => {
     );
   });
 
-  it("does not allow decimal amounts or amounts above the pot balance", () => {
+  it("allows whole-pence amounts above the pot balance and shows their pound value", async () => {
+    fetchMock.mockResolvedValue(response());
     render(createScheduledTransfer());
 
     fireEvent.click(
@@ -233,18 +232,36 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.change(amount, { target: { value: "25" } });
     expect(amount).toHaveValue("25");
+    expect(
+      screen.getByRole("status", { name: "Value in pounds: £0.25" }),
+    ).toHaveTextContent("£0.25");
 
     fireEvent.change(amount, { target: { value: "25.5" } });
     expect(amount).toHaveValue("25");
 
     fireEvent.change(amount, { target: { value: "5000" } });
     expect(amount).toHaveValue("5000");
+    expect(
+      screen.getByRole("status", { name: "Value in pounds: £50.00" }),
+    ).toHaveTextContent("£50.00");
 
     fireEvent.change(amount, { target: { value: "5001" } });
-    expect(amount).toHaveValue("5000");
-    expect(amount).toHaveAccessibleDescription(
-      "Maximum: £50.00 (5,000 pence)",
+    expect(amount).toHaveValue("5001");
+    expect(
+      screen.getByRole("status", { name: "Value in pounds: £50.01" }),
+    ).toHaveTextContent("£50.01");
+
+    fireEvent.change(screen.getByLabelText("UK date and time"), {
+      target: { value: "2099-01-01T09:30" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create scheduled transfer" }),
     );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toMatchObject({
+      amount: 5001,
+    });
   });
 
   it("keeps the form open and announces backend failures", async () => {

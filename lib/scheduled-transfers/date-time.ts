@@ -81,8 +81,12 @@ export function getScheduledDateTimes(value: string) {
     return null;
   }
 
+  const localWithoutTimeZone = formatScheduledDate(date, undefined, false);
+  const uk = formatScheduledDate(date, "Europe/London", false);
+
   return {
     local: formatScheduledDate(date),
-    uk: formatScheduledDate(date, "Europe/London", false),
+    uk,
+    localMatchesUk: localWithoutTimeZone === uk,
   };
 }

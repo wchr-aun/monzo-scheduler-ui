@@ -47,7 +47,6 @@ export function PotDetails({
       <CreateScheduledTransfer
         accountId={accountId}
         potId={potId}
-        balance={pot.balance}
         currency={pot.currency}
       />
     </>

@@ -72,6 +72,10 @@ function ScheduledFor({ value }: { value: string }) {
     return value;
   }
 
+  if (dates.localMatchesUk) {
+    return <time dateTime={value}>{dates.uk}</time>;
+  }
+
   return (
     <span className={styles.times}>
       <span aria-label={`Local: ${dates.local}`}>

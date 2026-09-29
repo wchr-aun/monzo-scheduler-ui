@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
 import { formatMoney } from "@/lib/formatting/money";
@@ -52,6 +52,10 @@ describe("ScheduledTransfers", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("loads and displays scheduled transfers for the pot", async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(scheduledTransfersPage([transfer])),
@@ -90,6 +94,33 @@ describe("ScheduledTransfers", () => {
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
       { cache: "no-store" },
     );
+  });
+
+  it("shows only the UK time when the local and UK times match", async () => {
+    vi.stubEnv("TZ", "Europe/London");
+    fetchMock.mockResolvedValue(
+      jsonResponse(scheduledTransfersPage([transfer])),
+    );
+
+    render(scheduledTransfers());
+
+    const scheduledDate = new Date(transfer.scheduled_for);
+    const ukDate = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/London",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(scheduledDate);
+
+    expect(await screen.findByText(ukDate, { selector: "time" })).toHaveAttribute(
+      "datetime",
+      transfer.scheduled_for,
+    );
+    expect(screen.queryByText(/^Local:/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^UK:/)).not.toBeInTheDocument();
   });
 
   it("handles an empty response", async () => {

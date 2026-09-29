@@ -24,12 +24,14 @@ export function PotsList({ accountId }: { accountId: string }) {
       heading="Pots"
       headingId="pots-heading"
       action={
-        <Switch
-          checked={hideDeletedPots}
-          onChange={(event) => setHideDeletedPots(event.target.checked)}
-        >
-          Hide deleted pots
-        </Switch>
+        <div className={styles.action}>
+          <Switch
+            checked={hideDeletedPots}
+            onChange={(event) => setHideDeletedPots(event.target.checked)}
+          >
+            Hide deleted pots
+          </Switch>
+        </div>
       }
     >
       {isLoading || (!pots && !error) ? (
