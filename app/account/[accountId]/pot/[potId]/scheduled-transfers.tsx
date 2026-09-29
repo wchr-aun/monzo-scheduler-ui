@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { formatMoney } from "../../../../account-data";
+import {
+  getScheduledTransfersKey,
+  isScheduledTransfersKey,
+} from "./scheduled-transfer-data";
 
 type ScheduledTransfer = {
   setup_id: string;
@@ -156,16 +160,17 @@ export function ScheduledTransfers({
   accountId: string;
   potId: string;
 }) {
-  const scheduledTransfersKey = `/api/accounts/${encodeURIComponent(accountId)}/pots/${encodeURIComponent(potId)}/scheduled-transfers`;
+  const scheduledTransfersKey = getScheduledTransfersKey(accountId, potId);
   const [offset, setOffset] = useState(0);
   const pageKey =
     offset === 0
       ? scheduledTransfersKey
       : `${scheduledTransfersKey}?limit=50&offset=${offset}`;
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading, mutate: mutatePage } = useSWR(
     pageKey,
     fetchScheduledTransfers,
   );
+  const { mutate } = useSWRConfig();
   const [pendingSetupIds, setPendingSetupIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -194,7 +199,7 @@ export function ScheduledTransfers({
         throw new Error("Cancel scheduled transfer request failed");
       }
 
-      await mutate(
+      await mutatePage(
         (current) =>
           current
             ? {
@@ -209,6 +214,9 @@ export function ScheduledTransfers({
             : current,
         { revalidate: false },
       );
+      await mutate((key) =>
+        isScheduledTransfersKey(key, accountId, potId),
+      ).catch(() => undefined);
       setCancelMessage({
         kind: "success",
         text: "Scheduled transfer cancelled.",

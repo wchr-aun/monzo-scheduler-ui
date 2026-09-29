@@ -3,10 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useSWRConfig } from "swr";
 import { formatMoney } from "../../../../account-data";
-
-function getScheduledTransfersKey(accountId: string, potId: string) {
-  return `/api/accounts/${encodeURIComponent(accountId)}/pots/${encodeURIComponent(potId)}/scheduled-transfers`;
-}
+import {
+  getScheduledTransfersKey,
+  isScheduledTransfersKey,
+} from "./scheduled-transfer-data";
 
 const ukDateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Europe/London",
@@ -168,9 +168,9 @@ export function CreateScheduledTransfer({
         kind: "success",
         text: "Scheduled transfer created.",
       });
-      void mutate(getScheduledTransfersKey(accountId, potId)).catch(
-        () => undefined,
-      );
+      await mutate((key) =>
+        isScheduledTransfersKey(key, accountId, potId),
+      ).catch(() => undefined);
     } catch {
       setMessage({
         kind: "error",

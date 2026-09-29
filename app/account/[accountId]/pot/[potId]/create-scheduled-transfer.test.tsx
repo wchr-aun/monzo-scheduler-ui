@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "../../../../data-provider";
 import { CreateScheduledTransfer } from "./create-scheduled-transfer";
+import { ScheduledTransfers } from "./scheduled-transfers";
 
 function response(ok = true) {
   return { ok, status: ok ? 204 : 422 } as Response;
@@ -18,6 +19,27 @@ function createScheduledTransfer() {
       />
     </DataProvider>
   );
+}
+
+const transfer = {
+  setup_id: "setup_1",
+  transfer_id: "transfer_1",
+  status: "pending",
+  scheduled_for: "2099-01-01T09:30:00Z",
+  interval: "monthly",
+  type: "deposit",
+  amount: 100,
+  pot_id: "pot_456",
+  account_id: "acc_123",
+};
+
+function scheduledTransfersPage(scheduledTransfers: (typeof transfer)[]) {
+  return {
+    scheduledTransfers,
+    total: scheduledTransfers.length,
+    limit: 50,
+    offset: 0,
+  };
 }
 
 describe("CreateScheduledTransfer", () => {
@@ -143,6 +165,59 @@ describe("CreateScheduledTransfer", () => {
       await screen.findByText("Scheduled transfer created."),
     ).toHaveAttribute("role", "status");
     expect(screen.queryByLabelText("UK date and time")).not.toBeInTheDocument();
+  });
+
+  it("refreshes the scheduled transfer list after creating a transfer", async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => scheduledTransfersPage([]),
+      } as Response)
+      .mockResolvedValueOnce(response())
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => scheduledTransfersPage([transfer]),
+      } as Response);
+
+    render(
+      <DataProvider>
+        <CreateScheduledTransfer
+          accountId="acc_123"
+          potId="pot_456"
+          balance={5_000}
+          currency="GBP"
+        />
+        <ScheduledTransfers accountId="acc_123" potId="pot_456" />
+      </DataProvider>,
+    );
+
+    expect(
+      await screen.findByText("No scheduled transfers found."),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Create a new scheduled transfer",
+      }),
+    );
+    fireEvent.change(screen.getByLabelText("UK date and time"), {
+      target: { value: "2099-01-01T09:30" },
+    });
+    fireEvent.change(screen.getByLabelText("Amount (pence)"), {
+      target: { value: "100" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create scheduled transfer" }),
+    );
+
+    expect(await screen.findByText("transfer_1")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
+      { cache: "no-store" },
+    );
   });
 
   it("does not allow decimal amounts or amounts above the pot balance", () => {

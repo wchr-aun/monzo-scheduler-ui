@@ -114,9 +114,13 @@ describe("ScheduledTransfers", () => {
   });
 
   it("cancels a scheduled transfer and keeps it in the list", async () => {
+    const cancelledTransfer = { ...transfer, status: "cancelled" };
     fetchMock
       .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
-      .mockResolvedValueOnce(jsonResponse(null, { status: 204 }));
+      .mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+      .mockResolvedValueOnce(
+        jsonResponse(scheduledTransfersPage([cancelledTransfer])),
+      );
 
     render(scheduledTransfers());
 
@@ -150,6 +154,11 @@ describe("ScheduledTransfers", () => {
         method: "DELETE",
         headers: { Accept: "application/json" },
       },
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
+      { cache: "no-store" },
     );
   });
 
