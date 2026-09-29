@@ -1,6 +1,6 @@
 .page {
-  min-height: calc(100vh - var(--footer-height));
-  min-height: calc(100dvh - var(--footer-height));
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  min-height: calc(100dvh - var(--navbar-height) - var(--footer-height));
   padding: var(--space-10) var(--space-6);
 }
 

@@ -1,19 +1,23 @@
 :root {
   color-scheme: light;
-  --color-background: #f7f8fa;
-  --color-surface: #fff;
-  --color-surface-hover: #f0f4f8;
-  --color-surface-muted: #f1f3f5;
-  --color-text: #14233c;
-  --color-text-muted: #526178;
-  --color-primary: #14233c;
-  --color-primary-hover: #24456f;
-  --color-login: #091723;
-  --color-login-hover: #142b3b;
-  --color-border: #dce1e8;
-  --color-border-control: #9aa6b5;
-  --color-focus: #5cc6c6;
-  --color-danger: #a22626;
+  --color-background: oklch(0.982446 0.010114 325.653);
+  --color-navbar: oklch(0.982446 0.010114 325.653);
+  --color-navbar-control: oklch(0.939552 0.024286 321.664);
+  --color-navbar-control-hover: oklch(0.884525 0.041658 337.177);
+  --color-surface: oklch(0.971835 0.012884 321.894);
+  --color-surface-hover: oklch(0.939552 0.024286 321.664);
+  --color-surface-muted: oklch(0.926746 0.037898 332.6);
+  --color-text: #000;
+  --color-text-muted: #000;
+  --color-on-primary: #fff;
+  --color-primary: oklch(0.591646 0.217985 0.584);
+  --color-primary-hover: oklch(0.539042 0.197866 0.305);
+  --color-login: oklch(0.591646 0.217985 0.584);
+  --color-login-hover: oklch(0.539042 0.197866 0.305);
+  --color-border: oklch(0.923531 0.021247 328.096);
+  --color-border-control: oklch(0.851713 0.055822 336.6);
+  --color-focus: oklch(0.591646 0.217985 0.584);
+  --color-danger: oklch(0.458704 0.169677 3.815);
   --color-success: #116b57;
   --space-1: 4px;
   --space-2: 8px;
@@ -28,10 +32,59 @@
   --radius-action: 10px;
   --focus-ring: 3px solid var(--color-focus);
   --page-width: 720px;
+  --navbar-height: 64px;
   --footer-height: 55px;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--color-text);
   background: var(--color-background);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: oklch(0.22813 0.020366 307.469);
+  --color-navbar: oklch(0.22813 0.020366 307.469);
+  --color-navbar-control: oklch(0.313674 0.030572 310.061);
+  --color-navbar-control-hover: oklch(0.364912 0.050794 308.491);
+  --color-surface: oklch(0.267101 0.02016 311.799);
+  --color-surface-hover: oklch(0.313674 0.030572 310.061);
+  --color-surface-muted: oklch(0.273791 0.025541 309.079);
+  --color-text: #fff;
+  --color-text-muted: #fff;
+  --color-on-primary: #fff;
+  --color-primary: oklch(0.460685 0.185347 4.099);
+  --color-primary-hover: oklch(0.591646 0.217985 0.584);
+  --color-login: oklch(0.460685 0.185347 4.099);
+  --color-login-hover: oklch(0.591646 0.217985 0.584);
+  --color-border: oklch(0.266943 0.015262 302.425);
+  --color-border-control: oklch(0.266817 0.02897 344.461);
+  --color-focus: oklch(0.591646 0.217985 0.584);
+  --color-danger: oklch(0.901233 0.057189 343.694);
+  --color-success: #7ee2c4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --color-background: oklch(0.22813 0.020366 307.469);
+    --color-navbar: oklch(0.22813 0.020366 307.469);
+    --color-navbar-control: oklch(0.313674 0.030572 310.061);
+    --color-navbar-control-hover: oklch(0.364912 0.050794 308.491);
+    --color-surface: oklch(0.267101 0.02016 311.799);
+    --color-surface-hover: oklch(0.313674 0.030572 310.061);
+    --color-surface-muted: oklch(0.273791 0.025541 309.079);
+    --color-text: #fff;
+    --color-text-muted: #fff;
+    --color-on-primary: #fff;
+    --color-primary: oklch(0.460685 0.185347 4.099);
+    --color-primary-hover: oklch(0.591646 0.217985 0.584);
+    --color-login: oklch(0.460685 0.185347 4.099);
+    --color-login-hover: oklch(0.591646 0.217985 0.584);
+    --color-border: oklch(0.266943 0.015262 302.425);
+    --color-border-control: oklch(0.266817 0.02897 344.461);
+    --color-focus: oklch(0.591646 0.217985 0.584);
+    --color-danger: oklch(0.901233 0.057189 343.694);
+    --color-success: #7ee2c4;
+  }
 }
 
 * {
@@ -42,4 +95,9 @@ html,
 body {
   min-height: 100%;
   margin: 0;
+}
+
+body {
+  color: var(--color-text);
+  background: var(--color-background);
 }

@@ -89,7 +89,7 @@
 }
 
 .retry:hover:not(:disabled) {
-  color: var(--color-surface);
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 

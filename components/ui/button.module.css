@@ -20,7 +20,7 @@
 
 .primary {
   width: fit-content;
-  color: var(--color-surface);
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 
@@ -31,7 +31,7 @@
 
 .primary:hover:not(:disabled),
 .secondary:hover:not(:disabled) {
-  color: var(--color-surface);
+  color: var(--color-on-primary);
   background: var(--color-primary-hover);
 }
 
@@ -45,6 +45,6 @@
 }
 
 .danger:hover:not(:disabled) {
-  color: var(--color-surface);
+  color: var(--color-on-primary);
   background: var(--color-danger);
 }
