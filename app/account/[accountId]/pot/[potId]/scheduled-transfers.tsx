@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import useSWR from "swr";
+import { formatMoney } from "../../../../account-data";
 
 type ScheduledTransfer = {
   setup_id: string;
@@ -71,9 +72,40 @@ async function fetchScheduledTransfers(url: string): Promise<ScheduledTransfer[]
   return transfers;
 }
 
-function formatScheduledFor(value: string) {
+function formatScheduledDate(date: Date, timeZone?: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  }).format(date);
+}
+
+function ScheduledFor({ value }: { value: string }) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const localDate = formatScheduledDate(date);
+  const ukDate = formatScheduledDate(date, "Europe/London");
+
+  return (
+    <span className="scheduled-transfer-times">
+      <span aria-label={`Local: ${localDate}`}>
+        Local: <time dateTime={value}>{localDate}</time>
+      </span>
+      <span aria-label={`UK: ${ukDate}`}>
+        UK:{" "}
+        <time dateTime={value}>{ukDate}</time>
+      </span>
+    </span>
+  );
 }
 
 export function ScheduledTransfers({
@@ -185,11 +217,13 @@ export function ScheduledTransfers({
               <dl>
                 <div>
                   <dt>Scheduled for</dt>
-                  <dd>{formatScheduledFor(transfer.scheduled_for)}</dd>
+                  <dd>
+                    <ScheduledFor value={transfer.scheduled_for} />
+                  </dd>
                 </div>
                 <div>
                   <dt>Amount</dt>
-                  <dd>{transfer.amount.toLocaleString()}</dd>
+                  <dd>{formatMoney(transfer.amount, "GBP")}</dd>
                 </div>
                 <div>
                   <dt>Interval</dt>

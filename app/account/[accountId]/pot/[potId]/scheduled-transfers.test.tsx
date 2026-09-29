@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "../../../../data-provider";
+import { formatMoney } from "../../../../account-data";
 import { ScheduledTransfers } from "./scheduled-transfers";
 
 function jsonResponse(body: unknown, options?: { ok?: boolean; status?: number }) {
@@ -52,6 +53,27 @@ describe("ScheduledTransfers", () => {
     expect(await screen.findByText("transfer_1")).toBeInTheDocument();
     expect(screen.getByText("monthly")).toBeInTheDocument();
     expect(screen.getByText("deposit")).toBeInTheDocument();
+    expect(screen.getByText(formatMoney(2500, "GBP"))).toBeInTheDocument();
+
+    const scheduledDate = new Date(transfer.scheduled_for);
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+      timeZoneName: "short",
+    };
+    const localDate = new Intl.DateTimeFormat("en-US", dateOptions).format(
+      scheduledDate,
+    );
+    const ukDate = new Intl.DateTimeFormat("en-US", {
+      ...dateOptions,
+      timeZone: "Europe/London",
+    }).format(scheduledDate);
+    expect(screen.getByLabelText(`Local: ${localDate}`)).toBeInTheDocument();
+    expect(screen.getByLabelText(`UK: ${ukDate}`)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
       { cache: "no-store" },

@@ -509,6 +509,11 @@ footer a {
   overflow-wrap: anywhere;
 }
 
+.scheduled-transfer-times {
+  display: grid;
+  gap: 4px;
+}
+
 .secondary-button,
 .primary-button {
   min-height: 42px;
