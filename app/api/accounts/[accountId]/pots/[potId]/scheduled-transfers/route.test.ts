@@ -39,6 +39,7 @@ describe("scheduled transfers route", () => {
           {
             setup_id: "setup_1",
             transfer_id: "transfer_1",
+            status: "pending",
             scheduled_for: "2026-10-01T09:30:00Z",
             interval: "monthly",
             type: "deposit",
@@ -49,6 +50,7 @@ describe("scheduled transfers route", () => {
           {
             setup_id: "setup_2",
             transfer_id: "transfer_2",
+            status: "completed",
             scheduled_for: "2026-10-02T09:30:00Z",
             interval: "monthly",
             type: "deposit",

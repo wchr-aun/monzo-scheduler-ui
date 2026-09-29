@@ -7,6 +7,7 @@ import { formatMoney } from "../../../../account-data";
 type ScheduledTransfer = {
   setup_id: string;
   transfer_id: string;
+  status: string;
   scheduled_for: string;
   interval: string;
   type: string;
@@ -32,6 +33,9 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
     "transfer_id" in value &&
     typeof value.transfer_id === "string" &&
     Boolean(value.transfer_id.trim()) &&
+    "status" in value &&
+    typeof value.status === "string" &&
+    Boolean(value.status.trim()) &&
     "scheduled_for" in value &&
     typeof value.scheduled_for === "string" &&
     Boolean(value.scheduled_for.trim()) &&
@@ -133,6 +137,18 @@ function ScheduledFor({ value }: { value: string }) {
   );
 }
 
+function getStatusClassName(status: string) {
+  switch (status) {
+    case "completed":
+    case "pending":
+    case "cancelled":
+    case "failed":
+      return `status-tag status-tag-${status}`;
+    default:
+      return "status-tag";
+  }
+}
+
 export function ScheduledTransfers({
   accountId,
   potId,
@@ -158,6 +174,10 @@ export function ScheduledTransfers({
   >();
 
   async function cancelTransfer(transfer: ScheduledTransfer) {
+    if (transfer.status !== "pending") {
+      return;
+    }
+
     setCancelMessage(undefined);
     setPendingSetupIds((current) => new Set(current).add(transfer.setup_id));
 
@@ -179,10 +199,12 @@ export function ScheduledTransfers({
           current
             ? {
                 ...current,
-                scheduledTransfers: current.scheduledTransfers.filter(
-                  (item) => item.setup_id !== transfer.setup_id,
+                scheduledTransfers: current.scheduledTransfers.map(
+                  (item) =>
+                    item.setup_id === transfer.setup_id
+                      ? { ...item, status: "cancelled" }
+                      : item,
                 ),
-                total: Math.max(0, current.total - 1),
               }
             : current,
         { revalidate: false },
@@ -237,20 +259,34 @@ export function ScheduledTransfers({
       ) : (
         <ul className="scheduled-transfer-list">
           {data.scheduledTransfers.map((transfer) => (
-            <li className="scheduled-transfer" key={transfer.setup_id}>
+            <li
+              className={
+                transfer.status === "cancelled"
+                  ? "scheduled-transfer scheduled-transfer-cancelled"
+                  : "scheduled-transfer"
+              }
+              key={transfer.setup_id}
+            >
               <div className="scheduled-transfer-heading">
-                <h3>{transfer.transfer_id}</h3>
-                <button
-                  className="danger-button"
-                  type="button"
-                  aria-label={`Cancel transfer ${transfer.transfer_id}`}
-                  disabled={pendingSetupIds.has(transfer.setup_id)}
-                  onClick={() => void cancelTransfer(transfer)}
-                >
-                  {pendingSetupIds.has(transfer.setup_id)
-                    ? "Cancelling…"
-                    : "Cancel"}
-                </button>
+                <div className="scheduled-transfer-title">
+                  <h3>{transfer.transfer_id}</h3>
+                  <span className={getStatusClassName(transfer.status)}>
+                    {transfer.status}
+                  </span>
+                </div>
+                {transfer.status === "pending" ? (
+                  <button
+                    className="danger-button"
+                    type="button"
+                    aria-label={`Cancel transfer ${transfer.transfer_id}`}
+                    disabled={pendingSetupIds.has(transfer.setup_id)}
+                    onClick={() => void cancelTransfer(transfer)}
+                  >
+                    {pendingSetupIds.has(transfer.setup_id)
+                      ? "Cancelling…"
+                      : "Cancel"}
+                  </button>
+                ) : null}
               </div>
               <dl>
                 <div>

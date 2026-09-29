@@ -446,6 +446,10 @@ footer a {
   background: #fff;
 }
 
+.scheduled-transfer-cancelled {
+  background: #f1f3f5;
+}
+
 .scheduled-transfer h3 {
   margin: 0;
   overflow-wrap: anywhere;
@@ -456,6 +460,43 @@ footer a {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.scheduled-transfer-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-tag {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: #526178;
+  background: #edf0f4;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-tag-completed {
+  color: #116b57;
+  background: #e1f4ed;
+}
+
+.status-tag-pending {
+  color: #24456f;
+  background: #e7eef7;
+}
+
+.status-tag-cancelled {
+  color: #725700;
+  background: #fff1bd;
+}
+
+.status-tag-failed {
+  color: #a22626;
+  background: #fde8e8;
 }
 
 .danger-button {

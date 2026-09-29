@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 type ScheduledTransfer = {
   setup_id: string;
   transfer_id: string;
+  status: string;
   scheduled_for: string;
   interval: string;
   type: string;
@@ -61,6 +62,9 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
     "transfer_id" in value &&
     typeof value.transfer_id === "string" &&
     Boolean(value.transfer_id.trim()) &&
+    "status" in value &&
+    typeof value.status === "string" &&
+    Boolean(value.status.trim()) &&
     "scheduled_for" in value &&
     typeof value.scheduled_for === "string" &&
     Boolean(value.scheduled_for.trim()) &&

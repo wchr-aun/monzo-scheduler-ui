@@ -23,6 +23,7 @@ function scheduledTransfers() {
 const transfer = {
   setup_id: "setup_1",
   transfer_id: "transfer_1",
+  status: "pending",
   scheduled_for: "2026-10-01T09:30:00Z",
   interval: "monthly",
   type: "deposit",
@@ -59,6 +60,10 @@ describe("ScheduledTransfers", () => {
     render(scheduledTransfers());
 
     expect(await screen.findByText("transfer_1")).toBeInTheDocument();
+    expect(screen.getByText("pending")).toHaveClass(
+      "status-tag",
+      "status-tag-pending",
+    );
     expect(screen.getByText("monthly")).toBeInTheDocument();
     expect(screen.getByText("deposit")).toBeInTheDocument();
     expect(screen.getByText(formatMoney(2500, "GBP"))).toBeInTheDocument();
@@ -108,7 +113,7 @@ describe("ScheduledTransfers", () => {
     ).toHaveAttribute("role", "alert");
   });
 
-  it("cancels a scheduled transfer and removes it from the list", async () => {
+  it("cancels a scheduled transfer and keeps it in the list", async () => {
     fetchMock
       .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
       .mockResolvedValueOnce(jsonResponse(null, { status: 204 }));
@@ -124,8 +129,20 @@ describe("ScheduledTransfers", () => {
     expect(
       await screen.findByText("Scheduled transfer cancelled."),
     ).toHaveAttribute("role", "status");
-    expect(screen.queryByText("transfer_1")).not.toBeInTheDocument();
-    expect(screen.getByText("No scheduled transfers found.")).toBeInTheDocument();
+    expect(screen.getByText("transfer_1")).toBeInTheDocument();
+    expect(screen.getByText("cancelled")).toHaveClass(
+      "status-tag",
+      "status-tag-cancelled",
+    );
+    expect(screen.getByText("transfer_1").closest("li")).toHaveClass(
+      "scheduled-transfer-cancelled",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Cancel transfer transfer_1" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No scheduled transfers found."),
+    ).not.toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers/setup_1",
@@ -153,6 +170,55 @@ describe("ScheduledTransfers", () => {
       await screen.findByText("Could not cancel the scheduled transfer."),
     ).toHaveAttribute("role", "alert");
     expect(screen.getByText("transfer_1")).toBeInTheDocument();
+  });
+
+  it("styles terminal statuses and does not offer cancellation", async () => {
+    const completedTransfer = {
+      ...transfer,
+      setup_id: "setup_2",
+      transfer_id: "transfer_2",
+      status: "completed",
+    };
+    const cancelledTransfer = {
+      ...transfer,
+      setup_id: "setup_3",
+      transfer_id: "transfer_3",
+      status: "cancelled",
+    };
+    const failedTransfer = {
+      ...transfer,
+      setup_id: "setup_4",
+      transfer_id: "transfer_4",
+      status: "failed",
+    };
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        scheduledTransfersPage([
+          completedTransfer,
+          cancelledTransfer,
+          failedTransfer,
+        ]),
+      ),
+    );
+
+    render(scheduledTransfers());
+
+    expect(await screen.findByText("completed")).toHaveClass(
+      "status-tag",
+      "status-tag-completed",
+    );
+    expect(screen.getByText("cancelled")).toHaveClass(
+      "status-tag",
+      "status-tag-cancelled",
+    );
+    expect(screen.getByText("transfer_3").closest("li")).toHaveClass(
+      "scheduled-transfer-cancelled",
+    );
+    expect(screen.getByText("failed")).toHaveClass(
+      "status-tag",
+      "status-tag-failed",
+    );
+    expect(screen.queryByRole("button", { name: /Cancel transfer/ })).toBeNull();
   });
 
   it("loads the next page of scheduled transfers", async () => {
