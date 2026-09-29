@@ -1,0 +1,31 @@
+.button {
+  display: inline-flex;
+  min-width: 220px;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 0 28px;
+  border-radius: var(--radius-action);
+  color: var(--color-surface);
+  background: var(--color-login);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--color-login-hover);
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.logo {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}

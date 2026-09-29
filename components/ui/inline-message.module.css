@@ -1,0 +1,13 @@
+.message {
+  margin: 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.success {
+  color: var(--color-success);
+}
+
+.error {
+  color: var(--color-danger);
+}

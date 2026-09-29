@@ -1,0 +1,11 @@
+.message {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.balance {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 800;
+}

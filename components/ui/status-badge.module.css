@@ -1,0 +1,35 @@
+.badge {
+  flex: 0 0 auto;
+  padding: 3px var(--space-2);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  background: #edf0f4;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.completed {
+  color: var(--color-success);
+  background: #e1f4ed;
+}
+
+.pending {
+  color: var(--color-primary-hover);
+  background: #e7eef7;
+}
+
+.cancelled {
+  color: #725700;
+  background: #fff1bd;
+}
+
+.failed {
+  color: var(--color-danger);
+  background: #fde8e8;
+}
+
+.deleted {
+  padding-block: 2px;
+  color: #7d2020;
+  background: #fde8e8;
+}

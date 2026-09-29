@@ -1,0 +1,25 @@
+.status {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.loggedInStatus {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+}
+
+.loggedInContent {
+  display: grid;
+  width: 100%;
+  gap: var(--space-8);
+}
+
+.userId {
+  margin: 0;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+  text-align: center;
+}

@@ -1,0 +1,22 @@
+.section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.section h2 {
+  margin: 0;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+@media (max-width: 560px) {
+  .heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

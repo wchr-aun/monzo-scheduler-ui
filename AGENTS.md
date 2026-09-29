@@ -54,6 +54,30 @@ Do not rename `BASE_URL` to a `NEXT_PUBLIC_*` variable. Backend configuration mu
   are deduplicated across navigation. Do not persist authenticated data in browser storage.
 - Preserve accessible status messaging and reduced-motion behavior.
 
+## Application architecture
+
+- Keep `app/` focused on Next.js entry points: pages, layouts, Route Handlers,
+  global CSS, and other framework file conventions. Route pages should primarily
+  compose imported components.
+- Put React UI under `components/`, grouped by responsibility or domain:
+  - `components/ui/` for domain-independent controls and presentation primitives.
+  - `components/layout/` for shared page structure.
+  - `components/providers/` for client context providers.
+  - Domain folders such as `components/accounts/`, `components/auth/`, and
+    `components/scheduled-transfers/` for feature-specific UI.
+- Put non-React application logic under `lib/`, grouped by domain. Types,
+  runtime validation, request clients, SWR keys, formatting, and date handling
+  belong here rather than in component or route files.
+- Use the `@/*` path alias for imports that cross directory or domain boundaries.
+  Relative imports are appropriate for files colocated in the same component folder.
+- Keep server-only logic in explicitly named `*.server.ts` modules and import
+  `server-only` when it prevents accidental client use.
+- Keep `app/globals.css` limited to design tokens, resets, and document-wide
+  rules. Put component and feature styling in colocated `*.module.css` files.
+- Colocate behavior-focused tests with the component or library module they test.
+- Add new folders and abstractions only when they contain meaningful code; do not
+  create architectural placeholders for hypothetical features.
+
 ## Verification
 
 After meaningful changes, run:

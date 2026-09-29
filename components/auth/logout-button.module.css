@@ -1,0 +1,9 @@
+.control {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.button {
+  min-width: 140px;
+}

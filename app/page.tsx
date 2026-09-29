@@ -1,35 +1,10 @@
-import Image from "next/image";
+import { LoginButton } from "@/components/auth/login-button";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { AccountsList } from "@/components/accounts/accounts-list";
+import { PageContainer } from "@/components/layout/page-container";
+import { getUserId } from "@/lib/auth/session.server";
 import { cookies } from "next/headers";
-import { AccountsList } from "./accounts-list";
-import { LogoutButton } from "./logout-button";
-
-function getUserId(token: string): string | null {
-  try {
-    const parts = token.split(".");
-
-    if (parts.length !== 3) {
-      return null;
-    }
-
-    const payload: unknown = JSON.parse(
-      Buffer.from(parts[1], "base64url").toString("utf8"),
-    );
-
-    if (
-      typeof payload !== "object" ||
-      payload === null ||
-      !("sub" in payload) ||
-      typeof payload.sub !== "string" ||
-      !payload.sub.trim()
-    ) {
-      return null;
-    }
-
-    return payload.sub;
-  } catch {
-    return null;
-  }
-}
+import styles from "./page.module.css";
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -41,12 +16,12 @@ export default async function HomePage() {
   const loginUrl = baseUrl ? `${baseUrl}/monzo-redirect` : null;
 
   return (
-    <main className="screen">
+    <PageContainer centered width="narrow">
       {isLoggedIn ? (
-        <div className="logged-in-content">
-          <div className="logged-in-status">
-            <p className="status">Logged in</p>
-            <p className="user-id">
+        <div className={styles.loggedInContent}>
+          <div className={styles.loggedInStatus}>
+            <p className={styles.status}>Logged in</p>
+            <p className={styles.userId}>
               {userId ? `User ID: ${userId}` : "User ID unavailable"}
             </p>
           </div>
@@ -54,19 +29,10 @@ export default async function HomePage() {
           <LogoutButton />
         </div>
       ) : !loginUrl ? (
-        <p className="status">Login is not configured.</p>
+        <p className={styles.status}>Login is not configured.</p>
       ) : (
-        <a className="button" href={loginUrl}>
-          <Image
-            className="button-logo"
-            src="/monzo-logo.png"
-            alt=""
-            width={30}
-            height={30}
-          />
-          <span>Login with Monzo</span>
-        </a>
+        <LoginButton href={loginUrl} />
       )}
-    </main>
+    </PageContainer>
   );
 }

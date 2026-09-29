@@ -1,0 +1,22 @@
+.backLink {
+  width: fit-content;
+  color: var(--color-primary-hover);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.header h1,
+.header p {
+  margin: 0;
+}
+
+.header p {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}

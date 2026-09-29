@@ -1,0 +1,138 @@
+"use client";
+
+import { Section } from "@/components/layout/section";
+import { InlineMessage } from "@/components/ui/inline-message";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { fetchScheduledTransfers } from "@/lib/scheduled-transfers/client";
+import {
+  getScheduledTransfersKey,
+  isScheduledTransfersKey,
+} from "@/lib/scheduled-transfers/keys";
+import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
+import { useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { Pagination } from "./pagination";
+import { ScheduledTransferCard } from "./scheduled-transfer-card";
+import styles from "./scheduled-transfers.module.css";
+
+export function ScheduledTransfers({
+  accountId,
+  potId,
+}: {
+  accountId: string;
+  potId: string;
+}) {
+  const scheduledTransfersKey = getScheduledTransfersKey(accountId, potId);
+  const [offset, setOffset] = useState(0);
+  const pageKey =
+    offset === 0
+      ? scheduledTransfersKey
+      : `${scheduledTransfersKey}?limit=50&offset=${offset}`;
+  const { data, error, isLoading, mutate: mutatePage } = useSWR(
+    pageKey,
+    fetchScheduledTransfers,
+  );
+  const { mutate } = useSWRConfig();
+  const [pendingSetupIds, setPendingSetupIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [cancelMessage, setCancelMessage] = useState<
+    { kind: "error" | "success"; text: string } | undefined
+  >();
+
+  async function cancelTransfer(transfer: ScheduledTransfer) {
+    if (transfer.status !== "pending") {
+      return;
+    }
+
+    setCancelMessage(undefined);
+    setPendingSetupIds((current) => new Set(current).add(transfer.setup_id));
+
+    try {
+      const response = await fetch(
+        `${scheduledTransfersKey}/${encodeURIComponent(transfer.setup_id)}`,
+        {
+          method: "DELETE",
+          headers: { Accept: "application/json" },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Cancel scheduled transfer request failed");
+      }
+
+      await mutatePage(
+        (current) =>
+          current
+            ? {
+                ...current,
+                scheduledTransfers: current.scheduledTransfers.map((item) =>
+                  item.setup_id === transfer.setup_id
+                    ? { ...item, status: "cancelled" }
+                    : item,
+                ),
+              }
+            : current,
+        { revalidate: false },
+      );
+      await mutate((key) =>
+        isScheduledTransfersKey(key, accountId, potId),
+      ).catch(() => undefined);
+      setCancelMessage({
+        kind: "success",
+        text: "Scheduled transfer cancelled.",
+      });
+    } catch {
+      setCancelMessage({
+        kind: "error",
+        text: "Could not cancel the scheduled transfer.",
+      });
+    } finally {
+      setPendingSetupIds((current) => {
+        const next = new Set(current);
+        next.delete(transfer.setup_id);
+        return next;
+      });
+    }
+  }
+
+  return (
+    <Section heading="Scheduled transfers" headingId="transfers-heading">
+      {cancelMessage ? (
+        <InlineMessage tone={cancelMessage.kind}>{cancelMessage.text}</InlineMessage>
+      ) : null}
+      {isLoading || (!data && !error) ? (
+        <div
+          className={styles.message}
+          role="status"
+          aria-label="Loading scheduled transfers"
+        >
+          <LoadingIndicator />
+        </div>
+      ) : error || !data ? (
+        <InlineMessage tone="error">Could not load scheduled transfers.</InlineMessage>
+      ) : data.scheduledTransfers.length === 0 ? (
+        <InlineMessage>No scheduled transfers found.</InlineMessage>
+      ) : (
+        <ul className={styles.list}>
+          {data.scheduledTransfers.map((transfer) => (
+            <ScheduledTransferCard
+              cancelling={pendingSetupIds.has(transfer.setup_id)}
+              key={transfer.setup_id}
+              onCancel={() => void cancelTransfer(transfer)}
+              transfer={transfer}
+            />
+          ))}
+        </ul>
+      )}
+      {data && data.total > data.limit ? (
+        <Pagination
+          limit={data.limit}
+          offset={data.offset}
+          onChange={setOffset}
+          total={data.total}
+        />
+      ) : null}
+    </Section>
+  );
+}

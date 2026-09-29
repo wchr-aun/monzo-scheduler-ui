@@ -1,0 +1,12 @@
+.status {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.status p {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-align: center;
+}

@@ -1,0 +1,26 @@
+.page {
+  min-height: calc(100vh - var(--footer-height));
+  min-height: calc(100dvh - var(--footer-height));
+  padding: var(--space-10) var(--space-6);
+}
+
+.centered {
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.content {
+  display: grid;
+  width: min(100%, var(--page-width));
+  gap: var(--space-8);
+  margin: 0 auto;
+}
+
+.narrow {
+  max-width: 640px;
+}
+
+.wide {
+  max-width: var(--page-width);
+}

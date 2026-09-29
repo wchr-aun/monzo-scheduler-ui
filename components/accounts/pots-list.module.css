@@ -1,0 +1,12 @@
+.list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.message {
+  color: var(--color-text-muted);
+  text-align: center;
+}
