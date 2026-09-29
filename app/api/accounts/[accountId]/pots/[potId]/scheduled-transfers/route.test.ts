@@ -34,28 +34,33 @@ describe("scheduled transfers route", () => {
 
   it("forwards authentication and returns only transfers for the requested pot", async () => {
     fetchMock.mockResolvedValue(
-      backendResponse([
-        {
-          setup_id: "setup_1",
-          transfer_id: "transfer_1",
-          scheduled_for: "2026-10-01T09:30:00Z",
-          interval: "monthly",
-          type: "deposit",
-          amount: 2500,
-          pot_id: "pot_456",
-          account_id: "acc_123",
-        },
-        {
-          setup_id: "setup_2",
-          transfer_id: "transfer_2",
-          scheduled_for: "2026-10-02T09:30:00Z",
-          interval: "monthly",
-          type: "deposit",
-          amount: 1000,
-          pot_id: "another_pot",
-          account_id: "acc_123",
-        },
-      ]),
+      backendResponse({
+        items: [
+          {
+            setup_id: "setup_1",
+            transfer_id: "transfer_1",
+            scheduled_for: "2026-10-01T09:30:00Z",
+            interval: "monthly",
+            type: "deposit",
+            amount: 2500,
+            pot_id: "pot_456",
+            account_id: "acc_123",
+          },
+          {
+            setup_id: "setup_2",
+            transfer_id: "transfer_2",
+            scheduled_for: "2026-10-02T09:30:00Z",
+            interval: "monthly",
+            type: "deposit",
+            amount: 1000,
+            pot_id: "another_pot",
+            account_id: "acc_123",
+          },
+        ],
+        total: 2,
+        limit: 50,
+        offset: 0,
+      }),
     );
 
     const response = await GET(new Request("http://localhost"), context);
@@ -64,8 +69,9 @@ describe("scheduled transfers route", () => {
     expect(response.status).toBe(200);
     expect(body.scheduledTransfers).toHaveLength(1);
     expect(body.scheduledTransfers[0].transfer_id).toBe("transfer_1");
+    expect(body).toMatchObject({ total: 2, limit: 50, offset: 0 });
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://backend.example/scheduled-transfers",
+      new URL("https://backend.example/scheduled-transfers?limit=50&offset=0"),
       expect.objectContaining({
         headers: {
           Accept: "application/json",
@@ -76,8 +82,62 @@ describe("scheduled transfers route", () => {
     );
   });
 
+  it("forwards valid pagination parameters", async () => {
+    fetchMock.mockResolvedValue(
+      backendResponse({ items: [], total: 75, limit: 25, offset: 50 }),
+    );
+
+    const response = await GET(
+      new Request("http://localhost?limit=25&offset=50"),
+      context,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      scheduledTransfers: [],
+      total: 75,
+      limit: 25,
+      offset: 50,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("https://backend.example/scheduled-transfers?limit=25&offset=50"),
+      expect.anything(),
+    );
+  });
+
+  it("rejects out-of-range pagination without calling the backend", async () => {
+    const response = await GET(
+      new Request("http://localhost?limit=101&offset=-1"),
+      context,
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "invalid_pagination" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("rejects an invalid backend response", async () => {
-    fetchMock.mockResolvedValue(backendResponse([{ setup_id: "incomplete" }]));
+    fetchMock.mockResolvedValue(
+      backendResponse({
+        items: [{ setup_id: "incomplete" }],
+        total: 1,
+        limit: 50,
+        offset: 0,
+      }),
+    );
+
+    const response = await GET(new Request("http://localhost"), context);
+
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({
+      error: "invalid_scheduled_transfers_response",
+    });
+  });
+
+  it("rejects invalid pagination metadata", async () => {
+    fetchMock.mockResolvedValue(
+      backendResponse({ items: [], total: 0, limit: 0, offset: 0 }),
+    );
 
     const response = await GET(new Request("http://localhost"), context);
 

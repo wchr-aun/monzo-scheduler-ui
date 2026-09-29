@@ -31,6 +31,18 @@ const transfer = {
   account_id: "acc_123",
 };
 
+function scheduledTransfersPage(
+  scheduledTransfers: (typeof transfer)[],
+  pagination: { total?: number; limit?: number; offset?: number } = {},
+) {
+  return {
+    scheduledTransfers,
+    total: pagination.total ?? scheduledTransfers.length,
+    limit: pagination.limit ?? 50,
+    offset: pagination.offset ?? 0,
+  };
+}
+
 describe("ScheduledTransfers", () => {
   const fetchMock = vi.fn<typeof fetch>();
 
@@ -41,11 +53,7 @@ describe("ScheduledTransfers", () => {
 
   it("loads and displays scheduled transfers for the pot", async () => {
     fetchMock.mockResolvedValue(
-      jsonResponse({
-        scheduledTransfers: [
-          transfer,
-        ],
-      }),
+      jsonResponse(scheduledTransfersPage([transfer])),
     );
 
     render(scheduledTransfers());
@@ -81,7 +89,7 @@ describe("ScheduledTransfers", () => {
   });
 
   it("handles an empty response", async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ scheduledTransfers: [] }));
+    fetchMock.mockResolvedValue(jsonResponse(scheduledTransfersPage([])));
 
     render(scheduledTransfers());
 
@@ -102,7 +110,7 @@ describe("ScheduledTransfers", () => {
 
   it("cancels a scheduled transfer and removes it from the list", async () => {
     fetchMock
-      .mockResolvedValueOnce(jsonResponse({ scheduledTransfers: [transfer] }))
+      .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
       .mockResolvedValueOnce(jsonResponse(null, { status: 204 }));
 
     render(scheduledTransfers());
@@ -130,7 +138,7 @@ describe("ScheduledTransfers", () => {
 
   it("keeps a scheduled transfer visible when cancellation fails", async () => {
     fetchMock
-      .mockResolvedValueOnce(jsonResponse({ scheduledTransfers: [transfer] }))
+      .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
       .mockResolvedValueOnce(jsonResponse({}, { ok: false, status: 502 }));
 
     render(scheduledTransfers());
@@ -145,5 +153,33 @@ describe("ScheduledTransfers", () => {
       await screen.findByText("Could not cancel the scheduled transfer."),
     ).toHaveAttribute("role", "alert");
     expect(screen.getByText("transfer_1")).toBeInTheDocument();
+  });
+
+  it("loads the next page of scheduled transfers", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse(
+          scheduledTransfersPage([transfer], { total: 51, limit: 50 }),
+        ),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse(
+          scheduledTransfersPage([], { total: 51, limit: 50, offset: 50 }),
+        ),
+      );
+
+    render(scheduledTransfers());
+
+    fireEvent.click(await screen.findByRole("button", { name: "Next" }));
+
+    expect(
+      await screen.findByText("No scheduled transfers found."),
+    ).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?limit=50&offset=50",
+      { cache: "no-store" },
+    );
+    expect(screen.getByText("51–51 of 51")).toBeInTheDocument();
   });
 });

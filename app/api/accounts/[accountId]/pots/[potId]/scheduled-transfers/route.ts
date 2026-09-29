@@ -12,6 +12,13 @@ type ScheduledTransfer = {
   account_id: string;
 };
 
+type ScheduledTransfersResponse = {
+  items: ScheduledTransfer[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
 type RouteContext = {
   params: Promise<{ accountId: string; potId: string }>;
 };
@@ -73,6 +80,57 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
     typeof value.account_id === "string" &&
     Boolean(value.account_id.trim())
   );
+}
+
+function isScheduledTransfersResponse(
+  value: unknown,
+): value is ScheduledTransfersResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "items" in value &&
+    Array.isArray(value.items) &&
+    value.items.every(isScheduledTransfer) &&
+    "total" in value &&
+    typeof value.total === "number" &&
+    Number.isSafeInteger(value.total) &&
+    value.total >= 0 &&
+    "limit" in value &&
+    typeof value.limit === "number" &&
+    Number.isSafeInteger(value.limit) &&
+    value.limit > 0 &&
+    "offset" in value &&
+    typeof value.offset === "number" &&
+    Number.isSafeInteger(value.offset) &&
+    value.offset >= 0 &&
+    value.items.length <= value.limit &&
+    value.items.length <= value.total
+  );
+}
+
+function getPagination(request: Request) {
+  const searchParams = new URL(request.url).searchParams;
+  const limitValue = searchParams.get("limit") ?? "50";
+  const offsetValue = searchParams.get("offset") ?? "0";
+
+  if (!/^\d+$/.test(limitValue) || !/^\d+$/.test(offsetValue)) {
+    return null;
+  }
+
+  const limit = Number(limitValue);
+  const offset = Number(offsetValue);
+
+  if (
+    !Number.isSafeInteger(limit) ||
+    limit < 1 ||
+    limit > 100 ||
+    !Number.isSafeInteger(offset) ||
+    offset < 0
+  ) {
+    return null;
+  }
+
+  return { limit, offset };
 }
 
 function isUkDateTime(value: string) {
@@ -183,7 +241,7 @@ async function getBackendDetails() {
   return { token, baseUrl };
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { accountId, potId } = await context.params;
 
   if (!accountId.trim() || !potId.trim()) {
@@ -191,6 +249,12 @@ export async function GET(_request: Request, context: RouteContext) {
       { error: "account_and_pot_ids_required" },
       { status: 400 },
     );
+  }
+
+  const pagination = getPagination(request);
+
+  if (!pagination) {
+    return NextResponse.json({ error: "invalid_pagination" }, { status: 400 });
   }
 
   const { token, baseUrl } = await getBackendDetails();
@@ -207,7 +271,11 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 
   try {
-    const backendResponse = await fetch(`${baseUrl}/scheduled-transfers`, {
+    const backendUrl = new URL(`${baseUrl}/scheduled-transfers`);
+    backendUrl.searchParams.set("limit", String(pagination.limit));
+    backendUrl.searchParams.set("offset", String(pagination.offset));
+
+    const backendResponse = await fetch(backendUrl, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -226,18 +294,27 @@ export async function GET(_request: Request, context: RouteContext) {
 
     const payload: unknown = await backendResponse.json();
 
-    if (!Array.isArray(payload) || !payload.every(isScheduledTransfer)) {
+    if (
+      !isScheduledTransfersResponse(payload) ||
+      payload.limit !== pagination.limit ||
+      payload.offset !== pagination.offset
+    ) {
       return NextResponse.json(
         { error: "invalid_scheduled_transfers_response" },
         { status: 502 },
       );
     }
 
-    const scheduledTransfers = payload.filter(
+    const scheduledTransfers = payload.items.filter(
       (transfer) =>
         transfer.account_id === accountId && transfer.pot_id === potId,
     );
-    const response = NextResponse.json({ scheduledTransfers });
+    const response = NextResponse.json({
+      scheduledTransfers,
+      total: payload.total,
+      limit: payload.limit,
+      offset: payload.offset,
+    });
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {

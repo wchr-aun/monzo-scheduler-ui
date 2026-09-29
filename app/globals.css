@@ -514,6 +514,18 @@ footer a {
   gap: 4px;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pagination .secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .secondary-button,
 .primary-button {
   min-height: 42px;

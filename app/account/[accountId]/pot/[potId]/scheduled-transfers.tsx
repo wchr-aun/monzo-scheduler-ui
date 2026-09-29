@@ -15,6 +15,13 @@ type ScheduledTransfer = {
   account_id: string;
 };
 
+type ScheduledTransfersPage = {
+  scheduledTransfers: ScheduledTransfer[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
 function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
   return (
     typeof value === "object" &&
@@ -46,21 +53,39 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
   );
 }
 
-function getScheduledTransfers(value: unknown): ScheduledTransfer[] | null {
+function getScheduledTransfers(value: unknown): ScheduledTransfersPage | null {
   if (
     typeof value !== "object" ||
     value === null ||
     !("scheduledTransfers" in value) ||
     !Array.isArray(value.scheduledTransfers) ||
-    !value.scheduledTransfers.every(isScheduledTransfer)
+    !value.scheduledTransfers.every(isScheduledTransfer) ||
+    !("total" in value) ||
+    typeof value.total !== "number" ||
+    !Number.isSafeInteger(value.total) ||
+    value.total < 0 ||
+    !("limit" in value) ||
+    typeof value.limit !== "number" ||
+    !Number.isSafeInteger(value.limit) ||
+    value.limit < 1 ||
+    value.limit > 100 ||
+    !("offset" in value) ||
+    typeof value.offset !== "number" ||
+    !Number.isSafeInteger(value.offset) ||
+    value.offset < 0
   ) {
     return null;
   }
 
-  return value.scheduledTransfers;
+  return {
+    scheduledTransfers: value.scheduledTransfers,
+    total: value.total,
+    limit: value.limit,
+    offset: value.offset,
+  };
 }
 
-async function fetchScheduledTransfers(url: string): Promise<ScheduledTransfer[]> {
+async function fetchScheduledTransfers(url: string): Promise<ScheduledTransfersPage> {
   const response = await fetch(url, { cache: "no-store" });
   const payload: unknown = await response.json();
   const transfers = getScheduledTransfers(payload);
@@ -116,8 +141,13 @@ export function ScheduledTransfers({
   potId: string;
 }) {
   const scheduledTransfersKey = `/api/accounts/${encodeURIComponent(accountId)}/pots/${encodeURIComponent(potId)}/scheduled-transfers`;
+  const [offset, setOffset] = useState(0);
+  const pageKey =
+    offset === 0
+      ? scheduledTransfersKey
+      : `${scheduledTransfersKey}?limit=50&offset=${offset}`;
   const { data, error, isLoading, mutate } = useSWR(
-    scheduledTransfersKey,
+    pageKey,
     fetchScheduledTransfers,
   );
   const [pendingSetupIds, setPendingSetupIds] = useState<Set<string>>(
@@ -146,7 +176,15 @@ export function ScheduledTransfers({
 
       await mutate(
         (current) =>
-          current?.filter((item) => item.setup_id !== transfer.setup_id),
+          current
+            ? {
+                ...current,
+                scheduledTransfers: current.scheduledTransfers.filter(
+                  (item) => item.setup_id !== transfer.setup_id,
+                ),
+                total: Math.max(0, current.total - 1),
+              }
+            : current,
         { revalidate: false },
       );
       setCancelMessage({
@@ -194,11 +232,11 @@ export function ScheduledTransfers({
         <p className="accounts-message accounts-error" role="alert">
           Could not load scheduled transfers.
         </p>
-      ) : data.length === 0 ? (
+      ) : data.scheduledTransfers.length === 0 ? (
         <p className="accounts-message">No scheduled transfers found.</p>
       ) : (
         <ul className="scheduled-transfer-list">
-          {data.map((transfer) => (
+          {data.scheduledTransfers.map((transfer) => (
             <li className="scheduled-transfer" key={transfer.setup_id}>
               <div className="scheduled-transfer-heading">
                 <h3>{transfer.transfer_id}</h3>
@@ -242,6 +280,30 @@ export function ScheduledTransfers({
           ))}
         </ul>
       )}
+      {data && data.total > data.limit ? (
+        <nav className="pagination" aria-label="Scheduled transfers pages">
+          <button
+            className="secondary-button"
+            type="button"
+            disabled={data.offset === 0}
+            onClick={() => setOffset(Math.max(0, data.offset - data.limit))}
+          >
+            Previous
+          </button>
+          <span>
+            {data.offset + 1}–{Math.min(data.offset + data.limit, data.total)} of{" "}
+            {data.total}
+          </span>
+          <button
+            className="secondary-button"
+            type="button"
+            disabled={data.offset + data.limit >= data.total}
+            onClick={() => setOffset(data.offset + data.limit)}
+          >
+            Next
+          </button>
+        </nav>
+      ) : null}
     </section>
   );
 }
