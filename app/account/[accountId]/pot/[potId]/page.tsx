@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CreateScheduledTransfer } from "./create-scheduled-transfer";
+import { PotDetails } from "./pot-details";
 import { ScheduledTransfers } from "./scheduled-transfers";
 
 type PotPageProps = {
@@ -22,7 +22,7 @@ export default async function PotPage({ params }: PotPageProps) {
           <h1>Pot</h1>
           <p>{potId}</p>
         </header>
-        <CreateScheduledTransfer accountId={accountId} potId={potId} />
+        <PotDetails accountId={accountId} potId={potId} />
         <ScheduledTransfers accountId={accountId} potId={potId} />
       </div>
     </main>

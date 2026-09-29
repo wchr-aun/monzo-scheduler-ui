@@ -568,6 +568,31 @@ footer a {
   font-weight: 700;
 }
 
+.scheduled-transfer-field {
+  display: grid;
+  grid-template-rows: auto 44px auto;
+  align-content: start;
+  gap: 6px;
+}
+
+.local-datetime {
+  color: #526178;
+  font-size: 0.8125rem;
+}
+
+.field-hint {
+  color: #526178;
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.pot-page-balance {
+  margin: 0;
+  color: #14233c;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 800;
+}
+
 .scheduled-transfer-form input,
 .scheduled-transfer-form select {
   width: 100%;
