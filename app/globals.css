@@ -111,6 +111,16 @@ footer a {
   color: #a22626;
 }
 
+.logout-control {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.logout-button {
+  min-width: 140px;
+}
+
 .account-list {
   display: grid;
   gap: 12px;
@@ -677,18 +687,6 @@ footer a {
   display: grid;
   justify-items: center;
   gap: 16px;
-}
-
-.success {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  color: #fff;
-  background: #16856b;
-  font-size: 1.5rem;
-  font-weight: 700;
 }
 
 @keyframes spin {

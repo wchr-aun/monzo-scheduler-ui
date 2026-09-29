@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { cookies } from "next/headers";
 import { AccountsList } from "./accounts-list";
+import { LogoutButton } from "./logout-button";
 
 function getUserId(token: string): string | null {
   try {
@@ -50,11 +51,12 @@ export default async function HomePage() {
             </p>
           </div>
           <AccountsList />
+          <LogoutButton />
         </div>
       ) : !loginUrl ? (
         <p className="status">Login is not configured.</p>
       ) : (
-        <a className="button" href={loginUrl} target="_blank" rel="noopener noreferrer">
+        <a className="button" href={loginUrl}>
           <Image
             className="button-logo"
             src="/monzo-logo.png"

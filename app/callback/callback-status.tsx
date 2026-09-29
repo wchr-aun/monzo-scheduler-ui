@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-type Status = "loading" | "done" | "missing-params" | "request-error";
+type Status = "loading" | "redirecting" | "missing-params" | "request-error";
 
 export function CallbackStatus() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("loading");
 
@@ -32,7 +33,7 @@ export function CallbackStatus() {
           throw new Error(`Callback failed with status ${response.status}`);
         }
 
-        setStatus("done");
+        setStatus("redirecting");
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
           setStatus("request-error");
@@ -45,11 +46,23 @@ export function CallbackStatus() {
     return () => controller.abort();
   }, [searchParams]);
 
-  if (status === "done") {
+  useEffect(() => {
+    if (status !== "redirecting") {
+      return;
+    }
+
+    const redirectTimer = window.setTimeout(() => {
+      router.replace("/");
+    }, 3_000);
+
+    return () => window.clearTimeout(redirectTimer);
+  }, [router, status]);
+
+  if (status === "redirecting") {
     return (
-      <div className="callback-status">
-        <span className="success" aria-hidden="true">✓</span>
-        <p>Done. You can now close this window.</p>
+      <div className="callback-status" role="status">
+        <span className="loading-indicator" aria-hidden="true" />
+        <p>Redirecting you back to the homepage…</p>
       </div>
     );
   }
