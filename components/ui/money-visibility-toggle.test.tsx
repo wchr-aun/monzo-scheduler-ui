@@ -76,6 +76,38 @@ describe("MoneyVisibilityToggle", () => {
     expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
   });
 
+  it("reveals only the selected money value", () => {
+    render(
+      <MoneyVisibilityProvider>
+        <MoneyVisibilityToggle />
+        <Money amount={12_345} currency="GBP" />
+        <Money amount={5_000} currency="GBP" />
+      </MoneyVisibilityProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
+    const revealButtons = screen.getAllByRole("button", {
+      name: "Reveal money value",
+    });
+
+    fireEvent.click(revealButtons[0]);
+
+    expect(screen.getByText("£123.45")).toBeInTheDocument();
+    expect(screen.queryByText("£50.00")).not.toBeInTheDocument();
+    expect(screen.getAllByText(MONEY_MASK)).toHaveLength(1);
+    expect(
+      screen.getByRole("button", { name: "Hide money value" }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Show money values" }));
+    fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
+
+    expect(screen.getAllByText(MONEY_MASK)).toHaveLength(2);
+    expect(
+      screen.queryByRole("button", { name: "Hide money value" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("still toggles when browser storage is unavailable", () => {
     const getItem = vi
       .spyOn(Storage.prototype, "getItem")

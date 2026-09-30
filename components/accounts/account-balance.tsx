@@ -46,7 +46,11 @@ export function AccountBalance({ accountId }: { accountId: string }) {
             label="Balance"
             value={
               balance && (
-                <Money amount={balance.balance} currency={balance.currency} />
+                <Money
+                  amount={balance.balance}
+                  currency={balance.currency}
+                  label="balance"
+                />
               )
             }
           />
@@ -57,6 +61,7 @@ export function AccountBalance({ accountId }: { accountId: string }) {
                 <Money
                   amount={balance.total_balance}
                   currency={balance.currency}
+                  label="total balance"
                 />
               )
             }
@@ -68,6 +73,7 @@ export function AccountBalance({ accountId }: { accountId: string }) {
                 <Money
                   amount={balance.spend_today}
                   currency={balance.currency}
+                  label="spent today"
                 />
               )
             }

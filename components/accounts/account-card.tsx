@@ -42,13 +42,18 @@ export function AccountCard({ account }: { account: Account }) {
         {balance ? (
           <>
             <strong>
-              <Money amount={balance.balance} currency={balance.currency} />
+              <Money
+                amount={balance.balance}
+                currency={balance.currency}
+                label="available balance"
+              />
             </strong>
             <small>
               Total balance:{" "}
               <Money
                 amount={balance.total_balance}
                 currency={balance.currency}
+                label="total balance"
               />
             </small>
           </>

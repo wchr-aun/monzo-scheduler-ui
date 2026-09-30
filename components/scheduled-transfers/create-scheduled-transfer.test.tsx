@@ -240,7 +240,7 @@ describe("CreateScheduledTransfer", () => {
     fireEvent.change(amount, { target: { value: "25" } });
     expect(amount).toHaveValue("25");
     expect(
-      screen.getByRole("status", { name: "Value in pounds: £0.25" }),
+      screen.getByRole("status", { name: "Value in pounds" }),
     ).toHaveTextContent("£0.25");
 
     fireEvent.change(amount, { target: { value: "25.5" } });
@@ -249,13 +249,13 @@ describe("CreateScheduledTransfer", () => {
     fireEvent.change(amount, { target: { value: "5000" } });
     expect(amount).toHaveValue("5000");
     expect(
-      screen.getByRole("status", { name: "Value in pounds: £50.00" }),
+      screen.getByRole("status", { name: "Value in pounds" }),
     ).toHaveTextContent("£50.00");
 
     fireEvent.change(amount, { target: { value: "5001" } });
     expect(amount).toHaveValue("5001");
     expect(
-      screen.getByRole("status", { name: "Value in pounds: £50.01" }),
+      screen.getByRole("status", { name: "Value in pounds" }),
     ).toHaveTextContent("£50.01");
 
     fireEvent.change(screen.getByLabelText("UK date and time"), {

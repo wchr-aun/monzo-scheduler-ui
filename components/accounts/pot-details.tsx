@@ -43,7 +43,11 @@ export function PotDetails({
     <>
       <Section heading="Balance" headingId="pot-balance-heading">
         <p className={styles.balance}>
-          <Money amount={pot.balance} currency={pot.currency} />
+          <Money
+            amount={pot.balance}
+            currency={pot.currency}
+            label="pot balance"
+          />
         </p>
       </Section>
       <CreateScheduledTransfer

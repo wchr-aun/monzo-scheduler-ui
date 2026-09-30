@@ -6,22 +6,25 @@ import type { ReactNode } from "react";
 import styles from "./pot-card.module.css";
 
 export function PotCard({ accountId, pot }: { accountId: string; pot: Pot }) {
-  const content = <PotSummary pot={pot} />;
+  const potName = pot.name || "Unnamed pot";
 
   return (
     <li>
-      {pot.deleted ? (
-        <div className={`${styles.card} ${styles.disabled}`} aria-disabled="true">
-          {content}
+      <div
+        className={`${styles.card}${pot.deleted ? ` ${styles.disabled}` : ""}`}
+        aria-disabled={pot.deleted ? "true" : undefined}
+      >
+        {pot.deleted ? null : (
+          <Link
+            className={styles.link}
+            href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
+            aria-label={`View ${potName}`}
+          />
+        )}
+        <div className={styles.content}>
+          <PotSummary pot={pot} />
         </div>
-      ) : (
-        <Link
-          className={styles.card}
-          href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
-        >
-          {content}
-        </Link>
-      )}
+      </div>
     </li>
   );
 }
@@ -34,7 +37,11 @@ function PotSummary({ pot }: { pot: Pot }) {
         {pot.deleted ? <StatusBadge tone="deleted">Deleted</StatusBadge> : null}
       </div>
       <p className={styles.balance}>
-        <Money amount={pot.balance} currency={pot.currency} />
+        <Money
+          amount={pot.balance}
+          currency={pot.currency}
+          label={`${pot.name || "pot"} balance`}
+        />
       </p>
       <Details>
         <Detail label="Style">{pot.style || "Not specified"}</Detail>

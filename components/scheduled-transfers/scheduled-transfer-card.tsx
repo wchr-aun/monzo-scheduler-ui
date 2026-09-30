@@ -50,7 +50,11 @@ export function ScheduledTransferCard({
         <div>
           <dt>Amount</dt>
           <dd>
-            <Money amount={transfer.amount} currency="GBP" />
+            <Money
+              amount={transfer.amount}
+              currency="GBP"
+              label={`transfer ${transfer.transfer_id} amount`}
+            />
           </dd>
         </div>
         <div>

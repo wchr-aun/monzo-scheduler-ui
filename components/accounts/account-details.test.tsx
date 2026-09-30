@@ -185,7 +185,9 @@ describe("AccountDetails", () => {
 
     expect(await screen.findByText("Available balance")).toBeInTheDocument();
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect(screen.getByText("Total balance: £173.45")).toBeInTheDocument();
+    expect(screen.getByText("£173.45").closest("small")).toHaveTextContent(
+      "Total balance: £173.45",
+    );
 
     view.rerender(accountDetails());
 
@@ -242,7 +244,9 @@ describe("AccountDetails", () => {
     );
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect(await screen.findByText("Total balance: £173.45")).toBeInTheDocument();
+    expect((await screen.findByText("£173.45")).closest("small")).toHaveTextContent(
+      "Total balance: £173.45",
+    );
     expect(
       fetchMock.mock.calls.filter(([input]) =>
         String(input).endsWith("/balance"),
