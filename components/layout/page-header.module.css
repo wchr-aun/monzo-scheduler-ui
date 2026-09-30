@@ -1,6 +1,6 @@
 .backLink {
   width: fit-content;
-  color: var(--color-primary-hover);
+  color: var(--color-interactive);
   font-weight: 700;
   text-decoration: none;
 }
@@ -8,6 +8,10 @@
 .backLink:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 3px;
+}
+
+.backLink:hover {
+  color: var(--color-interactive-hover);
 }
 
 .header h1,
