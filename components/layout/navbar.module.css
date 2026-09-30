@@ -9,13 +9,55 @@
   width: min(100%, 1200px);
   height: 100%;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0 var(--space-6);
   margin: 0 auto;
+}
+
+.brand {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.brand:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.darkLogo {
+  display: none;
+}
+
+:global([data-theme="dark"]) .lightLogo {
+  display: none;
+}
+
+:global([data-theme="dark"]) .darkLogo {
+  display: block;
 }
 
 @media (max-width: 560px) {
   .content {
     padding-inline: var(--space-4);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme])) .lightLogo {
+    display: none;
+  }
+
+  :global(:root:not([data-theme])) .darkLogo {
+    display: block;
   }
 }

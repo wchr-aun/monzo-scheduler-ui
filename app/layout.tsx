@@ -1,16 +1,19 @@
-import { AccountsPreloader } from "@/components/accounts/accounts-preloader";
-import { Footer } from "@/components/layout/footer";
-import { Navbar } from "@/components/layout/navbar";
-import { DataProvider } from "@/components/providers/data-provider";
-import { THEME_STORAGE_KEY } from "@/lib/theme/constants";
-import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import type { ReactNode } from "react";
+import {AccountsPreloader} from "@/components/accounts/accounts-preloader";
+import {Footer} from "@/components/layout/footer";
+import {Navbar} from "@/components/layout/navbar";
+import {DataProvider} from "@/components/providers/data-provider";
+import {THEME_STORAGE_KEY} from "@/lib/theme/constants";
+import type {Metadata} from "next";
+import {cookies} from "next/headers";
+import type {ReactNode} from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Monzo Scheduler",
   description: "Sign in to Monzo Scheduler",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 const themeInitializationScript = `
