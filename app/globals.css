@@ -17,9 +17,19 @@
   --color-login-hover: #142b3b;
   --color-border: oklch(0.923531 0.021247 328.096);
   --color-border-control: oklch(0.851713 0.055822 336.6);
+  --color-control-thumb: oklch(1 0 0);
   --color-focus: oklch(0.591646 0.217985 0.584);
   --color-danger: oklch(0.458704 0.169677 3.815);
   --color-success: #116b57;
+  --color-status-default-background: #edf0f4;
+  --color-status-completed: #116b57;
+  --color-status-completed-background: #e1f4ed;
+  --color-status-pending: #24456f;
+  --color-status-pending-background: #e7eef7;
+  --color-status-failed: #a22626;
+  --color-status-failed-background: #fde8e8;
+  --color-status-cancelled: #725700;
+  --color-status-cancelled-background: #fff1bd;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -57,11 +67,21 @@
   --color-primary-hover: oklch(0.591646 0.217985 0.584);
   --color-login: #091723;
   --color-login-hover: #142b3b;
-  --color-border: oklch(0.266943 0.015262 302.425);
+  --color-border: oklch(0.360924 0.021469 316.83);
   --color-border-control: oklch(0.657087 0.028226 307.985);
+  --color-control-thumb: oklch(0.848252 0.038248 307.961);
   --color-focus: oklch(0.591646 0.217985 0.584);
   --color-danger: oklch(0.901233 0.057189 343.694);
   --color-success: #7ee2c4;
+  --color-status-default-background: oklch(0.313674 0.030572 310.061);
+  --color-status-completed: #7ee2c4;
+  --color-status-completed-background: #123d34;
+  --color-status-pending: #9cc2ff;
+  --color-status-pending-background: #142a47;
+  --color-status-failed: #ff8a90;
+  --color-status-failed-background: #42171b;
+  --color-status-cancelled: #f7d774;
+  --color-status-cancelled-background: #3d3210;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -82,11 +102,21 @@
     --color-primary-hover: oklch(0.591646 0.217985 0.584);
     --color-login: #091723;
     --color-login-hover: #142b3b;
-    --color-border: oklch(0.266943 0.015262 302.425);
+    --color-border: oklch(0.360924 0.021469 316.83);
     --color-border-control: oklch(0.657087 0.028226 307.985);
+    --color-control-thumb: oklch(0.848252 0.038248 307.961);
     --color-focus: oklch(0.591646 0.217985 0.584);
     --color-danger: oklch(0.901233 0.057189 343.694);
     --color-success: #7ee2c4;
+    --color-status-default-background: oklch(0.313674 0.030572 310.061);
+    --color-status-completed: #7ee2c4;
+    --color-status-completed-background: #123d34;
+    --color-status-pending: #9cc2ff;
+    --color-status-pending-background: #142a47;
+    --color-status-failed: #ff8a90;
+    --color-status-failed-background: #42171b;
+    --color-status-cancelled: #f7d774;
+    --color-status-cancelled-background: #3d3210;
   }
 }
 

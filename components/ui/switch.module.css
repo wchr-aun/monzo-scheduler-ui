@@ -27,7 +27,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--color-surface);
+  background: var(--color-control-thumb);
   box-shadow: 0 1px 2px rgb(20 35 60 / 25%);
   content: "";
   transition: transform 0.15s ease;

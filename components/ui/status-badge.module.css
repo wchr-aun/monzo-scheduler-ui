@@ -3,33 +3,33 @@
   padding: 3px var(--space-2);
   border-radius: 999px;
   color: var(--color-text-muted);
-  background: #edf0f4;
+  background: var(--color-status-default-background);
   font-size: 0.75rem;
   font-weight: 700;
 }
 
 .completed {
-  color: var(--color-success);
-  background: #e1f4ed;
+  color: var(--color-status-completed);
+  background: var(--color-status-completed-background);
 }
 
 .pending {
-  color: var(--color-primary-hover);
-  background: #e7eef7;
+  color: var(--color-status-pending);
+  background: var(--color-status-pending-background);
 }
 
 .cancelled {
-  color: #725700;
-  background: #fff1bd;
+  color: var(--color-status-cancelled);
+  background: var(--color-status-cancelled-background);
 }
 
 .failed {
-  color: var(--color-danger);
-  background: #fde8e8;
+  color: var(--color-status-failed);
+  background: var(--color-status-failed-background);
 }
 
 .deleted {
   padding-block: 2px;
-  color: #7d2020;
-  background: #fde8e8;
+  color: var(--color-status-failed);
+  background: var(--color-status-failed-background);
 }
