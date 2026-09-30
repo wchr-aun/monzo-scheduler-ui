@@ -128,12 +128,19 @@ describe("CreateScheduledTransfer", () => {
     expect(localTime.parentElement).toHaveTextContent(
       `Local date and time: ${expectedLocalDateTime}`,
     );
-    fireEvent.change(screen.getByLabelText("Interval"), {
-      target: { value: "weekly" },
-    });
-    fireEvent.change(screen.getByLabelText("Transfer type"), {
-      target: { value: "withdraw" },
-    });
+    const interval = screen.getByLabelText("Interval");
+    expect(interval).toHaveTextContent("Monthly");
+    expect(interval).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(interval);
+    expect(interval).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(screen.getByRole("option", { name: "Weekly" }));
+    expect(interval).toHaveAttribute("aria-expanded", "false");
+    expect(interval).toHaveTextContent("Weekly");
+
+    const transferType = screen.getByLabelText("Transfer type");
+    expect(transferType).toHaveTextContent("Deposit into pot");
+    fireEvent.click(transferType);
+    fireEvent.click(screen.getByRole("option", { name: "Withdraw from pot" }));
     fireEvent.change(screen.getByLabelText("Amount (pence)"), {
       target: { value: "2500" },
     });

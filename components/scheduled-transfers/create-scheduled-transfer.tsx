@@ -3,12 +3,27 @@
 import {Section} from "@/components/layout/section";
 import {Button} from "@/components/ui/button";
 import {InlineMessage} from "@/components/ui/inline-message";
+import {Select} from "@/components/ui/select";
 import {formatMoney} from "@/lib/formatting/money";
 import {formatLocalDateTime, getEarliestUkDateTime, getUkDateTime,} from "@/lib/scheduled-transfers/date-time";
 import {getScheduledTransfersKey, isScheduledTransfersKey,} from "@/lib/scheduled-transfers/keys";
 import {type FormEvent, useEffect, useState} from "react";
 import {useSWRConfig} from "swr";
 import styles from "./create-scheduled-transfer.module.css";
+
+const intervalOptions = [
+  {label: "Daily", value: "daily"},
+  {label: "Weekly", value: "weekly"},
+  {label: "Monthly", value: "monthly"},
+] as const;
+
+const transferTypeOptions = [
+  {label: "Deposit into pot", value: "deposit"},
+  {label: "Withdraw from pot", value: "withdraw"},
+] as const;
+
+type Interval = (typeof intervalOptions)[number]["value"];
+type TransferType = (typeof transferTypeOptions)[number]["value"];
 
 export function CreateScheduledTransfer({
   accountId,
@@ -24,6 +39,8 @@ export function CreateScheduledTransfer({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDateTime, setSelectedDateTime] = useState("");
   const [minimumDateTime, setMinimumDateTime] = useState("");
+  const [interval, setInterval] = useState<Interval>("monthly");
+  const [transferType, setTransferType] = useState<TransferType>("deposit");
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState<
     { kind: "error" | "success"; text: string } | undefined
@@ -38,6 +55,8 @@ export function CreateScheduledTransfer({
   function toggleForm() {
     if (isExpanded) {
       setSelectedDateTime("");
+      setInterval("monthly");
+      setTransferType("deposit");
       setAmount("");
     } else {
       const now = new Date();
@@ -109,6 +128,8 @@ export function CreateScheduledTransfer({
 
       form.reset();
       setSelectedDateTime("");
+      setInterval("monthly");
+      setTransferType("deposit");
       setAmount("");
       setIsExpanded(false);
       setMessage({ kind: "success", text: "Scheduled transfer created." });
@@ -171,30 +192,25 @@ export function CreateScheduledTransfer({
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="scheduled-transfer-interval">Interval</label>
-            <select
+            <Select
               id="scheduled-transfer-interval"
+              label="Interval"
               name="interval"
-              defaultValue="monthly"
-              required
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
+              onChange={setInterval}
+              options={intervalOptions}
+              value={interval}
+            />
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="scheduled-transfer-type">Transfer type</label>
-            <select
+            <Select
               id="scheduled-transfer-type"
+              label="Transfer type"
               name="type"
-              defaultValue="deposit"
-              required
-            >
-              <option value="deposit">Deposit into pot</option>
-              <option value="withdraw">Withdraw from pot</option>
-            </select>
+              onChange={setTransferType}
+              options={transferTypeOptions}
+              value={transferType}
+            />
           </div>
 
           <div className={styles.field}>

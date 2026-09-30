@@ -23,8 +23,7 @@
   gap: 6px;
 }
 
-.form input,
-.form select {
+.form input {
   width: 100%;
   min-height: 44px;
   padding: var(--space-2) 10px;
@@ -35,8 +34,7 @@
   font: inherit;
 }
 
-.form input:focus-visible,
-.form select:focus-visible {
+.form input:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 3px;
 }

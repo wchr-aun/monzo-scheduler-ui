@@ -97,14 +97,14 @@ describe("ScheduledTransfers", () => {
     );
   });
 
-  it("debounces selected status filters for two seconds", async () => {
+  it("debounces selected status filters for one second", async () => {
     fetchMock.mockResolvedValue(jsonResponse(scheduledTransfersPage([transfer])));
 
     render(scheduledTransfers());
 
     await screen.findByText("transfer_1");
     const dropdown = screen.getByRole("button", {
-      name: /status.*3 selected/,
+      name: /status.*3 selected/i,
     });
     expect(dropdown).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(dropdown);
@@ -119,7 +119,7 @@ describe("ScheduledTransfers", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "cancelled" }));
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(1_999);
+      await vi.advanceTimersByTimeAsync(999);
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useId, useRef, useState} from "react";
+import {Dropdown} from "./dropdown";
 import styles from "./multi-select.module.css";
 
 type MultiSelectOption<Value extends string> = {
@@ -23,36 +23,6 @@ export function MultiSelect<Value extends string>({
   options,
   values,
 }: MultiSelectProps<Value>) {
-  const [isOpen, setIsOpen] = useState(false);
-  const panelId = useId();
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    function closeOnOutsidePointer(event: PointerEvent) {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    document.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [isOpen]);
-
   function toggleValue(value: Value) {
     const nextValues = values.includes(value)
       ? values.filter((candidate) => candidate !== value)
@@ -69,41 +39,28 @@ export function MultiSelect<Value extends string>({
   }
 
   return (
-    <div className={styles.container} ref={containerRef}>
-      <button
-        aria-controls={panelId}
-        aria-expanded={isOpen}
-        className={styles.trigger}
-        onClick={() => setIsOpen((current) => !current)}
-        type="button"
-      >
-        <span>{label}</span>
-        <span className={styles.count}>{values.length} selected</span>
-      </button>
-      {isOpen ? (
-        <div
-          aria-label={`${label} options`}
-          className={styles.panel}
-          id={panelId}
-          role="group"
-        >
-          {options.map((option) => {
-            const isChecked = values.includes(option.value);
+    <Dropdown
+      panelLabel={`${label} options`}
+      primaryText={label}
+      secondaryText={`${values.length} selected`}
+    >
+      {() =>
+        options.map((option) => {
+          const isChecked = values.includes(option.value);
 
-            return (
-              <label className={styles.option} key={option.value}>
-                <input
-                  checked={isChecked}
-                  disabled={isChecked && values.length === minimumSelections}
-                  onChange={() => toggleValue(option.value)}
-                  type="checkbox"
-                />
-                <span>{option.label}</span>
-              </label>
-            );
-          })}
-        </div>
-      ) : null}
-    </div>
+          return (
+            <label className={styles.option} key={option.value}>
+              <input
+                checked={isChecked}
+                disabled={isChecked && values.length === minimumSelections}
+                onChange={() => toggleValue(option.value)}
+                type="checkbox"
+              />
+              <span>{option.label}</span>
+            </label>
+          );
+        })
+      }
+    </Dropdown>
   );
 }
