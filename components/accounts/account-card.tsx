@@ -1,10 +1,10 @@
 "use client";
 
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { Money } from "@/components/ui/money";
 import { fetchBalance } from "@/lib/accounts/client";
 import { getBalanceKey } from "@/lib/accounts/keys";
 import type { Account } from "@/lib/accounts/types";
-import { formatMoney } from "@/lib/formatting/money";
 import Link from "next/link";
 import useSWR from "swr";
 import styles from "./account-card.module.css";
@@ -41,9 +41,15 @@ export function AccountCard({ account }: { account: Account }) {
         <span>Available balance</span>
         {balance ? (
           <>
-            <strong>{formatMoney(balance.balance, balance.currency)}</strong>
+            <strong>
+              <Money amount={balance.balance} currency={balance.currency} />
+            </strong>
             <small>
-              Total balance: {formatMoney(balance.total_balance, balance.currency)}
+              Total balance:{" "}
+              <Money
+                amount={balance.total_balance}
+                currency={balance.currency}
+              />
             </small>
           </>
         ) : (

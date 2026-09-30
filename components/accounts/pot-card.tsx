@@ -1,5 +1,5 @@
 import { StatusBadge } from "@/components/ui/status-badge";
-import { formatMoney } from "@/lib/formatting/money";
+import { Money } from "@/components/ui/money";
 import type { Pot } from "@/lib/pots/types";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -33,7 +33,9 @@ function PotSummary({ pot }: { pot: Pot }) {
         <h3>{pot.name || "Unnamed pot"}</h3>
         {pot.deleted ? <StatusBadge tone="deleted">Deleted</StatusBadge> : null}
       </div>
-      <p className={styles.balance}>{formatMoney(pot.balance, pot.currency)}</p>
+      <p className={styles.balance}>
+        <Money amount={pot.balance} currency={pot.currency} />
+      </p>
       <Details>
         <Detail label="Style">{pot.style || "Not specified"}</Detail>
         <Detail label="Created">{pot.created}</Detail>

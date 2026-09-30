@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { MoneyVisibilityToggle } from "@/components/ui/money-visibility-toggle";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./navbar.module.css";
@@ -25,7 +26,10 @@ export function Navbar() {
             priority
           />
         </Link>
-        <ThemeToggle />
+        <div className={styles.controls}>
+          <MoneyVisibilityToggle />
+          <ThemeToggle />
+        </div>
       </div>
     </nav>
   );

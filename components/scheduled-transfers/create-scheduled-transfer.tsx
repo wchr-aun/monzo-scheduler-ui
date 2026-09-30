@@ -1,10 +1,13 @@
 "use client";
 
+import {useMoneyVisibility} from "@/components/providers/money-visibility-provider";
 import {Section} from "@/components/layout/section";
 import {Button} from "@/components/ui/button";
 import {InlineMessage} from "@/components/ui/inline-message";
 import {Select} from "@/components/ui/select";
+import {Money} from "@/components/ui/money";
 import {formatMoney} from "@/lib/formatting/money";
+import {MONEY_MASK} from "@/lib/money/constants";
 import {formatLocalDateTime, getEarliestUkDateTime, getUkDateTime,} from "@/lib/scheduled-transfers/date-time";
 import {getScheduledTransfersKey, isScheduledTransfersKey,} from "@/lib/scheduled-transfers/keys";
 import {type FormEvent, useEffect, useState} from "react";
@@ -34,6 +37,7 @@ export function CreateScheduledTransfer({
   potId: string;
   currency: string;
 }) {
+  const {isMoneyHidden} = useMoneyVisibility();
   const { mutate } = useSWRConfig();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -147,8 +151,6 @@ export function CreateScheduledTransfer({
   }
 
   const ukDateTime = getUkDateTime(selectedDateTime);
-  const amountInPounds = formatMoney(Number(amount || 0), currency);
-
   return (
     <Section
       heading="Schedule a transfer"
@@ -234,10 +236,14 @@ export function CreateScheduledTransfer({
               <output
                 className={styles.amountValue}
                 htmlFor="scheduled-transfer-amount"
-                aria-label={`Value in pounds: ${amountInPounds}`}
+                aria-label={`Value in pounds: ${
+                  isMoneyHidden
+                    ? MONEY_MASK
+                    : formatMoney(Number(amount || 0), currency)
+                }`}
                 aria-live="polite"
               >
-                {amountInPounds}
+                <Money amount={Number(amount || 0)} currency={currency} />
               </output>
             </div>
           </div>

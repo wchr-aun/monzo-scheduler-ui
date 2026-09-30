@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { formatMoney } from "@/lib/formatting/money";
+import { Money } from "@/components/ui/money";
 import { getScheduledDateTimes } from "@/lib/scheduled-transfers/date-time";
 import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
 import styles from "./scheduled-transfer-card.module.css";
@@ -49,7 +49,9 @@ export function ScheduledTransferCard({
         </div>
         <div>
           <dt>Amount</dt>
-          <dd>{formatMoney(transfer.amount, "GBP")}</dd>
+          <dd>
+            <Money amount={transfer.amount} currency="GBP" />
+          </dd>
         </div>
         <div>
           <dt>Interval</dt>

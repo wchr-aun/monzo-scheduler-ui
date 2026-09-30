@@ -3,13 +3,14 @@
 import { Section } from "@/components/layout/section";
 import { InlineMessage } from "@/components/ui/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { Money } from "@/components/ui/money";
 import { fetchBalance } from "@/lib/accounts/client";
 import {
   BALANCE_CACHE_WINDOW_MS,
   getBalanceKey,
   getBalanceLoadedAtKey,
 } from "@/lib/accounts/keys";
-import { formatMoney } from "@/lib/formatting/money";
+import type { ReactNode } from "react";
 import useSWR from "swr";
 import styles from "./account-balance.module.css";
 
@@ -43,15 +44,33 @@ export function AccountBalance({ accountId }: { accountId: string }) {
         >
           <BalanceValue
             label="Balance"
-            value={balance && formatMoney(balance.balance, balance.currency)}
+            value={
+              balance && (
+                <Money amount={balance.balance} currency={balance.currency} />
+              )
+            }
           />
           <BalanceValue
             label="Total balance"
-            value={balance && formatMoney(balance.total_balance, balance.currency)}
+            value={
+              balance && (
+                <Money
+                  amount={balance.total_balance}
+                  currency={balance.currency}
+                />
+              )
+            }
           />
           <BalanceValue
             label="Spent today"
-            value={balance && formatMoney(balance.spend_today, balance.currency)}
+            value={
+              balance && (
+                <Money
+                  amount={balance.spend_today}
+                  currency={balance.currency}
+                />
+              )
+            }
           />
         </dl>
       )}
@@ -59,7 +78,7 @@ export function AccountBalance({ accountId }: { accountId: string }) {
   );
 }
 
-function BalanceValue({ label, value }: { label: string; value?: string }) {
+function BalanceValue({ label, value }: { label: string; value?: ReactNode }) {
   return (
     <div>
       <dt>{label}</dt>

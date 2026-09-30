@@ -2,6 +2,7 @@ import {AccountsPreloader} from "@/components/accounts/accounts-preloader";
 import {Footer} from "@/components/layout/footer";
 import {Navbar} from "@/components/layout/navbar";
 import {DataProvider} from "@/components/providers/data-provider";
+import {MoneyVisibilityProvider} from "@/components/providers/money-visibility-provider";
 import {THEME_STORAGE_KEY} from "@/lib/theme/constants";
 import type {Metadata} from "next";
 import {cookies} from "next/headers";
@@ -43,12 +44,14 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
       </head>
       <body>
-        <Navbar />
-        <DataProvider>
-          {isLoggedIn ? <AccountsPreloader /> : null}
-          {children}
-        </DataProvider>
-        <Footer />
+        <MoneyVisibilityProvider>
+          <Navbar />
+          <DataProvider>
+            {isLoggedIn ? <AccountsPreloader /> : null}
+            {children}
+          </DataProvider>
+          <Footer />
+        </MoneyVisibilityProvider>
       </body>
     </html>
   );

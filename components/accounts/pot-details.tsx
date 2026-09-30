@@ -4,7 +4,7 @@ import { Section } from "@/components/layout/section";
 import { CreateScheduledTransfer } from "@/components/scheduled-transfers/create-scheduled-transfer";
 import { InlineMessage } from "@/components/ui/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { formatMoney } from "@/lib/formatting/money";
+import { Money } from "@/components/ui/money";
 import { fetchPots } from "@/lib/pots/client";
 import { getPotsKey } from "@/lib/pots/keys";
 import useSWR from "swr";
@@ -42,7 +42,9 @@ export function PotDetails({
   return (
     <>
       <Section heading="Balance" headingId="pot-balance-heading">
-        <p className={styles.balance}>{formatMoney(pot.balance, pot.currency)}</p>
+        <p className={styles.balance}>
+          <Money amount={pot.balance} currency={pot.currency} />
+        </p>
       </Section>
       <CreateScheduledTransfer
         accountId={accountId}
