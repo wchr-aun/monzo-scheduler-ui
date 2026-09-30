@@ -163,7 +163,7 @@ export function ScheduledTransfers({
           {data.scheduledTransfers.map((transfer) => (
             <ScheduledTransferCard
               cancelling={pendingSetupIds.has(transfer.setup_id)}
-              key={transfer.setup_id}
+              key={transfer.transfer_id}
               onCancel={() => void cancelTransfer(transfer)}
               transfer={transfer}
             />
