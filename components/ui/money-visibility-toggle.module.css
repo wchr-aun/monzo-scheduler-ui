@@ -8,6 +8,7 @@
   border-radius: 999px;
   color: var(--color-navbar-control-text);
   background: var(--color-navbar-control);
+  font-size: 1.25rem;
   cursor: pointer;
 }
 

@@ -37,11 +37,7 @@ export function Money({ amount, currency, label = "money value" }: MoneyProps) {
           title={buttonLabel}
           onClick={() => setIsLocallyRevealed((revealed) => !revealed)}
         >
-          {isLocallyRevealed ? (
-            <EyeOffIcon size={16} />
-          ) : (
-            <EyeIcon size={16} />
-          )}
+          {isLocallyRevealed ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       ) : null}
     </span>

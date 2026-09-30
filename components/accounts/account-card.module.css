@@ -66,12 +66,12 @@
 
 .total strong {
   color: var(--color-text);
-  font-size: 1.25rem;
+  font-size: 1.75rem;
 }
 
 .total small {
   color: var(--color-text-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 400;
 }
 

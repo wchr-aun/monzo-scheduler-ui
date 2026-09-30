@@ -4,7 +4,7 @@ import {Section} from "@/components/layout/section";
 import {Button} from "@/components/ui/button";
 import {InlineMessage} from "@/components/ui/inline-message";
 import {Select} from "@/components/ui/select";
-import {Money} from "@/components/ui/money";
+import {formatMoney} from "@/lib/formatting/money";
 import {formatLocalDateTime, getEarliestUkDateTime, getUkDateTime,} from "@/lib/scheduled-transfers/date-time";
 import {getScheduledTransfersKey, isScheduledTransfersKey,} from "@/lib/scheduled-transfers/keys";
 import {type FormEvent, useEffect, useState} from "react";
@@ -235,11 +235,7 @@ export function CreateScheduledTransfer({
                 aria-label="Value in pounds"
                 aria-live="polite"
               >
-                <Money
-                  amount={Number(amount || 0)}
-                  currency={currency}
-                  label="value in pounds"
-                />
+                {formatMoney(Number(amount || 0), currency)}
               </output>
             </div>
           </div>

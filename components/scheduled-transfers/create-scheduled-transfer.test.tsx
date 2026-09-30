@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
+import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
 import { CreateScheduledTransfer } from "@/components/scheduled-transfers/create-scheduled-transfer";
 import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
+import { MoneyVisibilityToggle } from "@/components/ui/money-visibility-toggle";
 
 function response(ok = true) {
   return { ok, status: ok ? 204 : 422 } as Response;
@@ -269,6 +271,30 @@ describe("CreateScheduledTransfer", () => {
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toMatchObject({
       amount: 5001,
     });
+  });
+
+  it("keeps the entered amount preview visible when money is masked", () => {
+    render(
+      <MoneyVisibilityProvider>
+        <MoneyVisibilityToggle />
+        {createScheduledTransfer()}
+      </MoneyVisibilityProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create a new scheduled transfer" }),
+    );
+    fireEvent.change(screen.getByLabelText("Amount (pence)"), {
+      target: { value: "2500" },
+    });
+
+    expect(
+      screen.getByRole("status", { name: "Value in pounds" }),
+    ).toHaveTextContent("£25.00");
+    expect(
+      screen.queryByRole("button", { name: "Reveal value in pounds" }),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps the form open and announces backend failures", async () => {

@@ -1,13 +1,9 @@
-type VisibilityIconProps = {
-  size?: number;
-};
-
-export function EyeIcon({ size = 20 }: VisibilityIconProps) {
+export function EyeIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      width={size}
-      height={size}
+      width="1em"
+      height="1em"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -21,12 +17,12 @@ export function EyeIcon({ size = 20 }: VisibilityIconProps) {
   );
 }
 
-export function EyeOffIcon({ size = 20 }: VisibilityIconProps) {
+export function EyeOffIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      width={size}
-      height={size}
+      width="1em"
+      height="1em"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
