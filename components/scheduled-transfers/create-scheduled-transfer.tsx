@@ -1,20 +1,13 @@
 "use client";
 
-import { Section } from "@/components/layout/section";
-import { Button } from "@/components/ui/button";
-import { InlineMessage } from "@/components/ui/inline-message";
-import { formatMoney } from "@/lib/formatting/money";
-import {
-  formatLocalDateTime,
-  getEarliestUkDateTime,
-  getUkDateTime,
-} from "@/lib/scheduled-transfers/date-time";
-import {
-  getScheduledTransfersKey,
-  isScheduledTransfersKey,
-} from "@/lib/scheduled-transfers/keys";
-import { type FormEvent, useEffect, useState } from "react";
-import { useSWRConfig } from "swr";
+import {Section} from "@/components/layout/section";
+import {Button} from "@/components/ui/button";
+import {InlineMessage} from "@/components/ui/inline-message";
+import {formatMoney} from "@/lib/formatting/money";
+import {formatLocalDateTime, getEarliestUkDateTime, getUkDateTime,} from "@/lib/scheduled-transfers/date-time";
+import {getScheduledTransfersKey, isScheduledTransfersKey,} from "@/lib/scheduled-transfers/keys";
+import {type FormEvent, useEffect, useState} from "react";
+import {useSWRConfig} from "swr";
 import styles from "./create-scheduled-transfer.module.css";
 
 export function CreateScheduledTransfer({
@@ -141,6 +134,7 @@ export function CreateScheduledTransfer({
       headingId="create-transfer-heading"
       action={
         <Button
+          variant={isExpanded ? "secondary" : "primary"}
           type="button"
           aria-expanded={isExpanded}
           aria-controls="scheduled-transfer-form"

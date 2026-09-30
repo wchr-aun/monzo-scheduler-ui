@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { InlineMessage } from "@/components/ui/inline-message";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useSWRConfig } from "swr";
+import {Button} from "@/components/ui/button";
+import {InlineMessage} from "@/components/ui/inline-message";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
+import {useSWRConfig} from "swr";
 import styles from "./logout-button.module.css";
 
 export function LogoutButton() {
@@ -41,6 +41,7 @@ export function LogoutButton() {
     <div className={styles.control}>
       <Button
         className={styles.button}
+        variant="danger"
         type="button"
         disabled={isLoggingOut}
         onClick={() => void logout()}
