@@ -2,11 +2,18 @@
 
 ## Project overview
 
-This is a minimal Next.js App Router frontend for a Monzo scheduler authentication flow.
+This is a Next.js App Router frontend for authenticating with Monzo, browsing
+accounts and pots, and managing scheduled pot transfers.
 
-- `/` displays a login link or `Logged in` when the session cookie exists.
-- `/callback` validates OAuth `code` and `state` parameters and calls the same-origin callback API.
-- `/api/auth/callback` calls the authentication backend server-to-server, receives a JWT, and stores it in a secure `HttpOnly` cookie.
+- `/` displays a login link when signed out. When signed in, it shows the user
+  ID, accounts, balances, and a logout action.
+- `/account/[accountId]` displays an account balance and its pots.
+- `/account/[accountId]/pot/[potId]` displays a pot balance and supports listing,
+  filtering, paginating, creating, and cancelling scheduled transfers.
+- `/callback` validates OAuth `code` and `state` parameters and calls the
+  same-origin callback API.
+- Route Handlers under `/api` validate requests and backend responses, then make
+  authenticated server-to-server requests using the JWT from the session cookie.
 
 ## Package manager
 
@@ -41,7 +48,9 @@ Do not rename `BASE_URL` to a `NEXT_PUBLIC_*` variable. Backend configuration mu
 - JWTs must never be returned to client-side JavaScript, placed in URLs, logged, or stored in local storage.
 - Session cookies must remain `HttpOnly`, `Secure` in production, `SameSite=Lax`, and scoped to `/`.
 - Validate all backend responses before setting cookies.
-- Future authenticated backend requests should go through narrow, endpoint-specific Route Handlers. Read the JWT from the cookie server-side and forward it as `Authorization: Bearer <jwt>`.
+- Authenticated backend requests must go through narrow, endpoint-specific Route
+  Handlers. Read the JWT from the cookie server-side and forward it as
+  `Authorization: Bearer <jwt>`.
 - Do not add a generic user-controlled proxy endpoint.
 
 ## Code conventions
@@ -53,6 +62,50 @@ Do not rename `BASE_URL` to a `NEXT_PUBLIC_*` variable. Backend configuration mu
 - Use the shared SWR cache for authenticated client-side reads so identical requests
   are deduplicated across navigation. Do not persist authenticated data in browser storage.
 - Preserve accessible status messaging and reduced-motion behavior.
+
+## Colour system
+
+The canonical brand palette is:
+
+| Token | Colour | Hex | Intended use |
+| --- | --- | --- | --- |
+| `deep-navy` | Deep Navy | `#082B63` | Primary brand, headings, navigation, key UI |
+| `ocean-blue` | Ocean Blue | `#0B6A95` | Interactive elements and informational highlights |
+| `mint` | Mint | `#8FDACB` | Success, accents, illustrations, and highlights |
+| `coral` | Coral | `#FF5B71` | Alerts and destructive or exceptional emphasis |
+| `sunset-orange` | Sunset Orange | `#F9A64B` | Warnings, badges, and highlights |
+| `warm-sand` | Warm Sand | `#FFF4EE` | Page backgrounds and warm foreground text |
+| `slate-text` | Slate Text | `#24324A` | Body text, labels, and icons |
+| `soft-border` | Soft Border | `#E7ECF2` | Borders, dividers, and input fields |
+
+Use the brand primitives and semantic `--color-*` custom properties in
+`app/globals.css`; do not hardcode brand colors in component styles. Components
+should consume semantic tokens so light and dark themes can choose accessible
+variants.
+
+| Semantic role | Light mode | Dark mode |
+| --- | --- | --- |
+| Page background | Warm Sand `#FFF4EE` | Derived navy `#051C40` |
+| Navigation | Deep Navy `#082B63` | Derived navy `#04152F` |
+| Card, form, and input surface | White `#FFFFFF` | Deep Navy `#082B63` |
+| Heading | Deep Navy `#082B63` | Warm Sand `#FFF4EE` |
+| Body text | Slate Text `#24324A` | Warm Sand `#FFF4EE` |
+| Muted text | Derived slate `#55627A` | Derived slate `#CBD5E1` |
+| Primary/completed/success | Derived Mint `#246E62` | Mint `#8FDACB` |
+| Secondary/pending/info | Derived Ocean `#0B5B80` | Derived Ocean `#A7DFF2` |
+| Danger/error | Derived Coral `#C7354D` | Derived Coral `#FF9AAA` |
+| Cancelled/warning | Derived Orange `#76500B` | Sunset Orange `#F9A64B` |
+| General border | Soft Border `#E7ECF2` | Derived blue `#557AA2` |
+| Focus indicator | Ocean Blue `#0B6A95` | Mint `#8FDACB` |
+
+- Primary actions must use the same family as completed/success states.
+- Secondary actions and general interactive controls must use the same family as
+  pending/info states.
+- Coral is not the primary action color; reserve it for danger/error emphasis.
+- Pair light Mint, Coral, and Sunset Orange fills with Deep Navy text. Do not use
+  white text on Coral for normal-size text because it does not meet AA contrast.
+- Keep both explicit dark-theme declarations in `app/globals.css` synchronized:
+  `:root[data-theme="dark"]` and the system-preference fallback.
 
 ## Application architecture
 
