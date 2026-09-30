@@ -1,5 +1,10 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import {
+  defaultScheduledTransferStatuses,
+  scheduledTransferStatuses,
+  type ScheduledTransferStatus,
+} from "@/lib/scheduled-transfers/types";
 
 type ScheduledTransfer = {
   setup_id: string;
@@ -137,6 +142,26 @@ function getPagination(request: Request) {
   return { limit, offset };
 }
 
+function getStatuses(request: Request): ScheduledTransferStatus[] | null {
+  const statusValue =
+    new URL(request.url).searchParams.get("status") ??
+    defaultScheduledTransferStatuses.join(",");
+  const statuses = statusValue.split(",");
+
+  if (
+    statuses.length === 0 ||
+    statuses.some(
+      (status, index) =>
+        !scheduledTransferStatuses.includes(status as ScheduledTransferStatus) ||
+        statuses.indexOf(status) !== index,
+    )
+  ) {
+    return null;
+  }
+
+  return statuses as ScheduledTransferStatus[];
+}
+
 function isUkDateTime(value: string) {
   const match =
     /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):00([+-])(\d{2}):(\d{2})$/.exec(
@@ -256,9 +281,13 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   const pagination = getPagination(request);
+  const statuses = getStatuses(request);
 
-  if (!pagination) {
-    return NextResponse.json({ error: "invalid_pagination" }, { status: 400 });
+  if (!pagination || !statuses) {
+    return NextResponse.json(
+      { error: !pagination ? "invalid_pagination" : "invalid_status" },
+      { status: 400 },
+    );
   }
 
   const { token, baseUrl } = await getBackendDetails();
@@ -278,6 +307,7 @@ export async function GET(request: Request, context: RouteContext) {
     const backendUrl = new URL(`${baseUrl}/scheduled-transfers`);
     backendUrl.searchParams.set("limit", String(pagination.limit));
     backendUrl.searchParams.set("offset", String(pagination.offset));
+    backendUrl.searchParams.set("status", statuses.join(","));
 
     const backendResponse = await fetch(backendUrl, {
       headers: {

@@ -1,3 +1,19 @@
+export const scheduledTransferStatuses = [
+  "completed",
+  "pending",
+  "failed",
+  "cancelled",
+] as const;
+
+export const defaultScheduledTransferStatuses = [
+  "completed",
+  "pending",
+  "failed",
+] as const;
+
+export type ScheduledTransferStatus =
+  (typeof scheduledTransferStatuses)[number];
+
 export type ScheduledTransfer = {
   setup_id: string;
   transfer_id: string;

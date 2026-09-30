@@ -1,19 +1,31 @@
 "use client";
 
-import { Section } from "@/components/layout/section";
-import { InlineMessage } from "@/components/ui/inline-message";
-import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { fetchScheduledTransfers } from "@/lib/scheduled-transfers/client";
+import {Section} from "@/components/layout/section";
+import {InlineMessage} from "@/components/ui/inline-message";
+import {LoadingIndicator} from "@/components/ui/loading-indicator";
+import {MultiSelect} from "@/components/ui/multi-select";
+import {fetchScheduledTransfers} from "@/lib/scheduled-transfers/client";
 import {
   getScheduledTransfersKey,
+  getScheduledTransfersPageKey,
   isScheduledTransfersKey,
 } from "@/lib/scheduled-transfers/keys";
-import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
-import { useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
-import { Pagination } from "./pagination";
-import { ScheduledTransferCard } from "./scheduled-transfer-card";
+import {
+  defaultScheduledTransferStatuses,
+  type ScheduledTransfer,
+  type ScheduledTransferStatus,
+  scheduledTransferStatuses,
+} from "@/lib/scheduled-transfers/types";
+import {useEffect, useState} from "react";
+import useSWR, {useSWRConfig} from "swr";
+import {Pagination} from "./pagination";
+import {ScheduledTransferCard} from "./scheduled-transfer-card";
 import styles from "./scheduled-transfers.module.css";
+
+const statusOptions = scheduledTransferStatuses.map((status) => ({
+  label: status,
+  value: status,
+}));
 
 export function ScheduledTransfers({
   accountId,
@@ -24,10 +36,18 @@ export function ScheduledTransfers({
 }) {
   const scheduledTransfersKey = getScheduledTransfersKey(accountId, potId);
   const [offset, setOffset] = useState(0);
-  const pageKey =
-    offset === 0
-      ? scheduledTransfersKey
-      : `${scheduledTransfersKey}?limit=50&offset=${offset}`;
+  const [selectedStatuses, setSelectedStatuses] = useState<
+    ScheduledTransferStatus[]
+  >(() => [...defaultScheduledTransferStatuses]);
+  const [debouncedStatuses, setDebouncedStatuses] = useState<
+    ScheduledTransferStatus[]
+  >(() => [...defaultScheduledTransferStatuses]);
+  const pageKey = getScheduledTransfersPageKey(
+    accountId,
+    potId,
+    debouncedStatuses,
+    offset,
+  );
   const { data, error, isLoading, mutate: mutatePage } = useSWR(
     pageKey,
     fetchScheduledTransfers,
@@ -39,6 +59,19 @@ export function ScheduledTransfers({
   const [cancelMessage, setCancelMessage] = useState<
     { kind: "error" | "success"; text: string } | undefined
   >();
+
+  useEffect(() => {
+    if (selectedStatuses.join(",") === debouncedStatuses.join(",")) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setDebouncedStatuses(selectedStatuses);
+      setOffset(0);
+    }, 1_000);
+
+    return () => window.clearTimeout(timer);
+  }, [debouncedStatuses, selectedStatuses]);
 
   async function cancelTransfer(transfer: ScheduledTransfer) {
     if (transfer.status !== "pending") {
@@ -97,7 +130,19 @@ export function ScheduledTransfers({
   }
 
   return (
-    <Section heading="Scheduled transfers" headingId="transfers-heading">
+    <Section
+      action={
+        <MultiSelect
+          label="Status"
+          minimumSelections={1}
+          onChange={setSelectedStatuses}
+          options={statusOptions}
+          values={selectedStatuses}
+        />
+      }
+      heading="Scheduled transfers"
+      headingId="transfers-heading"
+    >
       {cancelMessage ? (
         <InlineMessage tone={cancelMessage.kind}>{cancelMessage.text}</InlineMessage>
       ) : null}

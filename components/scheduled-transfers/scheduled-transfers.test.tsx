@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
@@ -53,6 +53,7 @@ describe("ScheduledTransfers", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllEnvs();
   });
 
@@ -91,7 +92,43 @@ describe("ScheduledTransfers", () => {
     expect(screen.getByLabelText(`UK: ${ukDate}`)).toBeInTheDocument();
     expect(screen.getByText("Setup ID: setup_1")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",
+      { cache: "no-store" },
+    );
+  });
+
+  it("debounces selected status filters for two seconds", async () => {
+    fetchMock.mockResolvedValue(jsonResponse(scheduledTransfersPage([transfer])));
+
+    render(scheduledTransfers());
+
+    await screen.findByText("transfer_1");
+    const dropdown = screen.getByRole("button", {
+      name: /status.*3 selected/,
+    });
+    expect(dropdown).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(dropdown);
+    expect(dropdown).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("checkbox", { name: "completed" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "pending" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "failed" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "cancelled" })).not.toBeChecked();
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole("checkbox", { name: "completed" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "cancelled" }));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1_999);
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=pending%2Cfailed%2Ccancelled",
       { cache: "no-store" },
     );
   });
@@ -185,7 +222,7 @@ describe("ScheduledTransfers", () => {
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
-      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",
       { cache: "no-store" },
     );
   });
@@ -275,7 +312,7 @@ describe("ScheduledTransfers", () => {
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?limit=50&offset=50",
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed&limit=50&offset=50",
       { cache: "no-store" },
     );
     expect(screen.getByText("51–51 of 51")).toBeInTheDocument();

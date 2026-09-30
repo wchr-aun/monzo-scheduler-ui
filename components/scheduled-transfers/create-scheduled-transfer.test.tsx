@@ -213,7 +213,7 @@ describe("CreateScheduledTransfer", () => {
     expect(await screen.findByText("transfer_1")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
-      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers",
+      "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",
       { cache: "no-store" },
     );
   });

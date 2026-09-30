@@ -73,7 +73,9 @@ describe("scheduled transfers route", () => {
     expect(body.scheduledTransfers[0].transfer_id).toBe("transfer_1");
     expect(body).toMatchObject({ total: 2, limit: 50, offset: 0 });
     expect(fetchMock).toHaveBeenCalledWith(
-      new URL("https://backend.example/scheduled-transfers?limit=50&offset=0"),
+      new URL(
+        "https://backend.example/scheduled-transfers?limit=50&offset=0&status=completed%2Cpending%2Cfailed",
+      ),
       expect.objectContaining({
         headers: {
           Accept: "application/json",
@@ -102,9 +104,41 @@ describe("scheduled transfers route", () => {
       offset: 50,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      new URL("https://backend.example/scheduled-transfers?limit=25&offset=50"),
+      new URL(
+        "https://backend.example/scheduled-transfers?limit=25&offset=50&status=completed%2Cpending%2Cfailed",
+      ),
       expect.anything(),
     );
+  });
+
+  it("forwards selected statuses", async () => {
+    fetchMock.mockResolvedValue(
+      backendResponse({ items: [], total: 0, limit: 50, offset: 0 }),
+    );
+
+    const response = await GET(
+      new Request("http://localhost?status=pending,cancelled"),
+      context,
+    );
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL(
+        "https://backend.example/scheduled-transfers?limit=50&offset=0&status=pending%2Ccancelled",
+      ),
+      expect.anything(),
+    );
+  });
+
+  it("rejects invalid statuses without calling the backend", async () => {
+    const response = await GET(
+      new Request("http://localhost?status=pending,unknown"),
+      context,
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "invalid_status" });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("rejects out-of-range pagination without calling the backend", async () => {
