@@ -26,6 +26,8 @@ const transfer = {
   setup_id: "setup_1",
   transfer_id: "transfer_1",
   status: "pending",
+  created_at: "2026-09-01T08:15:00Z",
+  executed_at: null,
   scheduled_for: "2099-01-01T09:30:00Z",
   interval: "monthly",
   type: "deposit",
@@ -102,6 +104,8 @@ describe("CreateScheduledTransfer", () => {
   });
 
   it("expands the form and creates a transfer using UK local time", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date("2026-10-01T08:30:00Z"));
     fetchMock.mockResolvedValue(response());
     render(createScheduledTransfer());
 

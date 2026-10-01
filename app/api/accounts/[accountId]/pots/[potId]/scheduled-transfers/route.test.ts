@@ -40,6 +40,8 @@ describe("scheduled transfers route", () => {
             setup_id: "setup_1",
             transfer_id: "transfer_1",
             status: "pending",
+            created_at: "2026-09-01T08:15:00Z",
+            executed_at: null,
             scheduled_for: "2026-10-01T09:30:00Z",
             interval: "monthly",
             type: "deposit",
@@ -51,6 +53,8 @@ describe("scheduled transfers route", () => {
             setup_id: "setup_2",
             transfer_id: "transfer_2",
             status: "completed",
+            created_at: "2026-09-02T08:15:00Z",
+            executed_at: "2026-10-02T09:30:05Z",
             scheduled_for: "2026-10-02T09:30:00Z",
             interval: "monthly",
             type: "deposit",
@@ -71,6 +75,10 @@ describe("scheduled transfers route", () => {
     expect(response.status).toBe(200);
     expect(body.scheduledTransfers).toHaveLength(1);
     expect(body.scheduledTransfers[0].transfer_id).toBe("transfer_1");
+    expect(body.scheduledTransfers[0].created_at).toBe(
+      "2026-09-01T08:15:00Z",
+    );
+    expect(body.scheduledTransfers[0].executed_at).toBeNull();
     expect(body).toMatchObject({ total: 2, limit: 50, offset: 0 });
     expect(fetchMock).toHaveBeenCalledWith(
       new URL(

@@ -10,6 +10,8 @@ type ScheduledTransfer = {
   setup_id: string;
   transfer_id: string;
   status: string;
+  created_at: string;
+  executed_at: string | null;
   scheduled_for: string;
   interval: string;
   type: string;
@@ -70,6 +72,13 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
     "status" in value &&
     typeof value.status === "string" &&
     Boolean(value.status.trim()) &&
+    "created_at" in value &&
+    typeof value.created_at === "string" &&
+    Boolean(value.created_at.trim()) &&
+    "executed_at" in value &&
+    (value.executed_at === null ||
+      (typeof value.executed_at === "string" &&
+        Boolean(value.executed_at.trim()))) &&
     "scheduled_for" in value &&
     typeof value.scheduled_for === "string" &&
     Boolean(value.scheduled_for.trim()) &&

@@ -18,6 +18,8 @@ export type ScheduledTransfer = {
   setup_id: string;
   transfer_id: string;
   status: string;
+  created_at: string;
+  executed_at: string | null;
   scheduled_for: string;
   interval: string;
   type: string;

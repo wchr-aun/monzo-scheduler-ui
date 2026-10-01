@@ -27,6 +27,7 @@ export function ScheduledTransferCard({
   const [now, setNow] = useState<number | null>(null);
   const detailsId = useId();
   const isDeposit = transfer.type === "deposit";
+  const summaryDateTime = transfer.executed_at ?? transfer.scheduled_for;
   const scheduledTime = new Date(transfer.scheduled_for).getTime();
   const isPast =
     now !== null && !Number.isNaN(scheduledTime) && scheduledTime < now;
@@ -76,7 +77,7 @@ export function ScheduledTransferCard({
             <>
               <p className={styles.cancelledMessage}>Cancelled</p>
               <div className={styles.scheduledFor}>
-                <ScheduledFor value={transfer.scheduled_for} />
+                <TransferDateTime value={summaryDateTime} />
               </div>
             </>
           ) : (
@@ -95,7 +96,7 @@ export function ScheduledTransferCard({
                     )}
               </p>
               <div className={styles.scheduledFor}>
-                <ScheduledFor value={transfer.scheduled_for} />
+                <TransferDateTime value={summaryDateTime} />
               </div>
             </>
           )}
@@ -106,6 +107,12 @@ export function ScheduledTransferCard({
         <div className={styles.details} id={detailsId}>
           <dl>
             <div>
+              <dt>Created at</dt>
+              <dd>
+                <TransferDateTime value={transfer.created_at} />
+              </dd>
+            </div>
+            <div>
               <dt>Type</dt>
               <dd>{getDisplayLabel(transfer.type)}</dd>
             </div>
@@ -113,6 +120,14 @@ export function ScheduledTransferCard({
               <dt>Interval</dt>
               <dd>{getDisplayLabel(transfer.interval)}</dd>
             </div>
+            {transfer.executed_at !== null ? (
+              <div>
+                <dt>Executed at</dt>
+                <dd>
+                  <TransferDateTime value={transfer.executed_at} />
+                </dd>
+              </div>
+            ) : null}
           </dl>
           {transfer.status === "pending" ? (
             <Button
@@ -172,7 +187,7 @@ function DifferentiatedId({
   ));
 }
 
-function ScheduledFor({ value }: { value: string }) {
+function TransferDateTime({ value }: { value: string }) {
   const dates = getScheduledDateTimes(value);
 
   if (!dates) {

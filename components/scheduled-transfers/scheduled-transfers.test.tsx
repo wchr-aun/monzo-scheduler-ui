@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
 import { formatMoney } from "@/lib/formatting/money";
+import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
 
 function jsonResponse(body: unknown, options?: { ok?: boolean; status?: number }) {
   return {
@@ -20,10 +21,12 @@ function scheduledTransfers() {
   );
 }
 
-const transfer = {
+const transfer: ScheduledTransfer = {
   setup_id: "setup_1",
   transfer_id: "transfer_1",
   status: "pending",
+  created_at: "2026-09-01T08:15:00Z",
+  executed_at: null,
   scheduled_for: "2026-10-01T09:30:00Z",
   interval: "monthly",
   type: "deposit",
@@ -80,6 +83,21 @@ describe("ScheduledTransfers", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("Monthly")).toBeInTheDocument();
     expect(screen.getByText("Deposit")).toBeInTheDocument();
+    expect(screen.getByText("Created at")).toBeInTheDocument();
+    expect(screen.queryByText("Executed at")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        new Intl.DateTimeFormat("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "Europe/London",
+        }).format(new Date(transfer.created_at)),
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Cancel transfer transfer_1" }),
     ).toBeInTheDocument();
@@ -279,6 +297,7 @@ describe("ScheduledTransfers", () => {
       setup_id: "setup_2",
       transfer_id: "transfer_2",
       status: "completed",
+      executed_at: "2020-01-01T09:31:00Z",
       scheduled_for: "2020-01-01T09:30:00Z",
     };
     const cancelledTransfer = {
@@ -310,7 +329,40 @@ describe("ScheduledTransfers", () => {
       "data-tone",
       "completed",
     );
-    expect(screen.getByText(/ago$/)).toHaveAttribute("data-timing", "past");
+    const completedCard = screen
+      .getByRole("button", {
+        name: "Show details for transfer transfer_2",
+      })
+      .closest("li");
+    expect(completedCard?.querySelector('[data-timing="past"]')).toHaveTextContent(
+      /ago$/,
+    );
+    expect(
+      completedCard?.querySelector(
+        'time[datetime="2020-01-01T09:31:00Z"]',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      completedCard?.querySelector(
+        'time[datetime="2020-01-01T09:30:00Z"]',
+      ),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Show details for transfer transfer_2",
+      }),
+    );
+    expect(
+      Array.from(completedCard?.querySelectorAll("dt") ?? [], (term) =>
+        term.textContent,
+      ),
+    ).toEqual(["Created at", "Type", "Interval", "Executed at"]);
+    expect(screen.getByText("Executed at")).toBeInTheDocument();
+    expect(
+      completedCard?.querySelector(
+        'time[datetime="2020-01-01T09:31:00Z"]',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("cancelled")).toHaveAttribute("data-tone", "cancelled");
     const cancelledCard = screen
       .getByRole("button", {
