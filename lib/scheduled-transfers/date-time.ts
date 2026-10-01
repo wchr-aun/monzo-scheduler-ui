@@ -90,3 +90,49 @@ export function getScheduledDateTimes(value: string) {
     localMatchesUk: localWithoutTimeZone === uk,
   };
 }
+
+export function getTimeUntil(
+  value: string,
+  now = Date.now(),
+  status?: string,
+) {
+  const scheduledTime = new Date(value).getTime();
+
+  if (Number.isNaN(scheduledTime)) {
+    return "Schedule unavailable";
+  }
+
+  const difference = scheduledTime - now;
+  const isPast = difference < 0;
+  const duration = Math.abs(difference);
+  const minute = 60_000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+
+  if (status === "pending" && difference < minute) {
+    return "Executing soon";
+  }
+
+  if (duration < minute) {
+    return status === "completed" ? "Just completed" : "Just now";
+  }
+
+  const suffix = isPast ? "ago" : "left";
+
+  if (duration >= 2 * day) {
+    return `${Math.floor(duration / day)}d ${suffix}`;
+  }
+
+  if (duration >= day) {
+    const hours = Math.floor((duration - day) / hour);
+    return `1d ${hours}h ${suffix}`;
+  }
+
+  if (duration >= hour) {
+    const hours = Math.floor(duration / hour);
+    const minutes = Math.floor((duration % hour) / minute);
+    return `${hours}h ${minutes}m ${suffix}`;
+  }
+
+  return `${Math.floor(duration / minute)}m ${suffix}`;
+}

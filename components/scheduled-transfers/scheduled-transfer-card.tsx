@@ -1,7 +1,13 @@
+"use client";
+
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Money } from "@/components/ui/money";
-import { getScheduledDateTimes } from "@/lib/scheduled-transfers/date-time";
+import { StatusBadge } from "@/components/ui/status-badge";
+import {
+  getScheduledDateTimes,
+  getTimeUntil,
+} from "@/lib/scheduled-transfers/date-time";
 import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
 import styles from "./scheduled-transfer-card.module.css";
 
@@ -16,57 +22,112 @@ export function ScheduledTransferCard({
   onCancel,
   transfer,
 }: ScheduledTransferCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [now, setNow] = useState<number | null>(null);
+  const detailsId = useId();
+  const isDeposit = transfer.type === "deposit";
+  const scheduledTime = new Date(transfer.scheduled_for).getTime();
+  const isPast =
+    now !== null && !Number.isNaN(scheduledTime) && scheduledTime < now;
+
+  useEffect(() => {
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <li
-      className={`${styles.card}${transfer.status === "cancelled" ? ` ${styles.cancelled}` : ""}`}
+      className={`${styles.card}${isExpanded ? ` ${styles.expanded}` : ""}${transfer.status === "cancelled" ? ` ${styles.cancelled}` : ""}`}
       data-status={transfer.status}
     >
-      <div className={styles.heading}>
-        <div className={styles.title}>
-          <h3>{transfer.transfer_id}</h3>
+      <button
+        className={styles.cardToggle}
+        type="button"
+        aria-controls={detailsId}
+        aria-expanded={isExpanded}
+        aria-label={`${isExpanded ? "Hide" : "Show"} details for transfer ${transfer.transfer_id}`}
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+      />
+
+      <div className={styles.summary}>
+        <div className={styles.amountGroup}>
+          <div className={styles.amount}>
+            <span>{isDeposit ? "+" : "−"}</span>
+            <Money
+              amount={Math.abs(transfer.amount)}
+              currency="GBP"
+              label={`transfer ${transfer.transfer_id} amount`}
+            />
+          </div>
           <StatusBadge tone={getStatusTone(transfer.status)}>
             {transfer.status}
           </StatusBadge>
         </div>
-        {transfer.status === "pending" ? (
-          <Button
-            variant="danger"
-            type="button"
-            aria-label={`Cancel transfer ${transfer.transfer_id}`}
-            disabled={cancelling}
-            onClick={onCancel}
-          >
-            {cancelling ? "Cancelling…" : "Cancel"}
-          </Button>
-        ) : null}
+
+        <div className={styles.schedule}>
+          {transfer.status === "cancelled" ? (
+            <>
+              <p className={styles.cancelledMessage}>Cancelled</p>
+              <div className={styles.scheduledFor}>
+                <ScheduledFor value={transfer.scheduled_for} />
+              </div>
+            </>
+          ) : (
+            <>
+              <p
+                className={`${styles.countdown}${isPast ? ` ${styles.past}` : ""}`}
+                data-timing={isPast ? "past" : "future"}
+                aria-live="off"
+              >
+                {now === null
+                  ? "Calculating…"
+                  : getTimeUntil(
+                      transfer.scheduled_for,
+                      now,
+                      transfer.status,
+                    )}
+              </p>
+              <div className={styles.scheduledFor}>
+                <ScheduledFor value={transfer.scheduled_for} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
-      <dl>
-        <div>
-          <dt>Scheduled for</dt>
-          <dd>
-            <ScheduledFor value={transfer.scheduled_for} />
-          </dd>
+
+      {isExpanded ? (
+        <div className={styles.details} id={detailsId}>
+          <dl>
+            <div>
+              <dt>Type</dt>
+              <dd>{getDisplayLabel(transfer.type)}</dd>
+            </div>
+            <div>
+              <dt>Interval</dt>
+              <dd>{getDisplayLabel(transfer.interval)}</dd>
+            </div>
+          </dl>
+          {transfer.status === "pending" ? (
+            <Button
+              variant="danger"
+              type="button"
+              aria-label={`Cancel transfer ${transfer.transfer_id}`}
+              disabled={cancelling}
+              onClick={onCancel}
+            >
+              {cancelling ? "Cancelling…" : "Cancel transfer"}
+            </Button>
+          ) : null}
         </div>
-        <div>
-          <dt>Amount</dt>
-          <dd>
-            <Money
-              amount={transfer.amount}
-              currency="GBP"
-              label={`transfer ${transfer.transfer_id} amount`}
-            />
-          </dd>
-        </div>
-        <div>
-          <dt>Interval</dt>
-          <dd>{transfer.interval}</dd>
-        </div>
-        <div>
-          <dt>Type</dt>
-          <dd>{transfer.type}</dd>
-        </div>
-      </dl>
-      <p className={styles.setupId}>Setup ID: {transfer.setup_id}</p>
+      ) : null}
+
+      <div className={styles.footer}>
+        <p>Transfer ID: {transfer.transfer_id}</p>
+        <p>Setup ID: {transfer.setup_id}</p>
+      </div>
+      <span className={styles.chevron} aria-hidden="true" />
     </li>
   );
 }
@@ -92,6 +153,10 @@ function ScheduledFor({ value }: { value: string }) {
       </span>
     </span>
   );
+}
+
+function getDisplayLabel(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function getStatusTone(status: string) {

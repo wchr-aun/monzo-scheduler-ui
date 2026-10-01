@@ -219,7 +219,11 @@ describe("CreateScheduledTransfer", () => {
       screen.getByRole("button", { name: "Create scheduled transfer" }),
     );
 
-    expect(await screen.findByText("transfer_1")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", {
+        name: "Show details for transfer transfer_1",
+      }),
+    ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",

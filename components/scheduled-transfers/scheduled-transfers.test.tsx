@@ -64,11 +64,25 @@ describe("ScheduledTransfers", () => {
 
     render(scheduledTransfers());
 
-    expect(await screen.findByText("transfer_1")).toBeInTheDocument();
+    const toggle = await screen.findByRole("button", {
+      name: "Show details for transfer transfer_1",
+    });
+    const card = toggle.closest("li");
+    expect(card).toHaveTextContent("Transfer ID: transfer_1");
+    expect(card).toHaveTextContent("Setup ID: setup_1");
+    expect(card).toHaveTextContent(`+${formatMoney(2500, "GBP")}`);
     expect(screen.getByText("pending")).toHaveAttribute("data-tone", "pending");
-    expect(screen.getByText("monthly")).toBeInTheDocument();
-    expect(screen.getByText("deposit")).toBeInTheDocument();
+    expect(screen.queryByText("Monthly")).not.toBeInTheDocument();
+    expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
     expect(screen.getByText(formatMoney(2500, "GBP"))).toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("Monthly")).toBeInTheDocument();
+    expect(screen.getByText("Deposit")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Cancel transfer transfer_1" }),
+    ).toBeInTheDocument();
 
     const scheduledDate = new Date(transfer.scheduled_for);
     const dateOptions: Intl.DateTimeFormatOptions = {
@@ -90,7 +104,6 @@ describe("ScheduledTransfers", () => {
     }).format(scheduledDate);
     expect(screen.getByLabelText(`Local: ${localDate}`)).toBeInTheDocument();
     expect(screen.getByLabelText(`UK: ${ukDate}`)).toBeInTheDocument();
-    expect(screen.getByText("Setup ID: setup_1")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",
       { cache: "no-store" },
@@ -102,7 +115,9 @@ describe("ScheduledTransfers", () => {
 
     render(scheduledTransfers());
 
-    await screen.findByText("transfer_1");
+    await screen.findByRole("button", {
+      name: "Show details for transfer transfer_1",
+    });
     const dropdown = screen.getByRole("button", {
       name: /status.*3 selected/i,
     });
@@ -193,19 +208,24 @@ describe("ScheduledTransfers", () => {
 
     fireEvent.click(
       await screen.findByRole("button", {
-        name: "Cancel transfer transfer_1",
+        name: "Show details for transfer transfer_1",
       }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Cancel transfer transfer_1" }),
     );
 
     expect(
       await screen.findByText("Scheduled transfer cancelled."),
     ).toHaveAttribute("role", "status");
-    expect(screen.getByText("transfer_1")).toBeInTheDocument();
+    const toggle = screen.getByRole("button", {
+      name: "Hide details for transfer transfer_1",
+    });
+    expect(toggle.closest("li")).toHaveTextContent("Transfer ID: transfer_1");
     expect(screen.getByText("cancelled")).toHaveAttribute("data-tone", "cancelled");
-    expect(screen.getByText("transfer_1").closest("li")).toHaveAttribute(
-      "data-status",
-      "cancelled",
-    );
+    expect(toggle.closest("li")).toHaveAttribute("data-status", "cancelled");
+    expect(toggle.closest("li")).toHaveTextContent("Cancelled");
+    expect(toggle.closest("li")).not.toHaveTextContent("Scheduled for");
     expect(
       screen.queryByRole("button", { name: "Cancel transfer transfer_1" }),
     ).not.toBeInTheDocument();
@@ -236,14 +256,21 @@ describe("ScheduledTransfers", () => {
 
     fireEvent.click(
       await screen.findByRole("button", {
-        name: "Cancel transfer transfer_1",
+        name: "Show details for transfer transfer_1",
       }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Cancel transfer transfer_1" }),
     );
 
     expect(
       await screen.findByText("Could not cancel the scheduled transfer."),
     ).toHaveAttribute("role", "alert");
-    expect(screen.getByText("transfer_1")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Hide details for transfer transfer_1",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("styles terminal statuses and does not offer cancellation", async () => {
@@ -252,6 +279,7 @@ describe("ScheduledTransfers", () => {
       setup_id: "setup_2",
       transfer_id: "transfer_2",
       status: "completed",
+      scheduled_for: "2020-01-01T09:30:00Z",
     };
     const cancelledTransfer = {
       ...transfer,
@@ -264,6 +292,7 @@ describe("ScheduledTransfers", () => {
       setup_id: "setup_4",
       transfer_id: "transfer_4",
       status: "failed",
+      type: "withdraw",
     };
     fetchMock.mockResolvedValue(
       jsonResponse(
@@ -281,12 +310,24 @@ describe("ScheduledTransfers", () => {
       "data-tone",
       "completed",
     );
+    expect(screen.getByText(/ago$/)).toHaveAttribute("data-timing", "past");
     expect(screen.getByText("cancelled")).toHaveAttribute("data-tone", "cancelled");
-    expect(screen.getByText("transfer_3").closest("li")).toHaveAttribute(
-      "data-status",
-      "cancelled",
-    );
+    const cancelledCard = screen
+      .getByRole("button", {
+        name: "Show details for transfer transfer_3",
+      })
+      .closest("li");
+    expect(cancelledCard).toHaveAttribute("data-status", "cancelled");
+    expect(cancelledCard).toHaveTextContent("Cancelled");
+    expect(cancelledCard).not.toHaveTextContent("Scheduled for");
     expect(screen.getByText("failed")).toHaveAttribute("data-tone", "failed");
+    expect(
+      screen
+        .getByRole("button", {
+          name: "Show details for transfer transfer_4",
+        })
+        .closest("li"),
+    ).toHaveTextContent(`−${formatMoney(2500, "GBP")}`);
     expect(screen.queryByRole("button", { name: /Cancel transfer/ })).toBeNull();
   });
 

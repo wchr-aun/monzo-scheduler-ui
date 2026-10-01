@@ -1,76 +1,223 @@
 .card {
+  position: relative;
   display: grid;
   gap: var(--space-4);
-  padding: var(--space-4);
+  padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   background: var(--color-surface);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--color-interactive);
+  background: var(--color-surface-hover);
+}
+
+.card:has(.cardToggle:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .cancelled {
   background: var(--color-surface-muted);
 }
 
-.card h3 {
-  margin: 0;
-  overflow-wrap: anywhere;
+.cardToggle {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
 }
 
-.heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.cardToggle:focus-visible {
+  outline: none;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 1.25fr);
+  align-items: start;
   gap: var(--space-4);
 }
 
-.title {
+.amountGroup {
   display: flex;
   min-width: 0;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
 }
 
-.card dl,
-.card dl div {
+.amount {
+  display: flex;
+  align-items: center;
+  color: var(--color-heading);
+  font-size: clamp(1.65rem, 5vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.amount button {
+  position: relative;
+  z-index: 2;
+}
+
+.schedule {
+  min-width: 0;
+  text-align: right;
+}
+
+.countdown {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.past {
+  font-style: italic;
+}
+
+.cancelledMessage {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.scheduledFor {
   display: grid;
-  gap: var(--space-1);
-  margin: 0;
-}
-
-.card dl {
-  grid-template-columns: minmax(260px, 2.5fr) repeat(3, minmax(100px, 1fr));
-  gap: var(--space-3);
-}
-
-.card dt {
+  justify-items: end;
+  gap: 1px;
+  margin-top: var(--space-1);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
-.card dd {
-  margin: 0;
-  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: right;
 }
 
 .times {
+  display: inline-grid;
+  gap: 1px;
+}
+
+.details {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  animation: reveal 0.15s ease-out;
+}
+
+.details dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: 0;
+}
+
+.details dl div {
   display: grid;
   gap: var(--space-1);
 }
 
-.setupId {
-  margin: 0;
+.details dt {
   color: var(--color-text-muted);
   font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.footer {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding-right: var(--space-6);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}
+
+.footer p {
+  max-width: 100%;
+  margin: 0;
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 680px) {
-  .card dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.chevron {
+  position: absolute;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--color-text-muted);
+  border-bottom: 2px solid var(--color-text-muted);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.expanded .chevron {
+  transform: rotate(225deg);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: var(--space-4);
   }
 
-  .card dl > div:first-child {
-    grid-column: 1 / -1;
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule {
+    text-align: left;
+  }
+
+  .details {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .details button {
+    width: 100%;
+  }
+
+  .chevron {
+    right: var(--space-4);
+    bottom: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .chevron {
+    transition: none;
+  }
+
+  .details {
+    animation: none;
   }
 }
