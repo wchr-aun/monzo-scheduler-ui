@@ -12,7 +12,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
   return (
     <PageContainer>
       <PageHeader
-        backHref="/"
+        backHref="/console"
         backLabel="Back to accounts"
         subtitle={accountId}
         title="Account"

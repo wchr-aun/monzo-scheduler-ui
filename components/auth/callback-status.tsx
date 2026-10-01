@@ -54,7 +54,7 @@ export function CallbackStatus() {
     }
 
     const redirectTimer = window.setTimeout(() => {
-      router.replace("/");
+      router.replace("/console");
     }, 3_000);
 
     return () => window.clearTimeout(redirectTimer);
@@ -64,7 +64,7 @@ export function CallbackStatus() {
     return (
       <div className={styles.status} role="status">
         <LoadingIndicator />
-        <p>Redirecting you back to the homepage…</p>
+        <p>Redirecting you to the console…</p>
       </div>
     );
   }

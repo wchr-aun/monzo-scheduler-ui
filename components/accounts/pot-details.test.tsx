@@ -50,6 +50,10 @@ describe("PotDetails", () => {
     expect(
       screen.getByRole("button", { name: "Create a new scheduled transfer" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Back to account/ })).toHaveAttribute(
+      "href",
+      "/console/account/acc_123",
+    );
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/accounts/acc_123/pots",
       { cache: "no-store" },

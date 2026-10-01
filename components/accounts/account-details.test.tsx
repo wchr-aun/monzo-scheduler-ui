@@ -157,7 +157,7 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
-      "/account/acc_123/pot/pot_active",
+      "/console/account/acc_123/pot/pot_active",
     );
     expect(screen.queryByText("Old pot")).not.toBeInTheDocument();
 

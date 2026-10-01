@@ -23,10 +23,11 @@ accounts and pots, and managing scheduled transfers.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Login when signed out; user identity, account list, balances, and logout when signed in |
+| `/` | Blank landing page reserved for a future project story or dev blog |
+| `/console` | Login when signed out; user identity, account list, balances, and logout when signed in |
 | `/callback` | Validate OAuth callback parameters and complete login through the same-origin API |
-| `/account/[accountId]` | Show account balances and pots |
-| `/account/[accountId]/pot/[potId]` | Show a pot and create, filter, paginate, or cancel scheduled transfers |
+| `/console/account/[accountId]` | Show account balances and pots |
+| `/console/account/[accountId]/pot/[potId]` | Show a pot and create, filter, paginate, or cancel scheduled transfers |
 
 The browser only calls narrow, same-origin Route Handlers under `/api`. Those
 handlers read the JWT from the session cookie, send it to the configured backend
@@ -54,7 +55,8 @@ The login link navigates to `${BASE_URL}/monzo-redirect`. After authorization,
 the callback page calls `/api/auth/callback`, which forwards validated `code` and
 `state` values to `${BASE_URL}/monzo-callback`. The backend response must contain
 `{ "token": "<jwt>" }` and may include `expiresIn` in seconds. Without
-`expiresIn`, the cookie lasts for the browser session.
+`expiresIn`, the cookie lasts for the browser session. Successful login returns
+to `/console`.
 
 ## Development commands
 
@@ -68,7 +70,10 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
 
 ## Project structure
 
-- `app/` contains pages, layouts, global tokens, and server-side Route Handlers.
+- `app/` contains the blank landing page, global tokens, and server-side Route
+  Handlers. Application pages live under `app/console/`; `/callback` stays at its
+  existing path for OAuth. The console and callback layouts share application
+  navigation, providers, and the footer.
 - `components/` contains UI primitives, layout components, and account,
   authentication, and scheduled-transfer features.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,

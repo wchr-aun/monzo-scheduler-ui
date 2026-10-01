@@ -8,7 +8,7 @@ export function Navbar() {
   return (
     <nav className={styles.navbar} aria-label="Site controls">
       <div className={styles.content}>
-        <Link className={styles.brand} href="/" aria-label="Monzo Scheduler home">
+        <Link className={styles.brand} href="/console" aria-label="Monzo Scheduler console">
           <Image
             className={`${styles.logo} ${styles.lightLogo}`}
             src="/logo.png"
