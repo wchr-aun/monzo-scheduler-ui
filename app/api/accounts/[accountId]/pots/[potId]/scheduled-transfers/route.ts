@@ -3,22 +3,10 @@ import { NextResponse } from "next/server";
 import {
   defaultScheduledTransferStatuses,
   scheduledTransferStatuses,
+  type ScheduledTransfer,
   type ScheduledTransferStatus,
 } from "@/lib/scheduled-transfers/types";
-
-type ScheduledTransfer = {
-  setup_id: string;
-  transfer_id: string;
-  status: string;
-  created_at: string;
-  executed_at: string | null;
-  scheduled_for: string;
-  interval: string;
-  type: string;
-  amount: number;
-  pot_id: string;
-  account_id: string;
-};
+import { isScheduledTransfer } from "@/lib/scheduled-transfers/validation";
 
 type ScheduledTransfersResponse = {
   items: ScheduledTransfer[];
@@ -40,13 +28,6 @@ type ScheduleTransferRequest = {
   account_id: string;
 };
 
-type ScheduleTransferResponse = {
-  status: "scheduled";
-  setup_id: string;
-  transfer_id: string;
-  next_run_at: string;
-};
-
 const transferIntervals = ["daily", "weekly", "monthly"] as const;
 const transferTypes = ["deposit", "withdraw"] as const;
 
@@ -58,47 +39,6 @@ const scheduleTransferKeys = [
   "pot_id",
   "account_id",
 ] as const;
-
-function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "setup_id" in value &&
-    typeof value.setup_id === "string" &&
-    Boolean(value.setup_id.trim()) &&
-    "transfer_id" in value &&
-    typeof value.transfer_id === "string" &&
-    Boolean(value.transfer_id.trim()) &&
-    "status" in value &&
-    typeof value.status === "string" &&
-    Boolean(value.status.trim()) &&
-    "created_at" in value &&
-    typeof value.created_at === "string" &&
-    Boolean(value.created_at.trim()) &&
-    "executed_at" in value &&
-    (value.executed_at === null ||
-      (typeof value.executed_at === "string" &&
-        Boolean(value.executed_at.trim()))) &&
-    "scheduled_for" in value &&
-    typeof value.scheduled_for === "string" &&
-    Boolean(value.scheduled_for.trim()) &&
-    "interval" in value &&
-    typeof value.interval === "string" &&
-    Boolean(value.interval.trim()) &&
-    "type" in value &&
-    typeof value.type === "string" &&
-    Boolean(value.type.trim()) &&
-    "amount" in value &&
-    typeof value.amount === "number" &&
-    Number.isInteger(value.amount) &&
-    "pot_id" in value &&
-    typeof value.pot_id === "string" &&
-    Boolean(value.pot_id.trim()) &&
-    "account_id" in value &&
-    typeof value.account_id === "string" &&
-    Boolean(value.account_id.trim())
-  );
-}
 
 function isScheduledTransfersResponse(
   value: unknown,
@@ -249,25 +189,18 @@ function isScheduleTransferRequest(
   );
 }
 
-function isScheduleTransferResponse(
-  value: unknown,
-): value is ScheduleTransferResponse {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "status" in value &&
-    value.status === "scheduled" &&
-    "setup_id" in value &&
-    typeof value.setup_id === "string" &&
-    Boolean(value.setup_id.trim()) &&
-    "transfer_id" in value &&
-    typeof value.transfer_id === "string" &&
-    Boolean(value.transfer_id.trim()) &&
-    "next_run_at" in value &&
-    typeof value.next_run_at === "string" &&
-    Boolean(value.next_run_at.trim()) &&
-    !Number.isNaN(new Date(value.next_run_at).getTime())
-  );
+function toScheduledTransfer(value: ScheduledTransfer): ScheduledTransfer {
+  return {
+    setup_id: value.setup_id,
+    transfer_id: value.transfer_id,
+    status: value.status,
+    created_at: value.created_at,
+    executed_at: value.executed_at,
+    scheduled_for: value.scheduled_for,
+    interval: value.interval,
+    type: value.type,
+    amount: value.amount,
+  };
 }
 
 async function getBackendDetails() {
@@ -314,6 +247,8 @@ export async function GET(request: Request, context: RouteContext) {
 
   try {
     const backendUrl = new URL(`${baseUrl}/scheduled-transfers`);
+    backendUrl.searchParams.set("account_id", accountId);
+    backendUrl.searchParams.set("pot_id", potId);
     backendUrl.searchParams.set("limit", String(pagination.limit));
     backendUrl.searchParams.set("offset", String(pagination.offset));
     backendUrl.searchParams.set("status", statuses.join(","));
@@ -348,10 +283,7 @@ export async function GET(request: Request, context: RouteContext) {
       );
     }
 
-    const scheduledTransfers = payload.items.filter(
-      (transfer) =>
-        transfer.account_id === accountId && transfer.pot_id === potId,
-    );
+    const scheduledTransfers = payload.items.map(toScheduledTransfer);
     const response = NextResponse.json({
       scheduledTransfers,
       total: payload.total,
@@ -431,14 +363,16 @@ export async function POST(request: Request, context: RouteContext) {
 
     const backendPayload: unknown = await backendResponse.json();
 
-    if (!isScheduleTransferResponse(backendPayload)) {
+    if (!isScheduledTransfer(backendPayload)) {
       return NextResponse.json(
         { error: "invalid_schedule_transfer_response" },
         { status: 502 },
       );
     }
 
-    const response = new NextResponse(null, { status: 204 });
+    const response = NextResponse.json(toScheduledTransfer(backendPayload), {
+      status: 201,
+    });
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {

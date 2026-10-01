@@ -1,6 +1,6 @@
 import type { ScheduledTransfer, ScheduledTransfersPage } from "./types";
 
-function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
+export function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
   return (
     typeof value === "object" &&
     value !== null &&
@@ -31,13 +31,7 @@ function isScheduledTransfer(value: unknown): value is ScheduledTransfer {
     Boolean(value.type.trim()) &&
     "amount" in value &&
     typeof value.amount === "number" &&
-    Number.isInteger(value.amount) &&
-    "pot_id" in value &&
-    typeof value.pot_id === "string" &&
-    Boolean(value.pot_id.trim()) &&
-    "account_id" in value &&
-    typeof value.account_id === "string" &&
-    Boolean(value.account_id.trim())
+    Number.isInteger(value.amount)
   );
 }
 

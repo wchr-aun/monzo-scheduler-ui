@@ -32,7 +32,7 @@ describe("scheduled transfers route", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("forwards authentication and returns only transfers for the requested pot", async () => {
+  it("forwards authentication and scopes transfers to the requested pot", async () => {
     fetchMock.mockResolvedValue(
       backendResponse({
         items: [
@@ -46,24 +46,9 @@ describe("scheduled transfers route", () => {
             interval: "monthly",
             type: "deposit",
             amount: 2500,
-            pot_id: "pot_456",
-            account_id: "acc_123",
-          },
-          {
-            setup_id: "setup_2",
-            transfer_id: "transfer_2",
-            status: "completed",
-            created_at: "2026-09-02T08:15:00Z",
-            executed_at: "2026-10-02T09:30:05Z",
-            scheduled_for: "2026-10-02T09:30:00Z",
-            interval: "monthly",
-            type: "deposit",
-            amount: 1000,
-            pot_id: "another_pot",
-            account_id: "acc_123",
           },
         ],
-        total: 2,
+        total: 1,
         limit: 50,
         offset: 0,
       }),
@@ -79,10 +64,12 @@ describe("scheduled transfers route", () => {
       "2026-09-01T08:15:00Z",
     );
     expect(body.scheduledTransfers[0].executed_at).toBeNull();
-    expect(body).toMatchObject({ total: 2, limit: 50, offset: 0 });
+    expect(body.scheduledTransfers[0]).not.toHaveProperty("account_id");
+    expect(body.scheduledTransfers[0]).not.toHaveProperty("pot_id");
+    expect(body).toMatchObject({ total: 1, limit: 50, offset: 0 });
     expect(fetchMock).toHaveBeenCalledWith(
       new URL(
-        "https://backend.example/scheduled-transfers?limit=50&offset=0&status=completed%2Cpending%2Cfailed",
+        "https://backend.example/scheduled-transfers?account_id=acc_123&pot_id=pot_456&limit=50&offset=0&status=completed%2Cpending%2Cfailed",
       ),
       expect.objectContaining({
         headers: {
@@ -113,7 +100,7 @@ describe("scheduled transfers route", () => {
     });
     expect(fetchMock).toHaveBeenCalledWith(
       new URL(
-        "https://backend.example/scheduled-transfers?limit=25&offset=50&status=completed%2Cpending%2Cfailed",
+        "https://backend.example/scheduled-transfers?account_id=acc_123&pot_id=pot_456&limit=25&offset=50&status=completed%2Cpending%2Cfailed",
       ),
       expect.anything(),
     );
@@ -132,7 +119,7 @@ describe("scheduled transfers route", () => {
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledWith(
       new URL(
-        "https://backend.example/scheduled-transfers?limit=50&offset=0&status=pending%2Ccancelled",
+        "https://backend.example/scheduled-transfers?account_id=acc_123&pot_id=pot_456&limit=50&offset=0&status=pending%2Ccancelled",
       ),
       expect.anything(),
     );
@@ -201,13 +188,22 @@ describe("scheduled transfers route", () => {
   });
 
   it("creates a scheduled transfer with the authenticated backend", async () => {
+    const createdTransfer = {
+      setup_id: "setup_1",
+      transfer_id: "transfer_1",
+      status: "pending",
+      created_at: "2026-09-01T08:15:00Z",
+      executed_at: null,
+      scheduled_for: "2026-10-01T09:30:00+01:00",
+      interval: "monthly",
+      type: "deposit",
+      amount: 2500,
+    };
     fetchMock.mockResolvedValue(
       backendResponse(
         {
-          status: "scheduled",
-          setup_id: "setup_1",
-          transfer_id: "transfer_1",
-          next_run_at: "2026-10-01T09:30:00+01:00",
+          ...createdTransfer,
+          internal_metadata: "not-for-the-browser",
         },
         { status: 201 },
       ),
@@ -230,8 +226,8 @@ describe("scheduled transfers route", () => {
       context,
     );
 
-    expect(response.status).toBe(204);
-    expect(await response.text()).toBe("");
+    expect(response.status).toBe(201);
+    expect(await response.json()).toEqual(createdTransfer);
     expect(fetchMock).toHaveBeenCalledWith(
       "https://backend.example/schedule-transfer",
       expect.objectContaining({
@@ -270,7 +266,14 @@ describe("scheduled transfers route", () => {
   });
 
   it("rejects an invalid create response from the backend", async () => {
-    fetchMock.mockResolvedValue(backendResponse({ status: "scheduled" }));
+    fetchMock.mockResolvedValue(
+      backendResponse({
+        status: "scheduled",
+        setup_id: "setup_1",
+        transfer_id: "transfer_1",
+        next_run_at: "2026-10-01T09:30:00+01:00",
+      }),
+    );
 
     const response = await POST(
       new Request("http://localhost", {

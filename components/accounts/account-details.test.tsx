@@ -8,17 +8,13 @@ const balance = {
   balance: 12_345,
   total_balance: 17_345,
   currency: "GBP",
-  spend_today: 678,
 };
 
 const activePot = {
   id: "pot_active",
   name: "Holiday",
-  style: "beach_ball",
   balance: 5_000,
   currency: "GBP",
-  created: "2026-01-02T03:04:05Z",
-  updated: "2026-02-03T04:05:06Z",
   deleted: false,
 };
 
@@ -102,7 +98,6 @@ describe("AccountDetails", () => {
             {
               id: "acc_123",
               description: "Current Account",
-              created: "2026-01-02T03:04:05Z",
               balance_details: null,
             },
           ],
@@ -131,7 +126,6 @@ describe("AccountDetails", () => {
           {
             id: "acc_123",
             description: "user_123",
-            created: "2026-01-02T03:04:05Z",
             balance_details: balance,
           },
         ],
@@ -147,7 +141,6 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Main Account")).toBeInTheDocument();
     expect(screen.queryByText("user_123")).not.toBeInTheDocument();
     expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
-    expect(screen.queryByText("2026-01-02T03:04:05Z")).not.toBeInTheDocument();
   });
 
   it("shows balances and toggles deleted pots", async () => {
@@ -162,9 +155,6 @@ describe("AccountDetails", () => {
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
-    expect(screen.queryByText("beach_ball")).not.toBeInTheDocument();
-    expect(screen.queryByText(activePot.created)).not.toBeInTheDocument();
-    expect(screen.queryByText(activePot.updated)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
       "/account/acc_123/pot/pot_active",
@@ -193,7 +183,6 @@ describe("AccountDetails", () => {
             {
               id: "acc_123",
               description: "Current Account",
-              created: "2026-01-02T03:04:05Z",
               balance_details: balance,
             },
           ],
@@ -249,7 +238,6 @@ describe("AccountDetails", () => {
             {
               id: "acc_123",
               description: "Current Account",
-              created: "2026-01-02T03:04:05Z",
               balance_details: null,
             },
           ],

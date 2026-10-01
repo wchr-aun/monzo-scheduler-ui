@@ -32,8 +32,6 @@ const transfer = {
   interval: "monthly",
   type: "deposit",
   amount: 100,
-  pot_id: "pot_456",
-  account_id: "acc_123",
 };
 
 function scheduledTransfersPage(scheduledTransfers: (typeof transfer)[]) {

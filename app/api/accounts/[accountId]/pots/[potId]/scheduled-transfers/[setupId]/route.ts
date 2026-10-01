@@ -9,20 +9,6 @@ type RouteContext = {
   }>;
 };
 
-function isCancelTransferResponse(
-  value: unknown,
-  setupId: string,
-): value is { setup_id: string; status: "deactivated" } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "setup_id" in value &&
-    value.setup_id === setupId &&
-    "status" in value &&
-    value.status === "deactivated"
-  );
-}
-
 export async function DELETE(_request: Request, context: RouteContext) {
   const { accountId, potId, setupId } = await context.params;
 
@@ -73,9 +59,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "cancel_transfer_failed" }, { status });
     }
 
-    const payload: unknown = await backendResponse.json();
-
-    if (!isCancelTransferResponse(payload, setupId)) {
+    if (backendResponse.status !== 204) {
       return NextResponse.json(
         { error: "invalid_cancel_transfer_response" },
         { status: 502 },

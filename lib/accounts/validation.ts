@@ -12,10 +12,7 @@ export function isBalance(value: unknown): value is Balance {
     Number.isInteger(value.total_balance) &&
     "currency" in value &&
     typeof value.currency === "string" &&
-    value.currency.length === 3 &&
-    "spend_today" in value &&
-    typeof value.spend_today === "number" &&
-    Number.isInteger(value.spend_today)
+    value.currency.length === 3
   );
 }
 
@@ -28,9 +25,6 @@ function isAccount(value: unknown): value is Account {
     Boolean(value.id.trim()) &&
     "description" in value &&
     typeof value.description === "string" &&
-    "created" in value &&
-    typeof value.created === "string" &&
-    Boolean(value.created.trim()) &&
     "balance_details" in value &&
     (value.balance_details === null || isBalance(value.balance_details))
   );

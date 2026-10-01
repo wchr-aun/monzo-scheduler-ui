@@ -37,13 +37,15 @@ describe("cancel scheduled transfer route", () => {
   });
 
   it("cancels the transfer using the authenticated backend", async () => {
-    fetchMock.mockResolvedValue(
-      backendResponse({ setup_id: "setup_1", status: "deactivated" }),
-    );
+    const backend = new Response(null, { status: 204 });
+    const jsonSpy = vi.spyOn(backend, "json");
+    fetchMock.mockResolvedValue(backend);
 
     const response = await DELETE(new Request("http://localhost"), context);
 
     expect(response.status).toBe(204);
+    expect(await response.text()).toBe("");
+    expect(jsonSpy).not.toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledWith(
       "https://backend.example/schedule-transfer/setup_1",
       expect.objectContaining({
@@ -68,7 +70,7 @@ describe("cancel scheduled transfer route", () => {
     expect(await response.json()).toEqual({ error: "cancel_transfer_failed" });
   });
 
-  it("rejects an invalid backend response", async () => {
+  it("rejects an unexpected backend success status", async () => {
     fetchMock.mockResolvedValue(
       backendResponse({ setup_id: "another_setup", status: "deactivated" }),
     );

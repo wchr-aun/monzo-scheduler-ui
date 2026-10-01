@@ -5,7 +5,6 @@ type Balance = {
   balance: number;
   total_balance: number;
   currency: string;
-  spend_today: number;
 };
 
 type RouteContext = {
@@ -24,10 +23,7 @@ function isBalance(value: unknown): value is Balance {
     Number.isInteger(value.total_balance) &&
     "currency" in value &&
     typeof value.currency === "string" &&
-    value.currency.length === 3 &&
-    "spend_today" in value &&
-    typeof value.spend_today === "number" &&
-    Number.isInteger(value.spend_today)
+    value.currency.length === 3
   );
 }
 
@@ -102,7 +98,6 @@ export async function GET(_request: Request, context: RouteContext) {
       balance: payload.balance,
       total_balance: payload.total_balance,
       currency: payload.currency,
-      spend_today: payload.spend_today,
     });
     response.headers.set("Cache-Control", "no-store");
     return response;

@@ -4,11 +4,8 @@ import { NextResponse } from "next/server";
 type Pot = {
   id: string;
   name: string;
-  style: string;
   balance: number;
   currency: string;
-  created: string;
-  updated: string;
   deleted: boolean;
 };
 
@@ -25,20 +22,12 @@ function isPot(value: unknown): value is Pot {
     Boolean(value.id.trim()) &&
     "name" in value &&
     typeof value.name === "string" &&
-    "style" in value &&
-    typeof value.style === "string" &&
     "balance" in value &&
     typeof value.balance === "number" &&
     Number.isInteger(value.balance) &&
     "currency" in value &&
     typeof value.currency === "string" &&
     value.currency.length === 3 &&
-    "created" in value &&
-    typeof value.created === "string" &&
-    Boolean(value.created.trim()) &&
-    "updated" in value &&
-    typeof value.updated === "string" &&
-    Boolean(value.updated.trim()) &&
     "deleted" in value &&
     typeof value.deleted === "boolean"
   );
@@ -127,14 +116,11 @@ export async function GET(_request: Request, context: RouteContext) {
 
     const response = NextResponse.json({
       pots: pots.map(
-        ({ id, name, style, balance, currency, created, updated, deleted }) => ({
+        ({ id, name, balance, currency, deleted }) => ({
           id,
           name,
-          style,
           balance,
           currency,
-          created,
-          updated,
           deleted,
         }),
       ),

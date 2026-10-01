@@ -26,11 +26,8 @@ describe("PotDetails", () => {
           {
             id: "pot_456",
             name: "Holiday",
-            style: "beach_ball",
             balance: 5_000,
             currency: "GBP",
-            created: "2026-01-01T00:00:00Z",
-            updated: "2026-01-02T00:00:00Z",
             deleted: false,
           },
         ],

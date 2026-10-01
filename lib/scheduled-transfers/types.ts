@@ -24,8 +24,6 @@ export type ScheduledTransfer = {
   interval: string;
   type: string;
   amount: number;
-  pot_id: string;
-  account_id: string;
 };
 
 export type ScheduledTransfersPage = {
