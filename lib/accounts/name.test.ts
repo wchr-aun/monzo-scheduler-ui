@@ -11,7 +11,7 @@ describe("getAccountName", () => {
   });
 
   it("uses Joint account when it appears anywhere in the description", () => {
-    expect(getAccountName(account("Monzo Joint account_user_123"))).toBe("Joint account");
+    expect(getAccountName(account("Monzo Joint account_user_123"))).toBe("Joint Account");
   });
 
   it.each([

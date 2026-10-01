@@ -5,8 +5,8 @@ export function getAccountName(account: Account, userId?: string | null) {
     return "Main Account";
   }
 
-  if (account.description.includes("Joint account")) {
-    return "Joint account";
+  if (account.description.toLowerCase().includes("joint account")) {
+    return "Joint Account";
   }
 
   const name = account.description.split("_")[0].trim();
