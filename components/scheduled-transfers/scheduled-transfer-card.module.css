@@ -192,10 +192,6 @@
     grid-template-columns: 1fr;
   }
 
-  .schedule {
-    text-align: left;
-  }
-
   .details {
     align-items: stretch;
     flex-direction: column;
