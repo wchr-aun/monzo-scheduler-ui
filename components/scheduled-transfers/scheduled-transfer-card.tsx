@@ -8,6 +8,7 @@ import {
   getScheduledDateTimes,
   getTimeUntil,
 } from "@/lib/scheduled-transfers/date-time";
+import { getDifferingUuidSections } from "@/lib/scheduled-transfers/id-sections";
 import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
 import styles from "./scheduled-transfer-card.module.css";
 
@@ -29,6 +30,10 @@ export function ScheduledTransferCard({
   const scheduledTime = new Date(transfer.scheduled_for).getTime();
   const isPast =
     now !== null && !Number.isNaN(scheduledTime) && scheduledTime < now;
+  const differingIdSections = getDifferingUuidSections(
+    transfer.transfer_id,
+    transfer.setup_id,
+  );
 
   useEffect(() => {
     setNow(Date.now());
@@ -124,12 +129,47 @@ export function ScheduledTransferCard({
       ) : null}
 
       <div className={styles.footer}>
-        <p>Transfer ID: {transfer.transfer_id}</p>
-        <p>Setup ID: {transfer.setup_id}</p>
+        <p>
+          Transfer ID:{" "}
+          <DifferentiatedId
+            differingSections={differingIdSections}
+            value={transfer.transfer_id}
+          />
+        </p>
+        <p>
+          Setup ID:{" "}
+          <DifferentiatedId
+            differingSections={differingIdSections}
+            value={transfer.setup_id}
+          />
+        </p>
       </div>
       <span className={styles.chevron} aria-hidden="true" />
     </li>
   );
+}
+
+function DifferentiatedId({
+  differingSections,
+  value,
+}: {
+  differingSections: boolean[] | null;
+  value: string;
+}) {
+  if (!differingSections) {
+    return value;
+  }
+
+  return value.split("-").map((section, index) => (
+    <span key={`${index}-${section}`}>
+      {index > 0 ? "-" : null}
+      {differingSections[index] ? (
+        <em className={styles.differingIdSection}>{section}</em>
+      ) : (
+        section
+      )}
+    </span>
+  ));
 }
 
 function ScheduledFor({ value }: { value: string }) {

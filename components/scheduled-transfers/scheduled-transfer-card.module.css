@@ -160,6 +160,10 @@
   overflow-wrap: anywhere;
 }
 
+.differingIdSection {
+  font-style: italic;
+}
+
 .chevron {
   position: absolute;
   right: var(--space-5);
