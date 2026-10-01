@@ -66,18 +66,6 @@ export function AccountBalance({ accountId }: { accountId: string }) {
               )
             }
           />
-          <BalanceValue
-            label="Spent today"
-            value={
-              balance && (
-                <Money
-                  amount={balance.spend_today}
-                  currency={balance.currency}
-                  label="spent today"
-                />
-              )
-            }
-          />
         </dl>
       )}
     </Section>

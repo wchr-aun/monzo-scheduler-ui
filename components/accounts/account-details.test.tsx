@@ -64,7 +64,6 @@ describe("AccountDetails", () => {
 
     expect(within(loadingBalance).getByText("Balance")).toBeInTheDocument();
     expect(within(loadingBalance).getByText("Total balance")).toBeInTheDocument();
-    expect(within(loadingBalance).getByText("Spent today")).toBeInTheDocument();
     expect(
       screen.getByRole("status", { name: "Loading pots" }),
     ).toBeInTheDocument();
