@@ -1,5 +1,34 @@
-import { describe, expect, it } from "vitest";
-import { getTimeUntil } from "./date-time";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { formatLocalDateTime, getScheduledDateTimes, getTimeUntil } from "./date-time";
+
+describe("display date formatting", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("uses day-first dates, full month names, and 24-hour UK and local times", () => {
+    vi.stubEnv("TZ", "Asia/Bangkok");
+    expect(getScheduledDateTimes("2026-10-01T09:30:00Z")).toEqual({
+      uk: "1 October 2026 - 10:30 UK",
+      local: "1 October 2026 - 16:30 Local",
+      localMatchesUk: false,
+    });
+    expect(formatLocalDateTime("2026-10-01T09:30:00Z")).toBe(
+      "1 October 2026 - 16:30 Local",
+    );
+  });
+
+  it("formats midnight as 00:00 and recognizes matching winter UK times", () => {
+    vi.stubEnv("TZ", "Europe/London");
+    expect(getScheduledDateTimes("2026-12-01T00:00:00Z")).toEqual({
+      uk: "1 December 2026 - 00:00 UK",
+      local: "1 December 2026 - 00:00 Local",
+      localMatchesUk: true,
+    });
+  });
+
+  it("handles invalid scheduled dates", () => {
+    expect(getScheduledDateTimes("invalid")).toBeNull();
+  });
+});
 
 describe("getTimeUntil", () => {
   const now = new Date("2026-10-01T09:30:00Z").getTime();

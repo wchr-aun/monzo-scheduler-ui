@@ -71,6 +71,12 @@
   box-shadow: 0 8px 24px rgb(20 35 60 / 18%);
 }
 
+@media (max-width: 560px) {
+  .container {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .trigger::after {
     transition: none;

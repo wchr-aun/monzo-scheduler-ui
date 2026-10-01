@@ -4,6 +4,10 @@
   gap: var(--space-1);
 }
 
+.decimals {
+  font-size: 0.7em;
+}
+
 .toggle {
   position: relative;
   z-index: 2;

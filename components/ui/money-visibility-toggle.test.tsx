@@ -1,3 +1,4 @@
+import { textContent } from "@/test-utils/text";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
@@ -28,21 +29,21 @@ describe("MoneyVisibilityToggle", () => {
 
     const hideButton = screen.getByRole("button", { name: "Hide money values" });
     expect(hideButton).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByText("£123.45")).toBeInTheDocument();
-    expect(screen.getByText("£50.00")).toBeInTheDocument();
+    expect(screen.getByText(textContent("£123.45"))).toBeInTheDocument();
+    expect(screen.getByText(textContent("£50.00"))).toBeInTheDocument();
 
     fireEvent.click(hideButton);
 
-    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
-    expect(screen.queryByText("£50.00")).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£50.00"))).not.toBeInTheDocument();
     expect(screen.getAllByText(MONEY_MASK)).toHaveLength(2);
 
     const showButton = screen.getByRole("button", { name: "Show money values" });
     expect(showButton).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(showButton);
 
-    expect(screen.getByText("£123.45")).toBeInTheDocument();
-    expect(screen.getByText("£50.00")).toBeInTheDocument();
+    expect(screen.getByText(textContent("£123.45"))).toBeInTheDocument();
+    expect(screen.getByText(textContent("£50.00"))).toBeInTheDocument();
     expect(localStorage.getItem(MONEY_VISIBILITY_STORAGE_KEY)).toBe("false");
   });
 
@@ -73,7 +74,7 @@ describe("MoneyVisibilityToggle", () => {
       screen.getByRole("button", { name: "Show money values" }),
     ).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(MONEY_MASK)).toBeInTheDocument();
-    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
   });
 
   it("reveals only the selected money value", () => {
@@ -92,8 +93,8 @@ describe("MoneyVisibilityToggle", () => {
 
     fireEvent.click(revealButtons[0]);
 
-    expect(screen.getByText("£123.45")).toBeInTheDocument();
-    expect(screen.queryByText("£50.00")).not.toBeInTheDocument();
+    expect(screen.getByText(textContent("£123.45"))).toBeInTheDocument();
+    expect(screen.queryByText(textContent("£50.00"))).not.toBeInTheDocument();
     expect(screen.getAllByText(MONEY_MASK)).toHaveLength(1);
     expect(
       screen.getByRole("button", { name: "Hide money value" }),
@@ -135,7 +136,7 @@ describe("MoneyVisibilityToggle", () => {
       screen.getByRole("button", { name: "Show money values" }),
     ).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(MONEY_MASK)).toBeInTheDocument();
-    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
 
     getItem.mockRestore();
     setItem.mockRestore();

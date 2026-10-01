@@ -1,6 +1,5 @@
 "use client";
 
-import {Section} from "@/components/layout/section";
 import {Button} from "@/components/ui/button";
 import {InlineMessage} from "@/components/ui/inline-message";
 import {Select} from "@/components/ui/select";
@@ -148,21 +147,18 @@ export function CreateScheduledTransfer({
 
   const ukDateTime = getUkDateTime(selectedDateTime);
   return (
-    <Section
-      heading="Schedule a transfer"
-      headingId="create-transfer-heading"
-      action={
-        <Button
-          variant={isExpanded ? "secondary" : "primary"}
-          type="button"
-          aria-expanded={isExpanded}
-          aria-controls="scheduled-transfer-form"
-          onClick={toggleForm}
-        >
-          {isExpanded ? "Cancel" : "Create a new scheduled transfer"}
-        </Button>
-      }
-    >
+    <section className={styles.section} aria-label="Schedule a transfer">
+      <Button
+        className={styles.toggle}
+        variant={isExpanded ? "secondary" : "primary"}
+        type="button"
+        aria-expanded={isExpanded}
+        aria-controls="scheduled-transfer-form"
+        onClick={toggleForm}
+      >
+        <span>{isExpanded ? "Do it later" : "Schedule a transfer"}</span>
+        <span className={styles.plus} aria-hidden="true">{isExpanded ? "-" : "+"}</span>
+      </Button>
       {isExpanded ? (
         <form
           className={styles.form}
@@ -249,6 +245,6 @@ export function CreateScheduledTransfer({
       {message ? (
         <InlineMessage tone={message.kind}>{message.text}</InlineMessage>
       ) : null}
-    </Section>
+    </section>
   );
 }

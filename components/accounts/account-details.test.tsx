@@ -1,3 +1,4 @@
+import { textContent } from "@/test-utils/text";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AccountDetails } from "@/components/accounts/account-details";
@@ -33,10 +34,10 @@ function jsonResponse(body: unknown, options?: { ok?: boolean; status?: number }
   } as Response;
 }
 
-function accountDetails() {
+function accountDetails(userId?: string) {
   return (
     <DataProvider>
-      <AccountDetails accountId="acc_123" />
+      <AccountDetails accountId="acc_123" userId={userId} />
     </DataProvider>
   );
 }
@@ -65,7 +66,7 @@ describe("AccountDetails", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText("Loading balance…")).not.toBeInTheDocument();
     expect(screen.queryByText("Loading pots…")).not.toBeInTheDocument();
-    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
   });
 
   it("uses indicators while accounts load and a balance retries", async () => {
@@ -132,7 +133,7 @@ describe("AccountDetails", () => {
       }),
     );
 
-    render(
+    const view = render(
       <DataProvider>
         <AccountsList userId="user_123" />
       </DataProvider>,
@@ -141,11 +142,16 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Main Account")).toBeInTheDocument();
     expect(screen.queryByText("user_123")).not.toBeInTheDocument();
     expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
+    view.rerender(accountDetails("user_123"));
+    expect(await screen.findByRole("heading", { level: 1, name: "Main Account" })).toBeInTheDocument();
   });
 
   it("shows balances and toggles deleted pots", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
+      if (url === "/api/accounts") {
+        return jsonResponse({ accounts: [{ id: "acc_123", description: "Current Account", balance_details: null }] });
+      }
       return url.endsWith("/balance")
         ? jsonResponse(balance)
         : jsonResponse({ pots: [activePot, deletedPot] });
@@ -153,7 +159,7 @@ describe("AccountDetails", () => {
 
     render(accountDetails());
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
@@ -170,7 +176,15 @@ describe("AccountDetails", () => {
       "true",
     );
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByRole("heading", { level: 1, name: "Current Account" })).toBeInTheDocument();
+    expect(screen.getByText("Your account")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Back to accounts/ })).toHaveAttribute(
+      "href",
+      "/console",
+    );
+    expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Balance" })).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("reuses the balance loaded by the account list", async () => {
@@ -201,14 +215,14 @@ describe("AccountDetails", () => {
     );
 
     expect(await screen.findByText("Available balance")).toBeInTheDocument();
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect(screen.getByText("£173.45").closest("small")).toHaveTextContent(
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
+    expect(screen.getByText(textContent("£173.45")).closest("small")).toHaveTextContent(
       "Total balance: £173.45",
     );
 
     view.rerender(accountDetails());
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
     expect(await screen.findByText("No pots found.")).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(([input]) =>
@@ -259,8 +273,8 @@ describe("AccountDetails", () => {
       }),
     );
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect((await screen.findByText("£173.45")).closest("small")).toHaveTextContent(
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
+    expect((await screen.findByText(textContent("£173.45"))).closest("small")).toHaveTextContent(
       "Total balance: £173.45",
     );
     expect(
@@ -271,11 +285,14 @@ describe("AccountDetails", () => {
   });
 
   it("handles an empty pots response", async () => {
-    fetchMock.mockImplementation(async (input) =>
-      String(input).endsWith("/balance")
+    fetchMock.mockImplementation(async (input) => {
+      if (String(input) === "/api/accounts") {
+        return jsonResponse({ accounts: [] });
+      }
+      return String(input).endsWith("/balance")
         ? jsonResponse(balance)
-        : jsonResponse({ pots: [] }),
-    );
+        : jsonResponse({ pots: [] });
+    });
 
     render(accountDetails());
 

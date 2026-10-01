@@ -1,3 +1,4 @@
+import { textContent } from "@/test-utils/text";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
@@ -41,14 +42,14 @@ describe("PotDetails", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { name: "Balance" }),
+      await screen.findByRole("heading", { name: "Pot balance" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { level: 1, name: "Holiday" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(formatMoney(5_000, "GBP"))).toBeInTheDocument();
+    expect(screen.getByText(textContent(formatMoney(5_000, "GBP")))).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Create a new scheduled transfer" }),
+      screen.getByRole("button", { name: "Schedule a transfer" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Back to account/ })).toHaveAttribute(
       "href",

@@ -1,6 +1,5 @@
 "use client";
 
-import { Section } from "@/components/layout/section";
 import { InlineMessage } from "@/components/ui/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { Money } from "@/components/ui/money";
@@ -32,7 +31,7 @@ export function AccountBalance({ accountId }: { accountId: string }) {
   const balanceIsLoading = isLoading || !balance;
 
   return (
-    <Section heading="Balance" headingId="balance-heading">
+    <section aria-label="Account balances">
       {error ? (
         <InlineMessage tone="error">Could not load the balance.</InlineMessage>
       ) : (
@@ -68,7 +67,7 @@ export function AccountBalance({ accountId }: { accountId: string }) {
           />
         </dl>
       )}
-    </Section>
+    </section>
   );
 }
 

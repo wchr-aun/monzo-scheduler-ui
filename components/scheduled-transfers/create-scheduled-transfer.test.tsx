@@ -1,3 +1,4 @@
+import { formatLocalDateTime } from "@/lib/scheduled-transfers/date-time";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
@@ -62,7 +63,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Create a new scheduled transfer",
+        name: "Schedule a transfer",
       }),
     );
 
@@ -83,7 +84,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Create a new scheduled transfer",
+        name: "Schedule a transfer",
       }),
     );
     const dateTime = screen.getByLabelText("UK date and time");
@@ -108,7 +109,7 @@ describe("CreateScheduledTransfer", () => {
     render(createScheduledTransfer());
 
     const toggle = screen.getByRole("button", {
-      name: "Create a new scheduled transfer",
+      name: "Schedule a transfer",
     });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
@@ -119,14 +120,7 @@ describe("CreateScheduledTransfer", () => {
       target: { value: "2026-10-01T09:30" },
     });
     const selectedUkDateTime = "2026-10-01T09:30:00+01:00";
-    const expectedLocalDateTime = new Intl.DateTimeFormat(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short",
-    }).format(new Date(selectedUkDateTime));
+    const expectedLocalDateTime = formatLocalDateTime(selectedUkDateTime);
     const localTime = screen.getByText(expectedLocalDateTime);
     expect(localTime).toHaveAttribute("datetime", selectedUkDateTime);
     expect(localTime.parentElement).toHaveTextContent(
@@ -210,7 +204,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Create a new scheduled transfer",
+        name: "Schedule a transfer",
       }),
     );
     fireEvent.change(screen.getByLabelText("UK date and time"), {
@@ -259,7 +253,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Create a new scheduled transfer",
+        name: "Schedule a transfer",
       }),
     );
     const amount = screen.getByLabelText("Amount (pence)");
@@ -309,7 +303,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
     fireEvent.click(
-      screen.getByRole("button", { name: "Create a new scheduled transfer" }),
+      screen.getByRole("button", { name: "Schedule a transfer" }),
     );
     fireEvent.change(screen.getByLabelText("Amount (pence)"), {
       target: { value: "2500" },
@@ -329,7 +323,7 @@ describe("CreateScheduledTransfer", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Create a new scheduled transfer",
+        name: "Schedule a transfer",
       }),
     );
     fireEvent.change(screen.getByLabelText("UK date and time"), {

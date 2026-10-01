@@ -1,10 +1,14 @@
 export function formatMoney(amount: number, currency: string) {
+  return formatMoneyParts(amount, currency).map((part) => part.value).join("");
+}
+
+export function formatMoneyParts(amount: number, currency: string): Intl.NumberFormatPart[] {
   try {
     return new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,
-    }).format(amount / 100);
+    }).formatToParts(amount / 100);
   } catch {
-    return `${amount} ${currency}`;
+    return [{ type: "literal", value: `${amount} ${currency}` }];
   }
 }
