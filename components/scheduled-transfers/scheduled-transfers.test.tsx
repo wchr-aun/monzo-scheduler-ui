@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
@@ -211,7 +211,7 @@ describe("ScheduledTransfers", () => {
     ).toHaveAttribute("role", "alert");
   });
 
-  it("cancels a scheduled transfer and keeps it in the list", async () => {
+  it("uses the refreshed status after cancelling a scheduled transfer", async () => {
     const cancelledTransfer = { ...transfer, status: "cancelled" };
     fetchMock
       .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
@@ -262,6 +262,55 @@ describe("ScheduledTransfers", () => {
       { cache: "no-store" },
     );
   });
+
+  it.each([true, false])(
+    "keeps the list unchanged until cancellation refresh completes (refresh succeeds: %s)",
+    async (refreshSucceeds) => {
+      let resolveRefresh!: (response: Response) => void;
+      const refresh = new Promise<Response>((resolve) => {
+        resolveRefresh = resolve;
+      });
+      fetchMock
+        .mockResolvedValueOnce(jsonResponse(scheduledTransfersPage([transfer])))
+        .mockResolvedValueOnce(jsonResponse(null, { status: 204 }))
+        .mockReturnValueOnce(refresh);
+
+      render(scheduledTransfers());
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: "Show details for transfer transfer_1",
+        }),
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: "Cancel transfer transfer_1" }),
+      );
+
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+      expect(screen.getByText("pending")).toBeInTheDocument();
+      expect(screen.getByText("Cancelling…")).toBeDisabled();
+      expect(screen.queryByText("cancelled")).not.toBeInTheDocument();
+      expect(screen.queryByText("No scheduled transfers found.")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Loading scheduled transfers")).not.toBeInTheDocument();
+
+      await act(async () => {
+        resolveRefresh(
+          jsonResponse(scheduledTransfersPage([]), {
+            ok: refreshSucceeds,
+            status: refreshSucceeds ? 200 : 502,
+          }),
+        );
+      });
+
+      expect(await screen.findByText("Scheduled transfer cancelled.")).toBeInTheDocument();
+      if (refreshSucceeds) {
+        expect(screen.getByText("No scheduled transfers found.")).toBeInTheDocument();
+        expect(screen.queryByText("pending")).not.toBeInTheDocument();
+      } else {
+        expect(screen.getByText("pending")).toBeInTheDocument();
+        expect(screen.getByText("Could not load scheduled transfers.")).toHaveAttribute("role", "alert");
+      }
+    },
+  );
 
   it("keeps a scheduled transfer visible when cancellation fails", async () => {
     fetchMock

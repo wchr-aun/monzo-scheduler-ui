@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
@@ -177,19 +177,20 @@ describe("CreateScheduledTransfer", () => {
     expect(screen.queryByLabelText("UK date and time")).not.toBeInTheDocument();
   });
 
-  it("refreshes the scheduled transfer list after creating a transfer", async () => {
+  it.each([true, false])("preserves the list while refreshing after creation (refresh succeeds: %s)", async (refreshSucceeds) => {
+    let resolveRefresh!: (response: Response) => void;
+    const refresh = new Promise<Response>((resolve) => {
+      resolveRefresh = resolve;
+    });
+    const newTransfer = { ...transfer, setup_id: "setup_2", transfer_id: "transfer_2" };
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => scheduledTransfersPage([]),
+        json: async () => scheduledTransfersPage([transfer]),
       } as Response)
       .mockResolvedValueOnce(response())
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => scheduledTransfersPage([transfer]),
-      } as Response);
+      .mockReturnValueOnce(refresh);
 
     render(
       <DataProvider>
@@ -202,9 +203,10 @@ describe("CreateScheduledTransfer", () => {
       </DataProvider>,
     );
 
-    expect(
-      await screen.findByText("No scheduled transfers found."),
-    ).toBeInTheDocument();
+    const toggle = await screen.findByRole("button", {
+      name: "Show details for transfer transfer_1",
+    });
+    fireEvent.click(toggle);
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -221,11 +223,29 @@ describe("CreateScheduledTransfer", () => {
       screen.getByRole("button", { name: "Create scheduled transfer" }),
     );
 
-    expect(
-      await screen.findByRole("button", {
-        name: "Show details for transfer transfer_1",
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.queryByText("No scheduled transfers found.")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Loading scheduled transfers")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show details for transfer transfer_2" })).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveRefresh({
+        ok: refreshSucceeds,
+        status: refreshSucceeds ? 200 : 502,
+        json: async () => scheduledTransfersPage([transfer, newTransfer]),
+      } as Response);
+    });
+
+    if (refreshSucceeds) {
+      expect(await screen.findByRole("button", { name: "Show details for transfer transfer_2" })).toBeInTheDocument();
+    } else {
+      expect(await screen.findByText("Could not load scheduled transfers.")).toHaveAttribute("role", "alert");
+      expect(screen.queryByRole("button", { name: "Show details for transfer transfer_2" })).not.toBeInTheDocument();
+    }
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
       "/api/accounts/acc_123/pots/pot_456/scheduled-transfers?status=completed%2Cpending%2Cfailed",

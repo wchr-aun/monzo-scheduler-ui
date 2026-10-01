@@ -48,7 +48,7 @@ export function ScheduledTransfers({
     debouncedStatuses,
     offset,
   );
-  const { data, error, isLoading, mutate: mutatePage } = useSWR(
+  const { data, error } = useSWR(
     pageKey,
     fetchScheduledTransfers,
   );
@@ -94,20 +94,6 @@ export function ScheduledTransfers({
         throw new Error("Cancel scheduled transfer request failed");
       }
 
-      await mutatePage(
-        (current) =>
-          current
-            ? {
-                ...current,
-                scheduledTransfers: current.scheduledTransfers.map((item) =>
-                  item.setup_id === transfer.setup_id
-                    ? { ...item, status: "cancelled" }
-                    : item,
-                ),
-              }
-            : current,
-        { revalidate: false },
-      );
       await mutate((key) =>
         isScheduledTransfersKey(key, accountId, potId),
       ).catch(() => undefined);
@@ -146,7 +132,10 @@ export function ScheduledTransfers({
       {cancelMessage ? (
         <InlineMessage tone={cancelMessage.kind}>{cancelMessage.text}</InlineMessage>
       ) : null}
-      {isLoading || (!data && !error) ? (
+      {error ? (
+        <InlineMessage tone="error">Could not load scheduled transfers.</InlineMessage>
+      ) : null}
+      {!data && !error ? (
         <div
           className={styles.message}
           role="status"
@@ -154,9 +143,7 @@ export function ScheduledTransfers({
         >
           <LoadingIndicator />
         </div>
-      ) : error || !data ? (
-        <InlineMessage tone="error">Could not load scheduled transfers.</InlineMessage>
-      ) : data.scheduledTransfers.length === 0 ? (
+      ) : !data ? null : data.scheduledTransfers.length === 0 ? (
         <InlineMessage>No scheduled transfers found.</InlineMessage>
       ) : (
         <ul className={styles.list}>
