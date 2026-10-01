@@ -1,9 +1,9 @@
-import { LoginButton } from "@/components/auth/login-button";
-import { LogoutButton } from "@/components/auth/logout-button";
-import { AccountsList } from "@/components/accounts/accounts-list";
-import { PageContainer } from "@/components/layout/page-container";
-import { getUserId } from "@/lib/auth/session.server";
-import { cookies } from "next/headers";
+import {LoginButton} from "@/components/auth/login-button";
+import {LogoutButton} from "@/components/auth/logout-button";
+import {AccountsList} from "@/components/accounts/accounts-list";
+import {PageContainer} from "@/components/layout/page-container";
+import {getUserId} from "@/lib/auth/session.server";
+import {cookies} from "next/headers";
 import styles from "./page.module.css";
 
 export default async function HomePage() {
@@ -16,10 +16,9 @@ export default async function HomePage() {
   const loginUrl = baseUrl ? `${baseUrl}/monzo-redirect` : null;
 
   return (
-    <PageContainer centered width="narrow">
+    <PageContainer centered width={isLoggedIn ? "wide" : "narrow"}>
       {isLoggedIn ? (
         <div className={styles.loggedInContent}>
-          <p className={styles.status}>Logged in</p>
           <AccountsList userId={userId} />
           <LogoutButton />
         </div>

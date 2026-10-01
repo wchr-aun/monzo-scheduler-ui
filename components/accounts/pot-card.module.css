@@ -1,56 +1,17 @@
-.card {
-  position: relative;
-  display: block;
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  color: inherit;
-  background: var(--color-surface);
-}
-
-.card:not(.disabled):hover {
-  background: var(--color-surface-hover);
-}
-
-.link {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-}
-
-.link:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: 3px;
-}
-
-.content {
-  position: relative;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.disabled {
-  color: var(--color-text-muted);
-  background: var(--color-surface-muted);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.heading h3,
 .balance {
+  display: grid;
+  gap: 2px;
   margin: 0;
+  text-align: right;
 }
 
-.balance {
-  margin: var(--space-2) 0 0;
-  font-size: 1.25rem;
+.balance > span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
   font-weight: 700;
+}
+
+.balance strong {
+  color: var(--color-text);
+  font-size: 1.75rem;
 }
