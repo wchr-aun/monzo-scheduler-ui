@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/layout/page-header";
 import { Section } from "@/components/layout/section";
 import { CreateScheduledTransfer } from "@/components/scheduled-transfers/create-scheduled-transfer";
 import { InlineMessage } from "@/components/ui/inline-message";
@@ -22,25 +23,47 @@ export function PotDetails({
     fetchPots,
   );
   const pot = pots?.find((candidate) => candidate.id === potId);
+  const header = (
+    <PageHeader
+      backHref={`/account/${encodeURIComponent(accountId)}`}
+      backLabel="Back to account"
+      subtitle={potId}
+      title={pot ? pot.name || "Unnamed pot" : "Pot"}
+    />
+  );
 
   if (isLoading || (!pots && !error)) {
     return (
-      <div className={styles.message} role="status" aria-label="Loading pot">
-        <LoadingIndicator />
-      </div>
+      <>
+        {header}
+        <div className={styles.message} role="status" aria-label="Loading pot">
+          <LoadingIndicator />
+        </div>
+      </>
     );
   }
 
   if (error || !pots) {
-    return <InlineMessage tone="error">Could not load the pot.</InlineMessage>;
+    return (
+      <>
+        {header}
+        <InlineMessage tone="error">Could not load the pot.</InlineMessage>
+      </>
+    );
   }
 
   if (!pot) {
-    return <InlineMessage>Pot not found.</InlineMessage>;
+    return (
+      <>
+        {header}
+        <InlineMessage>Pot not found.</InlineMessage>
+      </>
+    );
   }
 
   return (
     <>
+      {header}
       <Section heading="Balance" headingId="pot-balance-heading">
         <p className={styles.balance}>
           <Money

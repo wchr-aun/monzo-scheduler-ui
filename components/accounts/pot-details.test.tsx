@@ -46,6 +46,9 @@ describe("PotDetails", () => {
     expect(
       await screen.findByRole("heading", { name: "Balance" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Holiday" }),
+    ).toBeInTheDocument();
     expect(screen.getByText(formatMoney(5_000, "GBP"))).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Create a new scheduled transfer" }),

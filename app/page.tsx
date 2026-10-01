@@ -19,13 +19,8 @@ export default async function HomePage() {
     <PageContainer centered width="narrow">
       {isLoggedIn ? (
         <div className={styles.loggedInContent}>
-          <div className={styles.loggedInStatus}>
-            <p className={styles.status}>Logged in</p>
-            <p className={styles.userId}>
-              {userId ? `User ID: ${userId}` : "User ID unavailable"}
-            </p>
-          </div>
-          <AccountsList />
+          <p className={styles.status}>Logged in</p>
+          <AccountsList userId={userId} />
           <LogoutButton />
         </div>
       ) : !loginUrl ? (

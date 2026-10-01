@@ -9,7 +9,17 @@ import Link from "next/link";
 import useSWR from "swr";
 import styles from "./account-card.module.css";
 
-export function AccountCard({ account }: { account: Account }) {
+export function AccountCard({
+  account,
+  userId,
+}: {
+  account: Account;
+  userId?: string | null;
+}) {
+  const accountName =
+    userId && account.description === userId
+      ? "Main Account"
+      : account.description || "Unnamed account";
   const {
     data: balance,
     isValidating,
@@ -25,17 +35,7 @@ export function AccountCard({ account }: { account: Account }) {
         className={styles.link}
         href={`/account/${encodeURIComponent(account.id)}`}
       >
-        <h3>{account.description || "Unnamed account"}</h3>
-        <dl>
-          <div>
-            <dt>ID</dt>
-            <dd>{account.id}</dd>
-          </div>
-          <div>
-            <dt>Created</dt>
-            <dd>{account.created}</dd>
-          </div>
-        </dl>
+        <h3>{accountName}</h3>
       </Link>
       <div className={styles.total} aria-live="polite">
         <span>Available balance</span>
@@ -61,7 +61,7 @@ export function AccountCard({ account }: { account: Account }) {
           <button
             className={styles.retry}
             type="button"
-            aria-label={`${isValidating ? "Retrying" : "Retry"} balance for ${account.description || account.id}`}
+            aria-label={`${isValidating ? "Retrying" : "Retry"} balance for ${accountName}`}
             disabled={isValidating}
             onClick={() => void mutate()}
           >

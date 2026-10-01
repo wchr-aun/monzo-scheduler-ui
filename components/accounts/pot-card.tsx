@@ -2,7 +2,6 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Money } from "@/components/ui/money";
 import type { Pot } from "@/lib/pots/types";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import styles from "./pot-card.module.css";
 
 export function PotCard({ accountId, pot }: { accountId: string; pot: Pot }) {
@@ -43,24 +42,6 @@ function PotSummary({ pot }: { pot: Pot }) {
           label={`${pot.name || "pot"} balance`}
         />
       </p>
-      <Details>
-        <Detail label="Style">{pot.style || "Not specified"}</Detail>
-        <Detail label="Created">{pot.created}</Detail>
-        <Detail label="Updated">{pot.updated}</Detail>
-      </Details>
     </>
-  );
-}
-
-function Details({ children }: { children: ReactNode }) {
-  return <dl>{children}</dl>;
-}
-
-function Detail({ children, label }: { children: ReactNode; label: string }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{children}</dd>
-    </div>
   );
 }

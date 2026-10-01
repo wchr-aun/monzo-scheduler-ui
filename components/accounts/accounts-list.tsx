@@ -7,7 +7,7 @@ import { AccountCard } from "./account-card";
 import { useAccounts } from "./use-accounts";
 import styles from "./accounts-list.module.css";
 
-export function AccountsList() {
+export function AccountsList({ userId }: { userId?: string | null }) {
   const { data: accounts, error, isLoading } = useAccounts();
 
   if (isLoading || (!accounts && !error)) {
@@ -39,7 +39,7 @@ export function AccountsList() {
       ) : (
         <ul className={styles.list}>
           {accounts.map((account) => (
-            <AccountCard account={account} key={account.id} />
+            <AccountCard account={account} key={account.id} userId={userId} />
           ))}
         </ul>
       )}

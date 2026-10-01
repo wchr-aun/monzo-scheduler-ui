@@ -25,32 +25,15 @@
 }
 
 .link h3 {
-  margin: 0 0 var(--space-4);
+  margin: 0;
   font-size: 1rem;
   word-break: break-all;
 }
 
-.link dl,
-.link dl div {
-  display: grid;
-  gap: var(--space-1);
-  margin: 0;
-}
-
-.link dl {
-  gap: var(--space-2);
-}
-
-.link dt,
 .total > span {
   color: var(--color-text-muted);
   font-size: 0.875rem;
   font-weight: 700;
-}
-
-.link dd {
-  margin: 0;
-  overflow-wrap: anywhere;
 }
 
 .total {

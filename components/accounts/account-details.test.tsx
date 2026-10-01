@@ -125,6 +125,32 @@ describe("AccountDetails", () => {
     expect(screen.queryByText("Retrying…")).not.toBeInTheDocument();
   });
 
+  it("labels an account whose description matches the user ID as the main account", async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        accounts: [
+          {
+            id: "acc_123",
+            description: "user_123",
+            created: "2026-01-02T03:04:05Z",
+            balance_details: balance,
+          },
+        ],
+      }),
+    );
+
+    render(
+      <DataProvider>
+        <AccountsList userId="user_123" />
+      </DataProvider>,
+    );
+
+    expect(await screen.findByText("Main Account")).toBeInTheDocument();
+    expect(screen.queryByText("user_123")).not.toBeInTheDocument();
+    expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
+    expect(screen.queryByText("2026-01-02T03:04:05Z")).not.toBeInTheDocument();
+  });
+
   it("shows balances and toggles deleted pots", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
@@ -137,6 +163,9 @@ describe("AccountDetails", () => {
 
     expect(await screen.findByText("£123.45")).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
+    expect(screen.queryByText("beach_ball")).not.toBeInTheDocument();
+    expect(screen.queryByText(activePot.created)).not.toBeInTheDocument();
+    expect(screen.queryByText(activePot.updated)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
       "/account/acc_123/pot/pot_active",
