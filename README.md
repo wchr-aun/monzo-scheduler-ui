@@ -23,7 +23,7 @@ accounts and pots, and managing scheduled transfers.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Blank landing page reserved for a future project story or dev blog |
+| `/` | Project landing page with a pot preview, story and development sections, and console access |
 | `/console` | Login when signed out; user identity, account list, balances, and logout when signed in |
 | `/callback` | Validate OAuth callback parameters and complete login through the same-origin API |
 | `/console/account/[accountId]` | Show account balances and pots |
@@ -33,6 +33,12 @@ The browser only calls narrow, same-origin Route Handlers under `/api`. Those
 handlers read the JWT from the session cookie, send it to the configured backend
 as `Authorization: Bearer <jwt>`, and validate untrusted backend responses before
 returning data to the UI. The JWT is never exposed to client-side JavaScript.
+
+The landing page uses static example data for its phone preview and does not
+fetch authenticated account data. Its invite button links to an on-page section;
+the email form is marked coming soon and disabled until invite collection is
+connected. Story and development copy are editable in
+`components/landing/landing-page.tsx`.
 
 ## Run locally
 
@@ -70,11 +76,11 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
 
 ## Project structure
 
-- `app/` contains the blank landing page, global tokens, and server-side Route
+- `app/` contains the landing page, global tokens, and server-side Route
   Handlers. Application pages live under `app/console/`; `/callback` stays at its
   existing path for OAuth. The console and callback layouts share application
   navigation, providers, and the footer.
-- `components/` contains UI primitives, layout components, and account,
+- `components/` contains the project landing page, UI primitives, layout components, and account,
   authentication, and scheduled-transfer features.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,
   money formatting, session helpers, and UK date-time handling.
