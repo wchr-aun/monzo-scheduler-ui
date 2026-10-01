@@ -34,10 +34,10 @@ function jsonResponse(body: unknown, options?: { ok?: boolean; status?: number }
   } as Response;
 }
 
-function accountDetails() {
+function accountDetails(userId?: string) {
   return (
     <DataProvider>
-      <AccountDetails accountId="acc_123" />
+      <AccountDetails accountId="acc_123" userId={userId} />
     </DataProvider>
   );
 }
@@ -133,7 +133,7 @@ describe("AccountDetails", () => {
       }),
     );
 
-    render(
+    const view = render(
       <DataProvider>
         <AccountsList userId="user_123" />
       </DataProvider>,
@@ -142,11 +142,16 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Main Account")).toBeInTheDocument();
     expect(screen.queryByText("user_123")).not.toBeInTheDocument();
     expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
+    view.rerender(accountDetails("user_123"));
+    expect(await screen.findByRole("heading", { level: 1, name: "Main Account" })).toBeInTheDocument();
   });
 
   it("shows balances and toggles deleted pots", async () => {
     fetchMock.mockImplementation(async (input) => {
       const url = String(input);
+      if (url === "/api/accounts") {
+        return jsonResponse({ accounts: [{ id: "acc_123", description: "Current Account", balance_details: null }] });
+      }
       return url.endsWith("/balance")
         ? jsonResponse(balance)
         : jsonResponse({ pots: [activePot, deletedPot] });
@@ -171,7 +176,11 @@ describe("AccountDetails", () => {
       "true",
     );
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByRole("heading", { level: 1, name: "Current Account" })).toBeInTheDocument();
+    expect(screen.getByText("Your account")).toBeInTheDocument();
+    expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Balance" })).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("reuses the balance loaded by the account list", async () => {
@@ -272,11 +281,14 @@ describe("AccountDetails", () => {
   });
 
   it("handles an empty pots response", async () => {
-    fetchMock.mockImplementation(async (input) =>
-      String(input).endsWith("/balance")
+    fetchMock.mockImplementation(async (input) => {
+      if (String(input) === "/api/accounts") {
+        return jsonResponse({ accounts: [] });
+      }
+      return String(input).endsWith("/balance")
         ? jsonResponse(balance)
-        : jsonResponse({ pots: [] }),
-    );
+        : jsonResponse({ pots: [] });
+    });
 
     render(accountDetails());
 

@@ -6,6 +6,8 @@
 }
 
 .grid div {
+  display: grid;
+  gap: var(--space-3);
   padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -19,8 +21,8 @@
 }
 
 .grid dd {
-  margin: var(--space-1) 0 0;
-  font-size: 1.25rem;
-  font-weight: 700;
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 800;
   overflow-wrap: anywhere;
 }
