@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Money } from "@/components/ui/money";
-import { StatusBadge } from "@/components/ui/status-badge";
-import {
-  getScheduledDateTimes,
-  getTimeUntil,
-} from "@/lib/scheduled-transfers/date-time";
-import { getDifferingUuidSections } from "@/lib/scheduled-transfers/id-sections";
-import type { ScheduledTransfer } from "@/lib/scheduled-transfers/types";
+import {useEffect, useId, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Money} from "@/components/ui/money";
+import {StatusBadge} from "@/components/ui/status-badge";
+import {getScheduledDateTimes, getTimeUntil,} from "@/lib/scheduled-transfers/date-time";
+import {getDifferingUuidSections} from "@/lib/scheduled-transfers/id-sections";
+import {getTransferRecurrence} from "@/lib/scheduled-transfers/recurrence";
+import type {ScheduledTransfer} from "@/lib/scheduled-transfers/types";
 import styles from "./scheduled-transfer-card.module.css";
 
 type ScheduledTransferCardProps = {
@@ -27,7 +25,7 @@ export function ScheduledTransferCard({
   const [now, setNow] = useState<number | null>(null);
   const detailsId = useId();
   const isDeposit = transfer.type === "deposit";
-  const summaryDateTime = transfer.executed_at ?? transfer.scheduled_for;
+  const recurrence = getTransferRecurrence(transfer.scheduled_for, transfer.interval);
   const scheduledTime = new Date(transfer.scheduled_for).getTime();
   const isPast =
     now !== null && !Number.isNaN(scheduledTime) && scheduledTime < now;
@@ -59,29 +57,32 @@ export function ScheduledTransferCard({
 
       <div className={styles.summary}>
         <div className={styles.amountGroup}>
-          <div className={styles.amount}>
-            <span>{isDeposit ? "+" : "−"}</span>
-            <Money
-              amount={Math.abs(transfer.amount)}
-              currency="GBP"
-              label={`transfer ${transfer.transfer_id} amount`}
-            />
+          <div className={styles.amountSummary}>
+            <div className={styles.amount}>
+              <span>{isDeposit ? "+" : "−"}</span>
+              <Money
+                amount={Math.abs(transfer.amount)}
+                currency="GBP"
+                label={`transfer ${transfer.transfer_id} amount`}
+              />
+            </div>
+            <p className={styles.scheduleType}>
+              {getDisplayLabel(transfer.interval)} {isDeposit ? "deposit" : "withdrawal"}
+            </p>
+            <p className={styles.recurrence}>
+              {recurrence ? (
+                <>
+                  {recurrence.frequency}
+                  {recurrence.isMonthly ? " of month" : ""} - {recurrence.time}
+                </>
+              ) : "Schedule unavailable"}
+            </p>
           </div>
-          <StatusBadge tone={getStatusTone(transfer.status)}>
-            {transfer.status}
-          </StatusBadge>
         </div>
 
         <div className={styles.schedule}>
-          {transfer.status === "cancelled" ? (
-            <>
-              <p className={styles.cancelledMessage}>Cancelled</p>
-              <div className={styles.scheduledFor}>
-                <TransferDateTime value={summaryDateTime} />
-              </div>
-            </>
-          ) : (
-            <>
+          <div className={styles.scheduleHeading}>
+            {transfer.status === "pending" ? (
               <p
                 className={`${styles.countdown}${isPast ? ` ${styles.past}` : ""}`}
                 data-timing={isPast ? "past" : "future"}
@@ -89,76 +90,73 @@ export function ScheduledTransferCard({
               >
                 {now === null
                   ? "Calculating…"
-                  : getTimeUntil(
-                      transfer.scheduled_for,
-                      now,
-                      transfer.status,
-                    )}
+                  : getTimeUntil(transfer.scheduled_for, now, transfer.status)}
               </p>
-              <div className={styles.scheduledFor}>
-                <TransferDateTime value={summaryDateTime} />
-              </div>
-            </>
-          )}
+            ) : null}
+            <StatusBadge tone={getStatusTone(transfer.status)}>
+              {transfer.status}
+            </StatusBadge>
+          </div>
         </div>
       </div>
 
       {isExpanded ? (
         <div className={styles.details} id={detailsId}>
-          <dl>
-            <div>
-              <dt>Created at</dt>
-              <dd>
-                <TransferDateTime value={transfer.created_at} />
-              </dd>
-            </div>
-            <div>
-              <dt>Type</dt>
-              <dd>{getDisplayLabel(transfer.type)}</dd>
-            </div>
-            <div>
-              <dt>Interval</dt>
-              <dd>{getDisplayLabel(transfer.interval)}</dd>
-            </div>
-            {transfer.executed_at !== null ? (
+          <div className={styles.detailsRow}>
+            <dl>
               <div>
-                <dt>Executed at</dt>
+                <dt>Created at</dt>
                 <dd>
-                  <TransferDateTime value={transfer.executed_at} />
+                  <TransferDateTime value={transfer.created_at} />
                 </dd>
               </div>
+              {transfer.executed_at !== null ? (
+                <div>
+                  <dt>Executed at</dt>
+                  <dd>
+                    <TransferDateTime value={transfer.executed_at} />
+                  </dd>
+                </div>
+              ) : (
+                <div>
+                  <dt>Scheduled for</dt>
+                  <dd>
+                    <TransferDateTime value={transfer.scheduled_for} />
+                  </dd>
+                </div>
+              )}
+            </dl>
+            {transfer.status === "pending" ? (
+              <Button
+                variant="danger"
+                type="button"
+                aria-label={`Cancel transfer ${transfer.transfer_id}`}
+                disabled={cancelling}
+                onClick={onCancel}
+              >
+                {cancelling ? "Cancelling…" : "Cancel transfer"}
+              </Button>
             ) : null}
-          </dl>
-          {transfer.status === "pending" ? (
-            <Button
-              variant="danger"
-              type="button"
-              aria-label={`Cancel transfer ${transfer.transfer_id}`}
-              disabled={cancelling}
-              onClick={onCancel}
-            >
-              {cancelling ? "Cancelling…" : "Cancel transfer"}
-            </Button>
-          ) : null}
+          </div>
+          <div className={styles.footer}>
+            <p>
+              Transfer ID:{" "}
+              <DifferentiatedId
+                differingSections={differingIdSections}
+                value={transfer.transfer_id}
+              />
+            </p>
+            <p>
+              Setup ID:{" "}
+              <DifferentiatedId
+                differingSections={differingIdSections}
+                value={transfer.setup_id}
+              />
+            </p>
+          </div>
         </div>
       ) : null}
 
-      <div className={styles.footer}>
-        <p>
-          Transfer ID:{" "}
-          <DifferentiatedId
-            differingSections={differingIdSections}
-            value={transfer.transfer_id}
-          />
-        </p>
-        <p>
-          Setup ID:{" "}
-          <DifferentiatedId
-            differingSections={differingIdSections}
-            value={transfer.setup_id}
-          />
-        </p>
-      </div>
       <span className={styles.chevron} aria-hidden="true" />
     </li>
   );
@@ -200,12 +198,8 @@ function TransferDateTime({ value }: { value: string }) {
 
   return (
     <span className={styles.times}>
-      <span aria-label={`Local: ${dates.local}`}>
-        Local: <time dateTime={value}>{dates.local}</time>
-      </span>
-      <span aria-label={`UK: ${dates.uk}`}>
-        UK: <time dateTime={value}>{dates.uk}</time>
-      </span>
+      <time dateTime={value}>{dates.local}</time>
+      <time dateTime={value}>{dates.uk}</time>
     </span>
   );
 }

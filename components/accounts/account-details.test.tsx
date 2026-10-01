@@ -1,3 +1,4 @@
+import { textContent } from "@/test-utils/text";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AccountDetails } from "@/components/accounts/account-details";
@@ -65,7 +66,7 @@ describe("AccountDetails", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText("Loading balance…")).not.toBeInTheDocument();
     expect(screen.queryByText("Loading pots…")).not.toBeInTheDocument();
-    expect(screen.queryByText("£123.45")).not.toBeInTheDocument();
+    expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
   });
 
   it("uses indicators while accounts load and a balance retries", async () => {
@@ -153,7 +154,7 @@ describe("AccountDetails", () => {
 
     render(accountDetails());
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
@@ -201,14 +202,14 @@ describe("AccountDetails", () => {
     );
 
     expect(await screen.findByText("Available balance")).toBeInTheDocument();
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect(screen.getByText("£173.45").closest("small")).toHaveTextContent(
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
+    expect(screen.getByText(textContent("£173.45")).closest("small")).toHaveTextContent(
       "Total balance: £173.45",
     );
 
     view.rerender(accountDetails());
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
     expect(await screen.findByText("No pots found.")).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(([input]) =>
@@ -259,8 +260,8 @@ describe("AccountDetails", () => {
       }),
     );
 
-    expect(await screen.findByText("£123.45")).toBeInTheDocument();
-    expect((await screen.findByText("£173.45")).closest("small")).toHaveTextContent(
+    expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
+    expect((await screen.findByText(textContent("£173.45"))).closest("small")).toHaveTextContent(
       "Total balance: £173.45",
     );
     expect(

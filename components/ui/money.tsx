@@ -1,7 +1,7 @@
 "use client";
 
 import {useMoneyVisibility} from "@/components/providers/money-visibility-provider";
-import {formatMoney} from "@/lib/formatting/money";
+import {formatMoneyParts} from "@/lib/formatting/money";
 import {MONEY_MASK} from "@/lib/money/constants";
 import {useEffect, useState} from "react";
 import {EyeIcon, EyeOffIcon} from "./visibility-icons";
@@ -28,7 +28,16 @@ export function Money({ amount, currency, label = "money value" }: MoneyProps) {
 
   return (
     <span className={styles.money}>
-      <span>{isValueHidden ? MONEY_MASK : formatMoney(amount, currency)}</span>
+      <span>
+        {isValueHidden ? MONEY_MASK : formatMoneyParts(amount, currency).map((part, index) => (
+          <span
+            className={part.type === "decimal" || part.type === "fraction" ? styles.decimals : undefined}
+            key={index}
+          >
+            {part.value}
+          </span>
+        ))}
+      </span>
       {isMoneyHidden ? (
         <button
           className={styles.toggle}

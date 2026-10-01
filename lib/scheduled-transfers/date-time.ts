@@ -41,37 +41,24 @@ export function getUkDateTime(value: string) {
   return null;
 }
 
-export function formatLocalDateTime(datetime: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  }).format(new Date(datetime));
+function formatDisplayDate(date: Date, timeZone?: string) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(date).map((part) => [part.type, part.value]),
+  );
+
+  return `${parts.day} ${parts.month} ${parts.year} - ${parts.hour}:${parts.minute}`;
 }
 
-function formatScheduledDate(
-  date: Date,
-  timeZone?: string,
-  includeTimeZoneName = true,
-) {
-  const options: Intl.DateTimeFormatOptions = {
-    timeZone,
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  };
-
-  if (includeTimeZoneName) {
-    options.timeZoneName = "short";
-  }
-
-  return new Intl.DateTimeFormat("en-US", options).format(date);
+export function formatLocalDateTime(datetime: string) {
+  return `${formatDisplayDate(new Date(datetime))} Local`;
 }
 
 export function getScheduledDateTimes(value: string) {
@@ -81,13 +68,13 @@ export function getScheduledDateTimes(value: string) {
     return null;
   }
 
-  const localWithoutTimeZone = formatScheduledDate(date, undefined, false);
-  const uk = formatScheduledDate(date, "Europe/London", false);
+  const local = formatDisplayDate(date);
+  const uk = formatDisplayDate(date, "Europe/London");
 
   return {
-    local: formatScheduledDate(date),
-    uk,
-    localMatchesUk: localWithoutTimeZone === uk,
+    local: `${local} Local`,
+    uk: `${uk} UK`,
+    localMatchesUk: local === uk,
   };
 }
 

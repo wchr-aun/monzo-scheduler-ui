@@ -19,6 +19,11 @@
   margin: 0;
 }
 
+.header .eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: 0.875rem;
+}
+
 .header p {
   margin-top: var(--space-1);
   color: var(--color-text-muted);

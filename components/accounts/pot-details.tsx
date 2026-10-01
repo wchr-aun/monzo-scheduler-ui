@@ -1,7 +1,6 @@
 "use client";
 
 import { PageHeader } from "@/components/layout/page-header";
-import { Section } from "@/components/layout/section";
 import { CreateScheduledTransfer } from "@/components/scheduled-transfers/create-scheduled-transfer";
 import { InlineMessage } from "@/components/ui/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
@@ -27,7 +26,7 @@ export function PotDetails({
     <PageHeader
       backHref={`/account/${encodeURIComponent(accountId)}`}
       backLabel="Back to account"
-      subtitle={potId}
+      eyebrow="Your pot"
       title={pot ? pot.name || "Unnamed pot" : "Pot"}
     />
   );
@@ -64,7 +63,8 @@ export function PotDetails({
   return (
     <>
       {header}
-      <Section heading="Balance" headingId="pot-balance-heading">
+      <section className={styles.balanceCard} aria-labelledby="pot-balance-heading">
+        <h2 id="pot-balance-heading">Pot balance</h2>
         <p className={styles.balance}>
           <Money
             amount={pot.balance}
@@ -72,7 +72,7 @@ export function PotDetails({
             label="pot balance"
           />
         </p>
-      </Section>
+      </section>
       <CreateScheduledTransfer
         accountId={accountId}
         potId={potId}
