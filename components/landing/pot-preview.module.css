@@ -64,125 +64,58 @@
   transform: translateX(-50%);
 }
 
-.appBar {
-  display: flex;
-  align-items: center;
-  padding: var(--space-2) var(--space-3) var(--space-3);
-  gap: var(--space-2);
-  color: var(--color-navbar-control-text);
-  font-size: 0.6875rem;
-  font-weight: 700;
-}
+.appBar { zoom: 0.72; }
 
-.appBar img { border-radius: var(--radius-control); }
-.menuIcon { margin-left: auto; letter-spacing: 2px; }
+.viewport { cursor: not-allowed; }
+.app { min-width: 0; padding: 0; margin: 0; border: 0; }
+.preview .app :disabled,
+.preview .app :disabled * { cursor: not-allowed; }
 
 .screen {
+  zoom: 0.72;
+  width: 100%;
   padding: var(--space-5) var(--space-4) var(--space-6);
-  border-radius: 0 0 36px 36px;
+  border-radius: 0 0 60px 60px;
   background: var(--color-background);
 }
 
-.backLabel {
-  margin: 0 0 var(--space-5);
-  color: var(--color-interactive);
-  font-size: 0.625rem;
+.potDetails {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
-.potHeading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-4);
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  color: var(--color-text-muted);
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.potHeading h3 {
+.preview .potDetails h1 {
   margin: 0;
   font-size: 1.375rem;
+  line-height: 1.2;
   letter-spacing: -0.04em;
 }
 
-.potIcon {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  color: var(--color-primary);
-  background: var(--color-status-completed-background);
+.preview .potDetails h2 {
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  line-height: normal;
+}
+
+.potDetails > a {
+  font-size: 0.625rem;
+}
+
+.preview .scheduledTransfers h2 {
   font-size: 1.375rem;
+  letter-spacing: normal;
+  line-height: 1.2;
 }
 
-.balanceCard {
-  display: flex;
+.scheduledTransfers > section > div:first-child {
   flex-direction: column;
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-surface);
+  align-items: stretch;
 }
 
-.balanceCard p {
-  margin: 0 0 var(--space-2);
-  color: var(--color-text-muted);
-  font-size: 0.625rem;
+.scheduledTransfers > section > div:first-child > div {
+  width: 100%;
 }
-
-.balanceCard strong {
-  color: var(--color-heading);
-  font-size: 2.375rem;
-  letter-spacing: -0.06em;
-}
-
-.balanceCard strong > span { font-size: 1.5rem; }
-.balanceNote { margin-top: var(--space-2); color: var(--color-text-muted); font-size: 0.5625rem; }
-
-.scheduleAction {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 38px;
-  padding: 0 var(--space-3);
-  margin-block: var(--space-3) var(--space-6);
-  border-radius: var(--radius-control);
-  color: var(--color-on-primary);
-  background: var(--color-primary);
-  font-size: 0.625rem;
-  font-weight: 700;
-}
-
-.scheduleAction > span { font-size: 1.125rem; }
-.transferHeading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.transferHeading h4 { margin: 0; color: var(--color-heading); font-size: 0.6875rem; }
-.transferHeading > span { color: var(--color-text-muted); font-size: 0.5rem; }
-
-.filter {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--space-2) var(--space-3);
-  margin-block: var(--space-3);
-  border: 1px solid var(--color-border-control);
-  border-radius: var(--radius-control);
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  font-size: 0.5625rem;
-}
-
-.transfers { display: grid; gap: var(--space-2); padding: 0; margin: 0; list-style: none; }
-.transfer { padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); }
-.transferTop { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
-.transferTop strong { color: var(--color-heading); font-size: 0.9375rem; letter-spacing: -0.03em; }
-.transferTop > span { font-size: 0.5rem; }
-.transfer p { margin: var(--space-2) 0 3px; color: var(--color-text); font-size: 0.5625rem; }
-.transferDate { display: block; color: var(--color-text-muted); font-size: 0.5rem; }
 
 .homeIndicator {
   position: absolute;

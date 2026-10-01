@@ -34,8 +34,11 @@ handlers read the JWT from the session cookie, send it to the configured backend
 as `Authorization: Bearer <jwt>`, and validate untrusted backend responses before
 returning data to the UI. The JWT is never exposed to client-side JavaScript.
 
-The landing page uses static example data for its phone preview and does not
-fetch authenticated account data. Its invite button links to an on-page section;
+The phone preview renders the existing `Navbar`, `PotDetails`, and `ScheduledTransfers`
+components with sample data
+from an isolated SWR cache. Revalidation is disabled, so it makes no authenticated
+account requests. The preview is inert, with disabled
+controls and a not-allowed cursor. Its invite button links to an on-page section;
 the email form is marked coming soon and disabled until invite collection is
 connected. Story and development copy are editable in
 `components/landing/landing-page.tsx`.

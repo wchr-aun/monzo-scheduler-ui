@@ -1,3 +1,4 @@
+import { createPreviewTransfersPage } from "@/lib/scheduled-transfers/preview";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -38,7 +39,7 @@ export function LandingPage() {
             <p className={styles.heroNote}>Built with curiosity. Made for the everyday.</p>
             <a className={styles.storyLink} href="#why">A little about the project <span aria-hidden="true">↓</span></a>
           </div>
-          <PotPreview />
+          <PotPreview transfersPage={createPreviewTransfersPage()} />
         </section>
 
         <section id="why" className={styles.storySection} aria-labelledby="why-heading">
