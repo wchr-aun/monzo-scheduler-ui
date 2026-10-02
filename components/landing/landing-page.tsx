@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {ArrowIcon} from "@/components/ui/icons/arrow-icon";
 import {GitHubIcon} from "@/components/ui/icons/github-icon";
+import {StatusBadge} from "@/components/ui/status-badge";
 import {ThemeToggle} from "@/components/ui/theme-toggle";
 import {Footer} from "@/components/layout/footer";
 import {PotPreview} from "./pot-preview";
@@ -178,11 +179,19 @@ export function LandingPage() {
             <a className={styles.repository} href="https://github.com/wchr-aun/monzo-scheduler-ui" target="_blank" rel="noopener noreferrer">
               <h3>Frontend code <ArrowIcon direction="up-right" /></h3>
               <p>The website and console for your accounts, pots, and scheduled transfers.</p>
+              <ul className={styles.stackBadges} aria-label="Frontend language and framework">
+                <li><StatusBadge tone="pending">TypeScript</StatusBadge></li>
+                <li><StatusBadge tone="pending">Next.js</StatusBadge></li>
+              </ul>
               <span><GitHubIcon /> View on GitHub</span>
             </a>
             <a className={styles.repository} href="https://github.com/wchr-aun/monzo-scheduler" target="_blank" rel="noopener noreferrer">
               <h3>Backend code <ArrowIcon direction="up-right" /></h3>
               <p>The scheduler that runs your transfers and sends updates to Monzo.</p>
+              <ul className={styles.stackBadges} aria-label="Backend language and framework">
+                <li><StatusBadge tone="pending">Python</StatusBadge></li>
+                <li><StatusBadge tone="pending">FastAPI</StatusBadge></li>
+              </ul>
               <span><GitHubIcon /> View on GitHub</span>
             </a>
           </div>
