@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { REFRESH_TOKEN_COOKIE_NAME } from "@/lib/auth/cookie-names";
 
 type CallbackResponse = {
   token?: unknown;
   expiresIn?: unknown;
+  refreshToken?: unknown;
+  refreshExpiresIn?: unknown;
 };
 
 export async function GET(request: NextRequest) {
@@ -59,7 +62,19 @@ export async function GET(request: NextRequest) {
 
     const payload = (await backendResponse.json()) as CallbackResponse;
 
-    if (typeof payload.token !== "string" || !payload.token.trim()) {
+    if (
+      typeof payload.token !== "string" ||
+      !payload.token.trim() ||
+      typeof payload.refreshToken !== "string" ||
+      !payload.refreshToken.trim() ||
+      (payload.expiresIn !== undefined &&
+        (typeof payload.expiresIn !== "number" ||
+          !Number.isSafeInteger(payload.expiresIn) ||
+          payload.expiresIn <= 0)) ||
+      typeof payload.refreshExpiresIn !== "number" ||
+      !Number.isSafeInteger(payload.refreshExpiresIn) ||
+      payload.refreshExpiresIn <= 0
+    ) {
       return NextResponse.json(
         { error: "invalid_callback_response" },
         { status: 502 },
@@ -67,13 +82,6 @@ export async function GET(request: NextRequest) {
     }
 
     const response = new NextResponse(null, { status: 204 });
-    const expiresIn =
-      typeof payload.expiresIn === "number" &&
-      Number.isSafeInteger(payload.expiresIn) &&
-      payload.expiresIn > 0
-        ? payload.expiresIn
-        : undefined;
-
     response.cookies.set({
       name: process.env.SESSION_COOKIE_NAME ?? "session",
       value: payload.token,
@@ -81,7 +89,25 @@ export async function GET(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      ...(expiresIn ? { maxAge: expiresIn } : {}),
+      maxAge: payload.refreshExpiresIn,
+    });
+    response.cookies.set({
+      name: REFRESH_TOKEN_COOKIE_NAME,
+      value: payload.refreshToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api",
+      maxAge: payload.refreshExpiresIn,
+    });
+    response.cookies.set({
+      name: "monzo_oauth_state",
+      value: "",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth/callback",
+      maxAge: 0,
     });
     response.headers.set("Cache-Control", "no-store");
 

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
 
 type RouteContext = {
   params: Promise<{
@@ -37,15 +38,14 @@ export async function DELETE(_request: Request, context: RouteContext) {
   }
 
   try {
-    const backendResponse = await fetch(
+    const backendResponse = await fetchBackendWithRefresh(
       `${baseUrl}/schedule-transfer/${encodeURIComponent(setupId)}`,
+      token,
       {
         method: "DELETE",
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${token}`,
         },
-        cache: "no-store",
         signal: AbortSignal.timeout(15_000),
       },
     );

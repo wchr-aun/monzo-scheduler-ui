@@ -2,6 +2,7 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 
 import { getAccounts } from "@/lib/accounts/validation";
+import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -22,14 +23,14 @@ export async function GET() {
   }
 
   try {
-    const backendResponse = await fetch(`${baseUrl}/accounts-with-balances`, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
+    const backendResponse = await fetchBackendWithRefresh(
+      `${baseUrl}/accounts-with-balances`,
+      token,
+      {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(15_000),
       },
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
+    );
 
     if (!backendResponse.ok) {
       const status =

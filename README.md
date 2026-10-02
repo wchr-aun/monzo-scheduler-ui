@@ -66,10 +66,16 @@ The login link navigates to `/api/auth/login`. That same-origin route requests
 It also relays the backend's short-lived `monzo_oauth_state` cookie to the app,
 scoped to `/api/auth/callback`. After authorization, the callback page calls
 `/api/auth/callback`, which forwards validated `code`, `state`, and the state
-cookie to `${BASE_URL}/monzo-callback`. The backend response must contain
-`{ "token": "<jwt>" }` and may include `expiresIn` in seconds. Without
-`expiresIn`, the cookie lasts for the browser session. Successful login returns
-to `/console`.
+cookie to `${BASE_URL}/monzo-callback`. The callback response contains
+`token`, `expiresIn`, `refreshToken`, and `refreshExpiresIn`; both tokens are
+stored in separate `HttpOnly` cookies. Both cookies expire according to
+`refreshExpiresIn`, so an expired JWT remains available for the BFF to detect a
+`401` and refresh while the refresh token is valid. Successful login returns to
+`/console`.
+
+Authenticated BFF requests that receive a backend `401` call
+`${BASE_URL}/auth/refresh` server-side with `{ "refresh_token": "…" }`, update
+the cookies, and retry the backend request once.
 
 ## Development commands
 

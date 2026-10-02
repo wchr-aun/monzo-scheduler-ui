@@ -7,6 +7,7 @@ import {
   type ScheduledTransferStatus,
 } from "@/lib/scheduled-transfers/types";
 import { isScheduledTransfer } from "@/lib/scheduled-transfers/validation";
+import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
 
 type ScheduledTransfersResponse = {
   items: ScheduledTransfer[];
@@ -253,12 +254,8 @@ export async function GET(request: Request, context: RouteContext) {
     backendUrl.searchParams.set("offset", String(pagination.offset));
     backendUrl.searchParams.set("status", statuses.join(","));
 
-    const backendResponse = await fetch(backendUrl, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
+    const backendResponse = await fetchBackendWithRefresh(backendUrl, token, {
+      headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(15_000),
     });
 
@@ -340,17 +337,19 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const backendResponse = await fetch(`${baseUrl}/schedule-transfer`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const backendResponse = await fetchBackendWithRefresh(
+      `${baseUrl}/schedule-transfer`,
+      token,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15_000),
       },
-      body: JSON.stringify(payload),
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
+    );
 
     if (!backendResponse.ok) {
       const status =

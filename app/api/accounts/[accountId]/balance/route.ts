@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { isBalance } from "@/lib/accounts/validation";
+import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
 
 type RouteContext = {
   params: Promise<{ accountId: string }>;
@@ -35,12 +36,8 @@ export async function GET(_request: Request, context: RouteContext) {
     const backendUrl = new URL(`${baseUrl}/balance`);
     backendUrl.searchParams.set("account_id", accountId);
 
-    const backendResponse = await fetch(backendUrl, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
+    const backendResponse = await fetchBackendWithRefresh(backendUrl, token, {
+      headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(15_000),
     });
 
