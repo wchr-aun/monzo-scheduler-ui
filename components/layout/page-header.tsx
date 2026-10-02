@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
 import styles from "./page-header.module.css";
 
 type PageHeaderProps = {
@@ -13,7 +14,7 @@ export function PageHeader({ backHref, backLabel, eyebrow, subtitle, title }: Pa
   return (
     <>
       <Link className={styles.backLink} href={backHref}>
-        ← {backLabel}
+        <ArrowIcon direction="left" /> {backLabel}
       </Link>
       <header className={styles.header}>
         {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}

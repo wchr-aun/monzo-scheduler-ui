@@ -1,0 +1,45 @@
+.trigger {
+  display: inline;
+  padding: 0;
+  border: 0;
+  color: var(--color-primary);
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+  cursor: help;
+}
+
+.trigger:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: var(--radius-control);
+}
+
+.tooltip {
+  position: fixed;
+  top: var(--tooltip-top);
+  left: var(--tooltip-left);
+  z-index: 30;
+  width: min(280px, calc(100vw - 32px));
+  padding-top: var(--space-2);
+}
+
+.content {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-card);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  box-shadow: 0 8px 24px -12px var(--color-heading);
+}
+
+.content > span:last-child {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}

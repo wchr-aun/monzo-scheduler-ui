@@ -23,7 +23,7 @@ accounts and pots, and managing scheduled transfers.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Project landing page with a pot preview, story and development sections, and console access |
+| `/` | Project landing page with a pot preview, story, features, and open-source links, and console access |
 | `/console` | Login when signed out; user identity, account list, balances, and logout when signed in |
 | `/callback` | Validate OAuth callback parameters and complete login through the same-origin API |
 | `/console/account/[accountId]` | Show account balances and pots |
@@ -38,10 +38,11 @@ The phone preview renders the existing `Navbar`, `PotDetails`, and `ScheduledTra
 components with sample data
 from an isolated SWR cache. Revalidation is disabled, so it makes no authenticated
 account requests. The preview is inert, with disabled
-controls and a not-allowed cursor. Its invite button links to an on-page section;
-the email form is marked coming soon and disabled until invite collection is
-connected. Story and development copy are editable in
-`components/landing/landing-page.tsx`.
+controls and a not-allowed cursor. The landing page explains the motivation,
+illustrates a pot withdrawal followed by a payment scheduled in Monzo,
+shows three features and example Monzo notifications, and links to both public
+repositories. Its Explore the code button links to the on-page open-source section.
+Landing page copy is editable in `components/landing/landing-page.tsx`.
 
 ## Run locally
 

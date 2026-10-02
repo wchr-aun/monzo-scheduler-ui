@@ -5,7 +5,7 @@
 This is a Next.js App Router frontend for authenticating with Monzo, browsing
 accounts and pots, and managing scheduled pot transfers.
 
-- `/` introduces the project with a pot preview, story and development sections,
+- `/` introduces the project with a pot preview, story, features, and open-source links,
   and a link to the console. The preview uses static example data.
 - `/console` displays a login link when signed out. When signed in, it shows the user
   ID, accounts, balances, and a logout action.
