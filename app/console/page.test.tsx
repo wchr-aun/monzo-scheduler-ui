@@ -32,7 +32,7 @@ describe("ConsolePage", () => {
     expect(getCookie).toHaveBeenCalledWith("custom-session");
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
-      "https://backend.example.test/monzo-redirect",
+      "/api/auth/login",
     );
   });
 

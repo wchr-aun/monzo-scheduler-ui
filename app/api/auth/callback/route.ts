@@ -16,6 +16,15 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const oauthStateCookie = request.cookies.get("monzo_oauth_state")?.value;
+
+  if (!oauthStateCookie) {
+    return NextResponse.json(
+      { error: "oauth_state_cookie_required" },
+      { status: 400 },
+    );
+  }
+
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
@@ -31,7 +40,10 @@ export async function GET(request: NextRequest) {
     callbackUrl.searchParams.set("state", state);
 
     const backendResponse = await fetch(callbackUrl, {
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        Cookie: `monzo_oauth_state=${oauthStateCookie}`,
+      },
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),
     });

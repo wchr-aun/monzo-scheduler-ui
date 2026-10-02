@@ -61,9 +61,12 @@ Configure these server-only values in `.env.local`:
 | `BASE_URL` | Origin of the authentication and scheduler backend |
 | `SESSION_COOKIE_NAME` | Frontend session-cookie name; defaults to `session` |
 
-The login link navigates to `${BASE_URL}/monzo-redirect`. After authorization,
-the callback page calls `/api/auth/callback`, which forwards validated `code` and
-`state` values to `${BASE_URL}/monzo-callback`. The backend response must contain
+The login link navigates to `/api/auth/login`. That same-origin route requests
+`${BASE_URL}/monzo-redirect` server-side and forwards its redirect to Monzo.
+It also relays the backend's short-lived `monzo_oauth_state` cookie to the app,
+scoped to `/api/auth/callback`. After authorization, the callback page calls
+`/api/auth/callback`, which forwards validated `code`, `state`, and the state
+cookie to `${BASE_URL}/monzo-callback`. The backend response must contain
 `{ "token": "<jwt>" }` and may include `expiresIn` in seconds. Without
 `expiresIn`, the cookie lasts for the browser session. Successful login returns
 to `/console`.

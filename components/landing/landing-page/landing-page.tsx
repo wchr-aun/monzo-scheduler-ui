@@ -167,7 +167,7 @@ export function LandingPage() {
               </p>
             </ScrollReveal>
             <figure className={styles.notificationPreview}>
-              <MonzoNotification title="🎉 £50.00 deposited!" />
+              <MonzoNotification title="🎉 £50.00 deposited" />
               <figcaption>Example notification</figcaption>
             </figure>
           </div>

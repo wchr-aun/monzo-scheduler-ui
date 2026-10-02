@@ -12,8 +12,7 @@ export default async function ConsolePage() {
   const sessionToken = cookieStore.get(sessionCookieName)?.value;
   const isLoggedIn = Boolean(sessionToken);
   const userId = sessionToken ? getUserId(sessionToken) : null;
-  const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
-  const loginUrl = baseUrl ? `${baseUrl}/monzo-redirect` : null;
+  const loginUrl = process.env.BASE_URL ? "/api/auth/login" : null;
 
   return (
     <PageContainer centered width={isLoggedIn ? "wide" : "narrow"}>
