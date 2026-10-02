@@ -42,7 +42,7 @@ controls and a not-allowed cursor. The landing page explains the motivation,
 illustrates a pot withdrawal followed by a payment scheduled in Monzo,
 shows three features and example Monzo notifications, and links to both public
 repositories. Its Explore the code button links to the on-page open-source section.
-Landing page copy is editable in `components/landing/landing-page.tsx`.
+Landing page copy is editable in `components/landing/landing-page/landing-page.tsx`.
 
 ## Run locally
 
@@ -85,9 +85,45 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
   existing path for OAuth. The console and callback layouts share application
   navigation, providers, and the footer.
 - `components/` contains the project landing page, UI primitives, layout components, and account,
-  authentication, and scheduled-transfer features.
+  pot, authentication, and scheduled-transfer features. Components with multiple
+  files have a named subfolder containing their implementation, styles, and tests
+  (for example, `components/pots/pot-details/pot-details.tsx`). Single-file
+  components remain at their domain's root. Imports point directly to the named
+  implementation rather than a barrel file.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,
   money formatting, session helpers, and UK date-time handling.
+
+### Adding or changing components
+
+Choose the domain first: accounts, pots, authentication (`auth`), scheduled
+transfers, or the landing page. Shared controls belong in `components/ui/`, SVG
+icons in `components/ui/icons/`, shared page structure in `components/layout/`,
+and context providers in `components/providers/`. Reuse existing components and
+helpers before extracting or adding new ones.
+
+Keep single-file components in their existing domain folder. Once a component
+needs a second related file, group its implementation, styles, and tests in a
+kebab-case folder named after it:
+
+```text
+components/pots/pot-details/
+  pot-details.tsx
+  pot-details.module.css
+  pot-details.test.tsx
+```
+
+Create only the files the component needs. Import the named implementation
+directly, without an `index.ts` barrel:
+
+```tsx
+import { PotDetails } from "@/components/pots/pot-details/pot-details";
+```
+
+Use relative imports within the component folder and `@/*` imports between
+folders. Keep non-React helpers under their existing `lib/` domains. When moving
+files, update imports, test mocks, and documentation paths, and remove abandoned
+files and unused styles. See [AGENTS.md](AGENTS.md) for the full repository rules
+and verification requirements.
 
 Authenticated browser reads use the shared SWR provider. Sensitive values are
 kept server-side and authenticated data is not persisted in browser storage.

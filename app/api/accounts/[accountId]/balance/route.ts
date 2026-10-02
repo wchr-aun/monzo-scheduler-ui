@@ -1,31 +1,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-type Balance = {
-  balance: number;
-  total_balance: number;
-  currency: string;
-};
+import { isBalance } from "@/lib/accounts/validation";
 
 type RouteContext = {
   params: Promise<{ accountId: string }>;
 };
-
-function isBalance(value: unknown): value is Balance {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "balance" in value &&
-    typeof value.balance === "number" &&
-    Number.isInteger(value.balance) &&
-    "total_balance" in value &&
-    typeof value.total_balance === "number" &&
-    Number.isInteger(value.total_balance) &&
-    "currency" in value &&
-    typeof value.currency === "string" &&
-    value.currency.length === 3
-  );
-}
 
 export async function GET(_request: Request, context: RouteContext) {
   const { accountId } = await context.params;

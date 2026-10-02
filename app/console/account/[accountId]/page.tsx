@@ -1,5 +1,5 @@
-import { PageContainer } from "@/components/layout/page-container";
-import { AccountDetails } from "@/components/accounts/account-details";
+import { PageContainer } from "@/components/layout/page-container/page-container";
+import { AccountDetails } from "@/components/accounts/account-details/account-details";
 import { getUserId } from "@/lib/auth/session.server";
 import { cookies } from "next/headers";
 

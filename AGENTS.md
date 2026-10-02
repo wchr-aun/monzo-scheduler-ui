@@ -118,8 +118,10 @@ variants.
   - `components/ui/` for domain-independent controls and presentation primitives.
   - `components/layout/` for shared page structure.
   - `components/providers/` for client context providers.
-  - Domain folders such as `components/accounts/`, `components/auth/`, and
-    `components/scheduled-transfers/` for feature-specific UI.
+  - `components/landing/` for the project landing page and its previews.
+  - `components/ui/icons/` for shared SVG icons.
+  - Domain folders such as `components/accounts/`, `components/pots/`,
+    `components/auth/`, and `components/scheduled-transfers/` for feature-specific UI.
 - Put non-React application logic under `lib/`, grouped by domain. Types,
   runtime validation, request clients, SWR keys, formatting, and date handling
   belong here rather than in component or route files.
@@ -130,8 +132,31 @@ variants.
 - Keep `app/globals.css` limited to design tokens, resets, and document-wide
   rules. Put component and feature styling in colocated `*.module.css` files.
 - Colocate behavior-focused tests with the component or library module they test.
+- Reuse existing components and domain helpers before introducing new ones.
+  Extract shared code when it removes meaningful duplication.
 - Add new folders and abstractions only when they contain meaningful code; do not
   create architectural placeholders for hypothetical features.
+
+### Component file layout
+
+- Keep a single-file component directly in its domain folder, or in
+  `components/ui/icons/` for an icon.
+- When a component has more than one related file (for example, an implementation
+  plus a CSS module or test), place those files in a kebab-case subfolder named
+  after the component. Adding a second file to an existing standalone component
+  should include moving its implementation into that subfolder.
+- Preserve explicit filenames inside the folder: `pot-details.tsx`,
+  `pot-details.module.css`, and `pot-details.test.tsx`. Add styles and tests only
+  when needed; a folder does not require all three files.
+- Import the implementation directly, for example
+  `@/components/pots/pot-details/pot-details`. Do not add `index.ts` barrel files
+  just to shorten imports. Use relative imports for files in the same component
+  folder, such as `./pot-details.module.css` or `./pot-details` in a test.
+- Keep pot UI in `components/pots/`, account UI in `components/accounts/`, and
+  shared controls in `components/ui/`. Keep `lib/` grouped by domain without
+  applying the component folder pattern to every helper.
+- When moving or deleting files, update imports, test mocks, and paths in Markdown
+  documentation. Remove abandoned files and unused CSS from the old location.
 
 ## Verification
 

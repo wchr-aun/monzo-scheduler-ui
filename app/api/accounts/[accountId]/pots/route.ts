@@ -1,51 +1,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-type Pot = {
-  id: string;
-  name: string;
-  balance: number;
-  currency: string;
-  deleted: boolean;
-};
+import { getPots } from "@/lib/pots/validation";
 
 type RouteContext = {
   params: Promise<{ accountId: string }>;
 };
-
-function isPot(value: unknown): value is Pot {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    typeof value.id === "string" &&
-    Boolean(value.id.trim()) &&
-    "name" in value &&
-    typeof value.name === "string" &&
-    "balance" in value &&
-    typeof value.balance === "number" &&
-    Number.isInteger(value.balance) &&
-    "currency" in value &&
-    typeof value.currency === "string" &&
-    value.currency.length === 3 &&
-    "deleted" in value &&
-    typeof value.deleted === "boolean"
-  );
-}
-
-function getPots(value: unknown): Pot[] | null {
-  const pots =
-    Array.isArray(value)
-      ? value
-      : typeof value === "object" &&
-          value !== null &&
-          "pots" in value &&
-          Array.isArray(value.pots)
-        ? value.pots
-        : null;
-
-  return pots?.every(isPot) ? pots : null;
-}
 
 export async function GET(_request: Request, context: RouteContext) {
   const { accountId } = await context.params;
@@ -105,7 +65,8 @@ export async function GET(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "pots_failed" }, { status });
     }
 
-    const pots = getPots(await backendResponse.json());
+    const payload: unknown = await backendResponse.json();
+    const pots = getPots(Array.isArray(payload) ? { pots: payload } : payload);
 
     if (!pots) {
       return NextResponse.json(

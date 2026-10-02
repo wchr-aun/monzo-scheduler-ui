@@ -1,0 +1,22 @@
+.list {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 300px), 1fr)
+  );
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.list > li {
+  justify-self: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+}
