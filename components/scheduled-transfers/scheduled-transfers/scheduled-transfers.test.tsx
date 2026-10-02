@@ -351,7 +351,7 @@ describe("ScheduledTransfers", () => {
         name: "Show details for transfer transfer_2",
       })
       .closest("li");
-    expect(completedCard?.querySelector('[data-timing]')).not.toBeInTheDocument();
+    expect(completedCard).not.toHaveTextContent(/left|ago|Executing soon|Calculating…/);
     expect(
       completedCard?.querySelector(
         'time[datetime="2020-01-01T09:31:00Z"]',
@@ -389,13 +389,13 @@ describe("ScheduledTransfers", () => {
     expect(cancelledCard).toHaveTextContent("cancelled");
     expect(cancelledCard).not.toHaveTextContent("Scheduled for");
     expect(cancelledCard?.querySelector("time")).not.toBeInTheDocument();
-    expect(cancelledCard?.querySelector("[data-timing]")).not.toBeInTheDocument();
+    expect(cancelledCard).not.toHaveTextContent(/left|ago|Executing soon|Calculating…/);
     expect(screen.getByText("failed")).toHaveAttribute("data-tone", "failed");
     const failedCard = screen.getByRole("button", {
       name: "Show details for transfer transfer_4",
     }).closest("li");
     expect(failedCard?.querySelector("time")).not.toBeInTheDocument();
-    expect(failedCard?.querySelector("[data-timing]")).not.toBeInTheDocument();
+    expect(failedCard).not.toHaveTextContent(/left|ago|Executing soon|Calculating…/);
     expect(screen.getByText("Monthly withdrawal")).toBeInTheDocument();
     expect(
       screen

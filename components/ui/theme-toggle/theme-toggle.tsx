@@ -7,7 +7,10 @@ import styles from "./theme-toggle.module.css";
 export function ThemeToggle() {
   function toggleTheme() {
     const root = document.documentElement;
-    const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+    const isDark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const nextTheme = isDark ? "light" : "dark";
 
     root.dataset.theme = nextTheme;
 
