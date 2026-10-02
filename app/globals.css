@@ -171,6 +171,12 @@ body {
   margin: 0;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   color: var(--color-text);
   background: var(--color-background);

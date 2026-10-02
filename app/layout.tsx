@@ -14,14 +14,11 @@ export const metadata: Metadata = {
 const themeInitializationScript = `
   try {
     const storedTheme = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});
-    const theme = storedTheme === "light" || storedTheme === "dark"
-      ? storedTheme
-      : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    document.documentElement.dataset.theme = theme;
+    if (storedTheme === "light" || storedTheme === "dark") {
+      document.documentElement.dataset.theme = storedTheme;
+    }
   } catch {
-    document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+    // CSS follows the system preference when no manual theme is set.
   }
 `;
 
