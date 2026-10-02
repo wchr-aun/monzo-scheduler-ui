@@ -4,6 +4,112 @@
   margin: var(--space-8) 0 0;
 }
 
+.player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "steps controls";
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.steps {
+  grid-area: steps;
+  min-width: 0;
+}
+
+.controls {
+  grid-area: controls;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-6);
+}
+
+@media (max-width: 700px) {
+  .player {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "controls" "steps";
+    gap: var(--space-5);
+  }
+
+  .controls {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-3);
+    padding-top: 0;
+  }
+}
+
+.controls button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-interactive);
+  border-radius: 50%;
+  color: var(--color-interactive);
+  background: var(--color-surface);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.controls button:hover,
+.controls button[aria-pressed="true"] {
+  color: var(--color-on-interactive);
+  background: var(--color-interactive);
+}
+
+.controls button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.explanation {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.explanation p {
+  margin: 0;
+}
+
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  color: var(--color-interactive);
+}
+
+.countdownTrack {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color-status-pending-background);
+  overflow: hidden;
+}
+
+.countdownTrack > span {
+  display: block;
+  height: 100%;
+  background: var(--color-interactive);
+  transform-origin: left;
+  animation: countdown 3s linear forwards;
+}
+
+@keyframes countdown {
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdownTrack > span { animation: none; }
+}
+
 .steps,
 .transferPreview ul {
   padding: 0;

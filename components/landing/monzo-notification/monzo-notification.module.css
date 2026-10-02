@@ -1,4 +1,68 @@
+.notificationDemo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.appButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  padding: var(--space-4);
+  border: 1px solid var(--color-navbar-border);
+  border-radius: 24px;
+  background: var(--color-navbar);
+  box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--color-heading) 40%, transparent);
+  cursor: pointer;
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+.appButton:hover {
+  transform: translateY(-4px) rotate(-4deg);
+  box-shadow: 0 18px 32px -10px color-mix(in srgb, var(--color-heading) 50%, transparent);
+}
+
+.appButton:active { transform: scale(0.96); }
+
+.appButton[hidden],
+.hint[hidden] {
+  display: none;
+}
+
+.appButton img {
+  display: block;
+  width: 56px;
+  height: auto;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-background);
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.hint {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 .notificationCard {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -8,6 +72,63 @@
   background: color-mix(in srgb, var(--color-surface) 70%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+  width: 100%;
+  box-shadow: 0 16px 40px -24px var(--color-heading);
+  transform-origin: top center;
+}
+
+.notificationMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline-end: var(--space-8);
+}
+
+.closeButton {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface-muted);
+  color: var(--color-interactive);
+  font: inherit;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.closeButton:hover { background: var(--color-status-pending-background); }
+
+.appButton:focus-visible,
+.closeButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .notificationCard { animation: notificationPopup 550ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .badge { animation: badgePulse 800ms ease-in-out 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appButton { transition: none; }
+  .appButton:hover,
+  .appButton:active { transform: none; }
+}
+
+@keyframes notificationPopup {
+  0% { opacity: 0; transform: translateY(-16px) scale(0.88); }
+  70% { opacity: 1; transform: translateY(2px) scale(1.025); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes badgePulse {
+  50% { transform: scale(1.18); }
 }
 
 .notificationIcon {
@@ -33,6 +154,7 @@
 
 .notificationHeader {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
   color: var(--color-text-muted);
@@ -57,4 +179,3 @@
   font-size: 0.875rem;
   line-height: 1.6;
 }
-

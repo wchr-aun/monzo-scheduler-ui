@@ -11,17 +11,17 @@ import {MonzoTransaction} from "@/components/landing/monzo-transaction/monzo-tra
 import {PaymentFlow} from "@/components/landing/payment-flow/payment-flow";
 import {RepositoryCard} from "@/components/landing/repository-card/repository-card";
 import {FeatureCard} from "@/components/landing/feature-card/feature-card";
+import {ScrollReveal} from "@/components/ui/scroll-reveal/scroll-reveal";
 import styles from "./landing-page.module.css";
 
 const exampleRentAmount = 2_273;
-const exampleRentTransferDate = "2026-09-14T23:00:00Z";
 
 export function LandingPage() {
   const transfersPage = createPreviewTransfersPage();
   const storyTransfer = {
     ...transfersPage.scheduledTransfers[1],
     amount: exampleRentAmount * 100,
-    scheduled_for: exampleRentTransferDate,
+    scheduled_for: new Date().toISOString(),
   };
 
   return (
@@ -45,7 +45,7 @@ export function LandingPage() {
 
       <main id="main">
         <section className={styles.hero} aria-labelledby="hero-heading">
-          <div className={styles.heroCopy}>
+          <ScrollReveal className={styles.heroCopy}>
             <p className={styles.eyebrow}><span className={styles.dot} /> Schedzo. On schedule.</p>
             <h1 id="hero-heading">Less remembering.<br /><span>More saving.</span></h1>
             <p className={styles.introduction}>
@@ -55,18 +55,20 @@ export function LandingPage() {
             <a className={styles.primaryLink} href="#code">Explore the code <ArrowIcon /></a>
             <p className={styles.heroNote}>Curious how it works? Explore the code.</p>
             <a className={styles.storyLink} href="#why">A little about the project <ArrowIcon direction="down" /></a>
-          </div>
-          <PotPreview transfersPage={transfersPage} />
+          </ScrollReveal>
+          <ScrollReveal delay={120}><PotPreview transfersPage={transfersPage} /></ScrollReveal>
         </section>
 
         <section id="why" className={styles.storySection} aria-labelledby="why-heading">
           <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>01 / The motivation</p>
-            <h2 id="why-heading">Why I&apos;m<br />building this.</h2>
+            <ScrollReveal>
+              <p className={styles.eyebrow}>01 / The motivation</p>
+              <h2 id="why-heading">Why I&apos;m<br />building this.</h2>
+            </ScrollReveal>
             <PaymentFlow transfer={storyTransfer} />
           </div>
           <div className={styles.storyContent}>
-            <div>
+            <ScrollReveal>
               <h3>The problem.</h3>
               <p>
                 Monzo doesn&apos;t let us <strong>schedule withdrawals from savings pots</strong>. So, if we
@@ -87,8 +89,8 @@ export function LandingPage() {
                 Illustrative calculation using <ExternalLink href="https://monzo.com/current-account">Monzo&apos;s Instant Access Savings rate</ExternalLink> of
                 2.75% AER variable on the free plan, checked on 2 October 2026. Rates can change.
               </p>
-            </div>
-            <div>
+            </ScrollReveal>
+            <ScrollReveal>
               <h3>The workaround.</h3>
               <p>
                 The workaround is to schedule the payment from the main balance, then
@@ -105,8 +107,8 @@ export function LandingPage() {
                 the savings pot until it&apos;s needed, <strong>without me having to remember
                 to move it myself</strong>.
               </p>
-            </div>
-            <div>
+            </ScrollReveal>
+            <ScrollReveal>
               <h3>Why I built this.</h3>
               <p>
                 There&apos;s already a platform that can do this: <ExternalLink href="https://ifttt.com/applets/d3xg75n8-move-money-daily-from-a-monzo-pot-to-your-account">IFTTT</ExternalLink> lets
@@ -118,12 +120,12 @@ export function LandingPage() {
                 Monzo already provides <ExternalLink href="https://docs.monzo.com">APIs to move money into and out of pots</ExternalLink>,
                 so this felt like a good place to start.
               </p>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
         <section id="building" className={styles.buildSection} aria-labelledby="building-heading">
-          <div className={styles.buildHeading}>
+          <ScrollReveal className={styles.buildHeading}>
             <div>
               <p className={styles.eyebrow}>02 / From idea to app</p>
               <h2 id="building-heading">What I&apos;ve built.<br />What you can do.</h2>
@@ -132,64 +134,76 @@ export function LandingPage() {
               I&apos;ve built a small web app that helps schedule transfers into and out of pots,
               without a limit on the number of scheduled transfers you can create.
             </p>
-          </div>
+          </ScrollReveal>
           <div className={styles.features}>
-            <FeatureCard
-              number="01"
-              title="Schedule money in or out."
-              description="Create recurring deposits or withdrawals between your pots and main balance."
-            />
-            <FeatureCard
-              number="02"
-              title="Make as many plans as you need."
-              description="No limit on the number of scheduled transfers you can create."
-            />
-            <FeatureCard
-              number="03"
-              title="Keep track of your plans."
-              description="See what's coming next, filter transfers by status, and cancel pending transfers."
-            />
+            <ScrollReveal>
+              <FeatureCard
+                number="01"
+                title="Schedule money in or out."
+                description="Create recurring deposits or withdrawals between your pots and main balance."
+              />
+            </ScrollReveal>
+            <ScrollReveal>
+              <FeatureCard
+                number="02"
+                title="Make as many plans as you need."
+                description="No limit on the number of scheduled transfers you can create."
+              />
+            </ScrollReveal>
+            <ScrollReveal>
+              <FeatureCard
+                number="03"
+                title="Keep track of your plans."
+                description="See what's coming next, filter transfers by status, and cancel pending transfers."
+              />
+            </ScrollReveal>
           </div>
           <div className={styles.notificationFeature}>
-            <div className={styles.notificationCopy}>
+            <ScrollReveal className={styles.notificationCopy}>
               <h3>Know what happened.</h3>
               <p>
                 When a scheduled transfer runs, whether it succeeds or fails, the app sends
                 a notification to your Monzo app so you know what happened.
               </p>
-            </div>
+            </ScrollReveal>
             <figure className={styles.notificationPreview}>
-                <MonzoNotification title="🎉 £50.00 deposited!" />
+              <MonzoNotification title="🎉 £50.00 deposited!" />
               <figcaption>Example notification</figcaption>
             </figure>
           </div>
         </section>
 
         <section id="code" className={styles.codeSection} aria-labelledby="code-heading">
-          <p className={styles.eyebrow}>03 / Open source</p>
-          <h2 id="code-heading">Built for my needs.<br />Open for yours.</h2>
-          <div className={styles.codeDescription}>
+          <ScrollReveal>
+            <p className={styles.eyebrow}>03 / Open source</p>
+            <h2 id="code-heading">Built for my needs.<br />Open for yours.</h2>
+          </ScrollReveal>
+          <ScrollReveal className={styles.codeDescription}>
             <p>
               Monzo&apos;s developer API is intended for personal projects and a small set of
               explicitly allowed users, so I can only let a small number of people in.
             </p>
             <p>But all the code is open source. Feel free to fork it, copy it, and run it on your own server.</p>
-          </div>
+          </ScrollReveal>
           <div className={styles.repositories}>
-            <RepositoryCard
-              href="https://github.com/wchr-aun/monzo-scheduler-ui"
-              title="Frontend code"
-              description="The website and console for your accounts, pots, and scheduled transfers."
-              stack={['TypeScript', 'Next.js']}
-              stackLabel="Frontend language and framework"
-            />
-            <RepositoryCard
-              href="https://github.com/wchr-aun/monzo-scheduler"
-              title="Backend code"
-              description="The scheduler that runs your transfers and sends updates to Monzo."
-              stack={['Python', 'FastAPI']}
-              stackLabel="Backend language and framework"
-            />
+            <ScrollReveal>
+              <RepositoryCard
+                href="https://github.com/wchr-aun/monzo-scheduler-ui"
+                title="Frontend code"
+                description="The website and console for your accounts, pots, and scheduled transfers."
+                stack={['TypeScript', 'Next.js']}
+                stackLabel="Frontend language and framework"
+              />
+            </ScrollReveal>
+            <ScrollReveal>
+              <RepositoryCard
+                href="https://github.com/wchr-aun/monzo-scheduler"
+                title="Backend code"
+                description="The scheduler that runs your transfers and sends updates to Monzo."
+                stack={['Python', 'FastAPI']}
+                stackLabel="Backend language and framework"
+              />
+            </ScrollReveal>
           </div>
         </section>
       </main>

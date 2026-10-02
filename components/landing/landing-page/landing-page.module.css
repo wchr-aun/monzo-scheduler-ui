@@ -301,6 +301,11 @@
   gap: var(--space-5);
 }
 
+.features > div,
+.repositories > div {
+  display: grid;
+}
+
 .notificationFeature {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -320,7 +325,11 @@
 }
 
 .notificationPreview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   width: min(100%, 420px);
+  min-height: 200px;
   margin: 0;
   justify-self: center;
 }
@@ -330,6 +339,10 @@
   color: var(--color-text-muted);
   font-size: 0.75rem;
   text-align: center;
+}
+
+.notificationPreview:has(button[aria-expanded="false"]) figcaption {
+  display: none;
 }
 
 .codeSection {

@@ -1,10 +1,11 @@
+import {ScrollReveal} from "@/components/ui/scroll-reveal/scroll-reveal";
 import Image from "next/image";
 import {ArrowIcon} from "@/components/ui/icons/arrow-icon";
 import {MoreVerticalIcon} from "@/components/ui/icons/more-vertical-icon";
 import {formatMoneyParts} from "@/lib/formatting/money";
 import styles from "./monzo-transaction.module.css";
 
-type MonzoTransactionProps = {
+type MonzoTransactionProps = ({
   kind: "transfer";
   amount: number;
   potName: string;
@@ -19,7 +20,7 @@ type MonzoTransactionProps = {
   amount: number;
   recipient: string;
   initials: string;
-};
+}) & {revealTrigger?: "scroll" | "mount"};
 
 export function MonzoTransaction(props: MonzoTransactionProps) {
   const parts = formatMoneyParts(props.amount, "GBP");
@@ -29,7 +30,7 @@ export function MonzoTransaction(props: MonzoTransactionProps) {
     : amount;
 
   return (
-    <div className={styles.row}>
+    <ScrollReveal effect="popup" className={styles.row} trigger={props.revealTrigger}>
       {props.kind === "transfer" ? (
         <div className={styles.appIcon}>
           <Image src="/logo.png" alt="" width={44} height={44} />
@@ -65,6 +66,6 @@ export function MonzoTransaction(props: MonzoTransactionProps) {
           ))}
         </span>
       )}
-    </div>
+    </ScrollReveal>
   );
 }
