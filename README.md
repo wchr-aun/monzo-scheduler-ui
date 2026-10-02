@@ -93,6 +93,38 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,
   money formatting, session helpers, and UK date-time handling.
 
+### Adding or changing components
+
+Choose the domain first: accounts, pots, authentication (`auth`), scheduled
+transfers, or the landing page. Shared controls belong in `components/ui/`, SVG
+icons in `components/ui/icons/`, shared page structure in `components/layout/`,
+and context providers in `components/providers/`. Reuse existing components and
+helpers before extracting or adding new ones.
+
+Keep single-file components in their existing domain folder. Once a component
+needs a second related file, group its implementation, styles, and tests in a
+kebab-case folder named after it:
+
+```text
+components/pots/pot-details/
+  pot-details.tsx
+  pot-details.module.css
+  pot-details.test.tsx
+```
+
+Create only the files the component needs. Import the named implementation
+directly, without an `index.ts` barrel:
+
+```tsx
+import { PotDetails } from "@/components/pots/pot-details/pot-details";
+```
+
+Use relative imports within the component folder and `@/*` imports between
+folders. Keep non-React helpers under their existing `lib/` domains. When moving
+files, update imports, test mocks, and documentation paths, and remove abandoned
+files and unused styles. See [AGENTS.md](AGENTS.md) for the full repository rules
+and verification requirements.
+
 Authenticated browser reads use the shared SWR provider. Sensitive values are
 kept server-side and authenticated data is not persisted in browser storage.
 
