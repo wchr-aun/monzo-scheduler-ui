@@ -1,4 +1,4 @@
-# Monzo Scheduler UI
+# Schedzo UI
 
 A small Next.js App Router application for authenticating with Monzo, browsing
 accounts and pots, and managing scheduled transfers.

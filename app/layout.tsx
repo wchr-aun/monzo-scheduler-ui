@@ -4,7 +4,7 @@ import type {ReactNode} from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Monzo Scheduler",
+  title: "Schedzo",
   description: "A project for managing scheduled Monzo pot transfers",
   icons: {
     icon: "/favicon.ico",

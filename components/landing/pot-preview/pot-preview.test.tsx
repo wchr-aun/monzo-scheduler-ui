@@ -22,7 +22,7 @@ describe("PotPreview", () => {
     render(<PotPreview transfersPage={createPreviewTransfersPage(new Date("2026-11-14T16:48:00Z"))} />);
 
     expect(screen.getByRole("navigation", { name: "Site controls", hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Monzo Scheduler home", hidden: true })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Schedzo home", hidden: true })).toHaveAttribute("href", "/");
     expect(screen.getByRole("heading", { name: "Rainy day", level: 1, hidden: true })).toBeInTheDocument();
     expect(screen.getByText(textContent("£5,549.54"))).toBeInTheDocument();
     expect(screen.getByText("Weekly deposit")).toBeInTheDocument();

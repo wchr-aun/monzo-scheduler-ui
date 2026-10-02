@@ -8,11 +8,11 @@ export function Navbar({ logoHref = "/console" }: { logoHref?: string }) {
   return (
     <nav className={styles.navbar} aria-label="Site controls">
       <div className={styles.content}>
-        <Link className={styles.brand} href={logoHref} aria-label="Monzo Scheduler home">
+        <Link className={styles.brand} href={logoHref} aria-label="Schedzo home">
           <Image
             className={`${styles.logo} ${styles.lightLogo}`}
             src="/logo.png"
-            alt="Monzo Scheduler"
+            alt="Schedzo"
             width={1254}
             height={1254}
             priority
@@ -20,7 +20,7 @@ export function Navbar({ logoHref = "/console" }: { logoHref?: string }) {
           <Image
             className={`${styles.logo} ${styles.darkLogo}`}
             src="/logo-dark-mode.png"
-            alt="Monzo Scheduler"
+            alt="Schedzo"
             width={1254}
             height={1254}
             priority

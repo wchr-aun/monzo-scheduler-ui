@@ -29,7 +29,7 @@ export function LandingPage() {
       <a className={styles.skipLink} href="#main">Skip to content</a>
       <header className={styles.header}>
         <nav className={styles.navigation} aria-label="Main navigation">
-          <a className={styles.brand} href="#top" aria-label="Monzo Scheduler, back to top">
+          <a className={styles.brand} href="#top" aria-label="Schedzo, back to top">
             <Image className={styles.lightLogo} src="/logo.png" alt="" width={56} height={56} priority />
             <Image className={styles.darkLogo} src="/logo-dark-mode.png" alt="" width={56} height={56} priority />
             <span>Schedzo<span className={styles.brandCaption}>On schedule.</span></span>
@@ -46,14 +46,14 @@ export function LandingPage() {
       <main id="main">
         <section className={styles.hero} aria-labelledby="hero-heading">
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}><span className={styles.dot} /> Small project. Everyday possibilities.</p>
+            <p className={styles.eyebrow}><span className={styles.dot} /> Schedzo. On schedule.</p>
             <h1 id="hero-heading">Less remembering.<br /><span>More saving.</span></h1>
             <p className={styles.introduction}>
               Schedule money into and out of your Monzo pots, so there&apos;s one less
               thing to remember when life gets busy.
             </p>
             <a className={styles.primaryLink} href="#code">Explore the code <ArrowIcon /></a>
-            <p className={styles.heroNote}>Built with curiosity. Made for the everyday.</p>
+            <p className={styles.heroNote}>Curious how it works? Explore the code.</p>
             <a className={styles.storyLink} href="#why">A little about the project <ArrowIcon direction="down" /></a>
           </div>
           <PotPreview transfersPage={transfersPage} />
