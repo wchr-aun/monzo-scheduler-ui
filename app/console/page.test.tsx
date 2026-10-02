@@ -10,10 +10,10 @@ vi.mock("next/headers", () => ({
 vi.mock("@/lib/auth/session.server", () => ({
   getUserId: () => "user_123",
 }));
-vi.mock("@/components/accounts/accounts-list", () => ({
+vi.mock("@/components/accounts/accounts-list/accounts-list", () => ({
   AccountsList: ({ userId }: { userId: string }) => <p>Accounts for {userId}</p>,
 }));
-vi.mock("@/components/auth/logout-button", () => ({
+vi.mock("@/components/auth/logout-button/logout-button", () => ({
   LogoutButton: () => <button>Log out</button>,
 }));
 

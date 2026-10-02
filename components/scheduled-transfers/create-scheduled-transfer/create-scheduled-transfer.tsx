@@ -1,0 +1,250 @@
+"use client";
+
+import {Button} from "@/components/ui/button/button";
+import {InlineMessage} from "@/components/ui/inline-message/inline-message";
+import {Select} from "@/components/ui/select/select";
+import {formatMoney} from "@/lib/formatting/money";
+import {formatLocalDateTime, getEarliestUkDateTime, getUkDateTime,} from "@/lib/scheduled-transfers/date-time";
+import {getScheduledTransfersKey, isScheduledTransfersKey,} from "@/lib/scheduled-transfers/keys";
+import {type FormEvent, useEffect, useState} from "react";
+import {useSWRConfig} from "swr";
+import styles from "./create-scheduled-transfer.module.css";
+
+const intervalOptions = [
+  {label: "Daily", value: "daily"},
+  {label: "Weekly", value: "weekly"},
+  {label: "Monthly", value: "monthly"},
+] as const;
+
+const transferTypeOptions = [
+  {label: "Deposit into pot", value: "deposit"},
+  {label: "Withdraw from pot", value: "withdraw"},
+] as const;
+
+type Interval = (typeof intervalOptions)[number]["value"];
+type TransferType = (typeof transferTypeOptions)[number]["value"];
+
+export function CreateScheduledTransfer({
+  accountId,
+  potId,
+  currency,
+}: {
+  accountId: string;
+  potId: string;
+  currency: string;
+}) {
+  const { mutate } = useSWRConfig();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState("");
+  const [minimumDateTime, setMinimumDateTime] = useState("");
+  const [interval, setInterval] = useState<Interval>("monthly");
+  const [transferType, setTransferType] = useState<TransferType>("deposit");
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState<
+    { kind: "error" | "success"; text: string } | undefined
+  >();
+
+  useEffect(() => {
+    const earliestDateTime = getEarliestUkDateTime(new Date());
+    setMinimumDateTime(earliestDateTime);
+    setSelectedDateTime(earliestDateTime);
+  }, []);
+
+  function toggleForm() {
+    if (isExpanded) {
+      setSelectedDateTime("");
+      setInterval("monthly");
+      setTransferType("deposit");
+      setAmount("");
+    } else {
+      const now = new Date();
+      const earliestDateTime = getEarliestUkDateTime(now);
+      const selectedInstant = getUkDateTime(selectedDateTime);
+
+      setMinimumDateTime(earliestDateTime);
+      if (!selectedInstant || new Date(selectedInstant).getTime() < now.getTime()) {
+        setSelectedDateTime(earliestDateTime);
+      }
+    }
+
+    setIsExpanded((expanded) => !expanded);
+    setMessage(undefined);
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage(undefined);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const datetime = getUkDateTime(String(formData.get("datetime") ?? ""));
+    const amountInPence = Number(formData.get("amount"));
+
+    if (!datetime) {
+      setMessage({ kind: "error", text: "Enter a valid UK date and time." });
+      return;
+    }
+
+    if (new Date(datetime).getTime() < Date.now()) {
+      setMessage({
+        kind: "error",
+        text: "Date and time must not be in the past.",
+      });
+      return;
+    }
+
+    if (!Number.isSafeInteger(amountInPence) || amountInPence <= 0) {
+      setMessage({
+        kind: "error",
+        text: "Amount must be a positive whole number of pence.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(getScheduledTransfersKey(accountId, potId), {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          datetime,
+          interval: formData.get("interval"),
+          type: formData.get("type"),
+          amount: amountInPence,
+          pot_id: potId,
+          account_id: accountId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Schedule transfer request failed");
+      }
+
+      form.reset();
+      setSelectedDateTime("");
+      setInterval("monthly");
+      setTransferType("deposit");
+      setAmount("");
+      setIsExpanded(false);
+      setMessage({ kind: "success", text: "Scheduled transfer created." });
+      await mutate((key) =>
+        isScheduledTransfersKey(key, accountId, potId),
+      ).catch(() => undefined);
+    } catch {
+      setMessage({
+        kind: "error",
+        text: "Could not create the scheduled transfer.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const ukDateTime = getUkDateTime(selectedDateTime);
+  return (
+    <section className={styles.section} aria-label="Schedule a transfer">
+      <Button
+        className={styles.toggle}
+        variant={isExpanded ? "secondary" : "primary"}
+        type="button"
+        aria-expanded={isExpanded}
+        aria-controls="scheduled-transfer-form"
+        onClick={toggleForm}
+      >
+        <span>{isExpanded ? "Do it later" : "Schedule a transfer"}</span>
+        <span className={styles.plus} aria-hidden="true">{isExpanded ? "-" : "+"}</span>
+      </Button>
+      {isExpanded ? (
+        <form
+          className={styles.form}
+          id="scheduled-transfer-form"
+          onSubmit={handleSubmit}
+        >
+          <div className={styles.field}>
+            <label htmlFor="scheduled-transfer-datetime">UK date and time</label>
+            <input
+              id="scheduled-transfer-datetime"
+              name="datetime"
+              type="datetime-local"
+              step="60"
+              min={minimumDateTime}
+              value={selectedDateTime}
+              onChange={(event) => setSelectedDateTime(event.target.value)}
+              required
+            />
+            {ukDateTime ? (
+              <output className={styles.hint} aria-live="polite">
+                Local date and time:{" "}
+                <time dateTime={ukDateTime}>{formatLocalDateTime(ukDateTime)}</time>
+              </output>
+            ) : null}
+          </div>
+
+          <div className={styles.field}>
+            <Select
+              id="scheduled-transfer-interval"
+              label="Interval"
+              name="interval"
+              onChange={setInterval}
+              options={intervalOptions}
+              value={interval}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <Select
+              id="scheduled-transfer-type"
+              label="Transfer type"
+              name="type"
+              onChange={setTransferType}
+              options={transferTypeOptions}
+              value={transferType}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="scheduled-transfer-amount">Amount (pence)</label>
+            <div className={styles.amountControl}>
+              <input
+                id="scheduled-transfer-amount"
+                name="amount"
+                type="text"
+                autoComplete="off"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={amount}
+                onChange={(event) => {
+                  if (/^\d*$/.test(event.target.value)) {
+                    setAmount(event.target.value);
+                  }
+                }}
+                required
+              />
+              <output
+                className={styles.amountValue}
+                htmlFor="scheduled-transfer-amount"
+                aria-label="Value in pounds"
+                aria-live="polite"
+              >
+                {formatMoney(Number(amount || 0), currency)}
+              </output>
+            </div>
+          </div>
+
+          <Button variant="primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating…" : "Create scheduled transfer"}
+          </Button>
+        </form>
+      ) : null}
+
+      {message ? (
+        <InlineMessage tone={message.kind}>{message.text}</InlineMessage>
+      ) : null}
+    </section>
+  );
+}

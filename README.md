@@ -42,7 +42,7 @@ controls and a not-allowed cursor. The landing page explains the motivation,
 illustrates a pot withdrawal followed by a payment scheduled in Monzo,
 shows three features and example Monzo notifications, and links to both public
 repositories. Its Explore the code button links to the on-page open-source section.
-Landing page copy is editable in `components/landing/landing-page.tsx`.
+Landing page copy is editable in `components/landing/landing-page/landing-page.tsx`.
 
 ## Run locally
 
@@ -85,7 +85,11 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
   existing path for OAuth. The console and callback layouts share application
   navigation, providers, and the footer.
 - `components/` contains the project landing page, UI primitives, layout components, and account,
-  authentication, and scheduled-transfer features.
+  pot, authentication, and scheduled-transfer features. Components with multiple
+  files have a named subfolder containing their implementation, styles, and tests
+  (for example, `components/pots/pot-details/pot-details.tsx`). Single-file
+  components remain at their domain's root. Imports point directly to the named
+  implementation rather than a barrel file.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,
   money formatting, session helpers, and UK date-time handling.
 

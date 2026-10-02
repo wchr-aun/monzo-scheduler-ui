@@ -1,6 +1,6 @@
-import { CallbackStatus } from "@/components/auth/callback-status";
-import { PageContainer } from "@/components/layout/page-container";
-import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { CallbackStatus } from "@/components/auth/callback-status/callback-status";
+import { PageContainer } from "@/components/layout/page-container/page-container";
+import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";

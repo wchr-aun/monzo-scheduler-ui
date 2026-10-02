@@ -1,10 +1,10 @@
-import { AccountsPreloader } from "@/components/accounts/accounts-preloader";
+import { AccountsPreloader } from "@/components/accounts/accounts-preloader/accounts-preloader";
 import { DataProvider } from "@/components/providers/data-provider";
 import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { Footer } from "./footer";
-import { Navbar } from "./navbar";
+import { Footer } from "@/components/layout/footer/footer";
+import { Navbar } from "@/components/layout/navbar/navbar";
 
 export async function ApplicationLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();

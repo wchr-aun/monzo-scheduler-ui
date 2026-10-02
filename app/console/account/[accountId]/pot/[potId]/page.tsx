@@ -1,6 +1,6 @@
-import { PageContainer } from "@/components/layout/page-container";
-import { PotDetails } from "@/components/accounts/pot-details";
-import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers";
+import { PageContainer } from "@/components/layout/page-container/page-container";
+import { PotDetails } from "@/components/pots/pot-details/pot-details";
+import { ScheduledTransfers } from "@/components/scheduled-transfers/scheduled-transfers/scheduled-transfers";
 
 type PotPageProps = {
   params: Promise<{ accountId: string; potId: string }>;

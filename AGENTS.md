@@ -118,7 +118,7 @@ variants.
   - `components/ui/` for domain-independent controls and presentation primitives.
   - `components/layout/` for shared page structure.
   - `components/providers/` for client context providers.
-  - Domain folders such as `components/accounts/`, `components/auth/`, and
+  - Domain folders such as `components/accounts/`, `components/pots/`, `components/auth/`, and
     `components/scheduled-transfers/` for feature-specific UI.
 - Put non-React application logic under `lib/`, grouped by domain. Types,
   runtime validation, request clients, SWR keys, formatting, and date handling
@@ -130,6 +130,9 @@ variants.
 - Keep `app/globals.css` limited to design tokens, resets, and document-wide
   rules. Put component and feature styling in colocated `*.module.css` files.
 - Colocate behavior-focused tests with the component or library module they test.
+- Give components with multiple files a named subfolder containing their
+  implementation, CSS module, and tests. Keep single-file components at their
+  domain's root. Import the named implementation directly without barrel files.
 - Add new folders and abstractions only when they contain meaningful code; do not
   create architectural placeholders for hypothetical features.
 
