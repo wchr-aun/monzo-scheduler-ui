@@ -26,9 +26,6 @@ export function ScheduledTransferCard({
   const detailsId = useId();
   const isDeposit = transfer.type === "deposit";
   const recurrence = getTransferRecurrence(transfer.scheduled_for, transfer.interval);
-  const scheduledTime = new Date(transfer.scheduled_for).getTime();
-  const isPast =
-    now !== null && !Number.isNaN(scheduledTime) && scheduledTime < now;
   const differingIdSections = getDifferingUuidSections(
     transfer.transfer_id,
     transfer.setup_id,
@@ -84,8 +81,7 @@ export function ScheduledTransferCard({
           <div className={styles.scheduleHeading}>
             {transfer.status === "pending" ? (
               <p
-                className={`${styles.countdown}${isPast ? ` ${styles.past}` : ""}`}
-                data-timing={isPast ? "past" : "future"}
+                className={styles.countdown}
                 aria-live="off"
               >
                 {now === null

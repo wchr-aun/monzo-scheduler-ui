@@ -111,10 +111,6 @@
   overflow-wrap: anywhere;
 }
 
-.past {
-  font-style: italic;
-}
-
 .times {
   display: inline-grid;
   gap: 1px;
