@@ -136,13 +136,7 @@ export function ScheduledTransfers({
         <InlineMessage tone="error">Could not load scheduled transfers.</InlineMessage>
       ) : null}
       {!data && !error ? (
-        <div
-          className={styles.message}
-          role="status"
-          aria-label="Loading scheduled transfers"
-        >
-          <LoadingIndicator />
-        </div>
+        <LoadingIndicator label="Loading scheduled transfers" />
       ) : !data ? null : data.scheduledTransfers.length === 0 ? (
         <InlineMessage>No scheduled transfers found.</InlineMessage>
       ) : (

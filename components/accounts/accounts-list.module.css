@@ -20,8 +20,3 @@
   width: 100%;
   max-width: 400px;
 }
-
-.message {
-  color: var(--color-text-muted);
-  text-align: center;
-}

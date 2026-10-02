@@ -2,8 +2,6 @@ import {createPreviewTransfersPage} from "@/lib/scheduled-transfers/preview";
 import Image from "next/image";
 import Link from "next/link";
 import {ArrowIcon} from "@/components/ui/icons/arrow-icon";
-import {GitHubIcon} from "@/components/ui/icons/github-icon";
-import {StatusBadge} from "@/components/ui/status-badge";
 import {ThemeToggle} from "@/components/ui/theme-toggle";
 import {Footer} from "@/components/layout/footer";
 import {PotPreview} from "./pot-preview";
@@ -11,6 +9,8 @@ import {MonzoNotification} from "./monzo-notification";
 import {InterestCalculation} from "./interest-calculation";
 import {MonzoTransaction} from "./monzo-transaction";
 import {PaymentFlow} from "./payment-flow";
+import {RepositoryCard} from "./repository-card";
+import {FeatureCard} from "./feature-card";
 import styles from "./landing-page.module.css";
 
 const exampleRentAmount = 2_273;
@@ -134,21 +134,21 @@ export function LandingPage() {
             </p>
           </div>
           <div className={styles.features}>
-            <article className={styles.feature}>
-              <span className={styles.featureNumber}>01</span>
-              <h3>Schedule money in or out.</h3>
-              <p>Create recurring deposits or withdrawals between your pots and main balance.</p>
-            </article>
-            <article className={styles.feature}>
-              <span className={styles.featureNumber}>02</span>
-              <h3>Make as many plans as you need.</h3>
-              <p>No limit on the number of scheduled transfers you can create.</p>
-            </article>
-            <article className={styles.feature}>
-              <span className={styles.featureNumber}>03</span>
-              <h3>Keep track of your plans.</h3>
-              <p>See what&apos;s coming next, filter transfers by status, and cancel pending transfers.</p>
-            </article>
+            <FeatureCard
+              number="01"
+              title="Schedule money in or out."
+              description="Create recurring deposits or withdrawals between your pots and main balance."
+            />
+            <FeatureCard
+              number="02"
+              title="Make as many plans as you need."
+              description="No limit on the number of scheduled transfers you can create."
+            />
+            <FeatureCard
+              number="03"
+              title="Keep track of your plans."
+              description="See what's coming next, filter transfers by status, and cancel pending transfers."
+            />
           </div>
           <div className={styles.notificationFeature}>
             <div className={styles.notificationCopy}>
@@ -176,24 +176,20 @@ export function LandingPage() {
             <p>But all the code is open source. Feel free to fork it, copy it, and run it on your own server.</p>
           </div>
           <div className={styles.repositories}>
-            <a className={styles.repository} href="https://github.com/wchr-aun/monzo-scheduler-ui" target="_blank" rel="noopener noreferrer">
-              <h3>Frontend code <ArrowIcon direction="up-right" /></h3>
-              <p>The website and console for your accounts, pots, and scheduled transfers.</p>
-              <ul className={styles.stackBadges} aria-label="Frontend language and framework">
-                <li><StatusBadge tone="pending">TypeScript</StatusBadge></li>
-                <li><StatusBadge tone="pending">Next.js</StatusBadge></li>
-              </ul>
-              <span><GitHubIcon /> View on GitHub</span>
-            </a>
-            <a className={styles.repository} href="https://github.com/wchr-aun/monzo-scheduler" target="_blank" rel="noopener noreferrer">
-              <h3>Backend code <ArrowIcon direction="up-right" /></h3>
-              <p>The scheduler that runs your transfers and sends updates to Monzo.</p>
-              <ul className={styles.stackBadges} aria-label="Backend language and framework">
-                <li><StatusBadge tone="pending">Python</StatusBadge></li>
-                <li><StatusBadge tone="pending">FastAPI</StatusBadge></li>
-              </ul>
-              <span><GitHubIcon /> View on GitHub</span>
-            </a>
+            <RepositoryCard
+              href="https://github.com/wchr-aun/monzo-scheduler-ui"
+              title="Frontend code"
+              description="The website and console for your accounts, pots, and scheduled transfers."
+              stack={['TypeScript', 'Next.js']}
+              stackLabel="Frontend language and framework"
+            />
+            <RepositoryCard
+              href="https://github.com/wchr-aun/monzo-scheduler"
+              title="Backend code"
+              description="The scheduler that runs your transfers and sends updates to Monzo."
+              stack={['Python', 'FastAPI']}
+              stackLabel="Backend language and framework"
+            />
           </div>
         </section>
       </main>

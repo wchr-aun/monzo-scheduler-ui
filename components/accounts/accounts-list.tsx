@@ -12,9 +12,7 @@ export function AccountsList({ userId }: { userId?: string | null }) {
 
   if (isLoading || (!accounts && !error)) {
     return (
-      <div className={styles.message} role="status" aria-label="Loading accounts">
-        <LoadingIndicator />
-      </div>
+      <LoadingIndicator label="Loading accounts" />
     );
   }
 

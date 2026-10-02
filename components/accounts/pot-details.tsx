@@ -35,9 +35,7 @@ export function PotDetails({
     return (
       <>
         {header}
-        <div className={styles.message} role="status" aria-label="Loading pot">
-          <LoadingIndicator />
-        </div>
+        <LoadingIndicator label="Loading pot" />
       </>
     );
   }

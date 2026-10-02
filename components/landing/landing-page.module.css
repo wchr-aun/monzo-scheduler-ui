@@ -237,7 +237,6 @@
 
 .storyContent p,
 .buildDescription,
-.feature p,
 .notificationCopy p,
 .codeDescription p {
   color: var(--color-text-muted);
@@ -300,36 +299,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-5);
-}
-
-.feature {
-  padding: var(--space-8);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  background: var(--color-surface);
-}
-
-.featureNumber {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  color: var(--color-primary);
-  background: var(--color-status-completed-background);
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.feature h3 {
-  margin: var(--space-8) 0 var(--space-3);
-  font-size: 1.375rem;
-  letter-spacing: -0.035em;
-}
-
-.feature p {
-  margin: 0;
-  font-size: 0.875rem;
 }
 
 .notificationFeature {
@@ -395,58 +364,6 @@
   text-align: left;
 }
 
-.repository {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  color: var(--color-text);
-  background: var(--color-surface);
-  text-decoration: none;
-}
-
-.repository:hover {
-  border-color: var(--color-interactive);
-}
-
-.repository h3 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin: 0;
-  color: var(--color-heading);
-  font-size: 1.125rem;
-}
-
-.repository p {
-  margin: var(--space-3) 0 var(--space-5);
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  line-height: 1.7;
-}
-
-.repository > span {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: auto;
-  color: var(--color-interactive);
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.stackBadges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  padding: 0;
-  margin: 0 0 var(--space-5);
-  list-style: none;
-}
-
-
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme])) .brand .lightLogo { display: none; }
   :global(:root:not([data-theme])) .brand .darkLogo { display: block; }
@@ -457,7 +374,6 @@
   .hero h1 { font-size: clamp(2.5rem, 5.2vw, 3.75rem); }
   .storySection { gap: var(--space-10); }
   .buildHeading { gap: var(--space-8); }
-  .feature { padding: var(--space-6); }
 }
 
 @media (max-width: 700px) {
@@ -481,7 +397,6 @@
   .buildHeading { align-items: start; flex-direction: column; gap: var(--space-6); }
   .buildDescription { max-width: 440px; }
   .features { grid-template-columns: 1fr; }
-  .feature h3 { margin-top: var(--space-6); }
   .notificationFeature { grid-template-columns: 1fr; gap: var(--space-6); }
   .repositories { grid-template-columns: 1fr; }
   .codeSection { padding: 48px var(--space-5); margin-bottom: 48px; }
@@ -489,10 +404,4 @@
 
 @media (max-width: 560px) {
   .brand > span { display: none; }
-}
-
-@media (max-width: 380px) {
-  .brand { gap: var(--space-2); }
-  .brand > span { font-size: 0.75rem; }
-  .brandCaption { display: none; }
 }

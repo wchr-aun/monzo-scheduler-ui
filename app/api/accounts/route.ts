@@ -1,47 +1,7 @@
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 
-type Account = {
-  id: string;
-  description: string;
-  balance_details: Balance | null;
-};
-
-type Balance = {
-  balance: number;
-  total_balance: number;
-  currency: string;
-};
-
-function isBalance(value: unknown): value is Balance {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "balance" in value &&
-    typeof value.balance === "number" &&
-    Number.isInteger(value.balance) &&
-    "total_balance" in value &&
-    typeof value.total_balance === "number" &&
-    Number.isInteger(value.total_balance) &&
-    "currency" in value &&
-    typeof value.currency === "string" &&
-    value.currency.length === 3
-  );
-}
-
-function isAccount(value: unknown): value is Account {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    typeof value.id === "string" &&
-    Boolean(value.id.trim()) &&
-    "description" in value &&
-    typeof value.description === "string" &&
-    "balance_details" in value &&
-    (value.balance_details === null || isBalance(value.balance_details))
-  );
-}
+import { getAccounts } from "@/lib/accounts/validation";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -94,20 +54,16 @@ export async function GET() {
 
     const payload: unknown = await backendResponse.json();
 
-    if (
-      typeof payload !== "object" ||
-      payload === null ||
-      !("accounts" in payload) ||
-      !Array.isArray(payload.accounts) ||
-      !payload.accounts.every(isAccount)
-    ) {
+    const validatedAccounts = getAccounts(payload);
+
+    if (!validatedAccounts) {
       return NextResponse.json(
         { error: "invalid_accounts_response" },
         { status: 502 },
       );
     }
 
-    const accounts = payload.accounts.map(
+    const accounts = validatedAccounts.map(
       ({ id, description, balance_details }) => ({
         id,
         description,

@@ -35,9 +35,7 @@ export function PotsList({ accountId }: { accountId: string }) {
       }
     >
       {isLoading || (!pots && !error) ? (
-        <div className={styles.message} role="status" aria-label="Loading pots">
-          <LoadingIndicator />
-        </div>
+        <LoadingIndicator label="Loading pots" />
       ) : error || !pots ? (
         <InlineMessage tone="error">Could not load pots.</InlineMessage>
       ) : visiblePots.length === 0 ? (

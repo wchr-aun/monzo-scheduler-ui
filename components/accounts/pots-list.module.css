@@ -16,11 +16,6 @@
   max-width: 400px;
 }
 
-.message {
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
 .action {
   display: flex;
   justify-content: flex-end;

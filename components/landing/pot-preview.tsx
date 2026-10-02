@@ -5,8 +5,8 @@ import {Navbar} from "@/components/layout/navbar";
 import {SWRConfig} from "swr";
 import {ScheduledTransfers} from "@/components/scheduled-transfers/scheduled-transfers";
 import {getScheduledTransfersPageKey} from "@/lib/scheduled-transfers/keys";
-import {defaultScheduledTransferStatuses} from "@/lib/scheduled-transfers/types";
 import type {ScheduledTransfersPage} from "@/lib/scheduled-transfers/types";
+import {defaultScheduledTransferStatuses} from "@/lib/scheduled-transfers/types";
 import {PotDetails} from "@/components/accounts/pot-details";
 import {getPotsKey} from "@/lib/pots/keys";
 import {previewAccountId, previewPot} from "@/lib/pots/preview";
@@ -29,7 +29,7 @@ export function PotPreview({transfersPage}: {transfersPage: ScheduledTransfersPa
       <div className={styles.orbit} aria-hidden="true" />
       <div className={styles.phone}>
         <div className={styles.statusBar} aria-hidden="true">
-          <span>9:41</span><span className={styles.camera} /><span>▴ ▰</span>
+          <span>9:41</span><span className={styles.camera} /><span></span>
         </div>
         <div className={styles.viewport}>
           <fieldset disabled inert aria-label="Pot page preview" className={styles.app}>

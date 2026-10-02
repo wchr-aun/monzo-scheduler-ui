@@ -5,8 +5,3 @@
   margin: 0;
   list-style: none;
 }
-
-.message {
-  color: var(--color-text-muted);
-  text-align: center;
-}
