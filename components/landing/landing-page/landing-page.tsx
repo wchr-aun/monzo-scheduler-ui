@@ -1,7 +1,7 @@
 import {createPreviewTransfersPage} from "@/lib/scheduled-transfers/preview";
 import Image from "next/image";
-import Link from "next/link";
 import {ArrowIcon} from "@/components/ui/icons/arrow-icon";
+import {ExternalLink} from "@/components/ui/external-link/external-link";
 import {ThemeToggle} from "@/components/ui/theme-toggle/theme-toggle";
 import {Footer} from "@/components/layout/footer/footer";
 import {PotPreview} from "@/components/landing/pot-preview/pot-preview";
@@ -35,9 +35,9 @@ export function LandingPage() {
             <span>Schedzo<span className={styles.brandCaption}>On schedule.</span></span>
           </a>
           <div className={styles.navigationControls}>
-            <Link className={styles.consoleLink} href="/console" target="_blank" rel="noopener noreferrer">
-              Go to console <ArrowIcon direction="up-right" />
-            </Link>
+            <ExternalLink className={styles.consoleLink} href="/console">
+              Go to console
+            </ExternalLink>
             <ThemeToggle />
           </div>
         </nav>
@@ -78,13 +78,13 @@ export function LandingPage() {
                 that&apos;s <strong>over two weeks of interest</strong> we could earn on the rent money.
               </p>
               <p>
-                Using <strong>£{exampleRentAmount.toLocaleString("en-GB")}</strong>, the <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026#private-rents-by-english-region" target="_blank" rel="noopener noreferrer">average monthly private rent in London in February 2026 according to the ONS</a>,
+                Using <strong>£{exampleRentAmount.toLocaleString("en-GB")}</strong>, the <ExternalLink href="https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/march2026#private-rents-by-english-region">average monthly private rent in London in February 2026 according to the ONS</ExternalLink>,
                 keeping that money in a savings pot for 17 days at 2.75% AER could earn roughly <InterestCalculation />. Do that each month and
                 it&apos;s around <strong className={styles.interestHighlight}>£34 over a year</strong>. It&apos;s a small amount each time, but it adds
                 up without having to put any extra money aside!
               </p>
               <p className={styles.rateNote}>
-                Illustrative calculation using <a href="https://monzo.com/current-account" target="_blank" rel="noopener noreferrer">Monzo&apos;s Instant Access Savings rate</a> of
+                Illustrative calculation using <ExternalLink href="https://monzo.com/current-account">Monzo&apos;s Instant Access Savings rate</ExternalLink> of
                 2.75% AER variable on the free plan, checked on 2 October 2026. Rates can change.
               </p>
             </div>
@@ -109,13 +109,13 @@ export function LandingPage() {
             <div>
               <h3>Why I built this.</h3>
               <p>
-                There&apos;s already a platform that can do this: <a href="https://ifttt.com/applets/d3xg75n8-move-money-daily-from-a-monzo-pot-to-your-account" target="_blank" rel="noopener noreferrer">IFTTT</a> lets
+                There&apos;s already a platform that can do this: <ExternalLink href="https://ifttt.com/applets/d3xg75n8-move-money-daily-from-a-monzo-pot-to-your-account">IFTTT</ExternalLink> lets
                 us schedule withdrawals from pots to the main balance. But its free tier only
                 allows <strong>two automations</strong>. So, I decided to build this to serve my needs.
               </p>
               <p>
                 I also wanted <strong>a small project to play around with APIs in UK banking</strong>.
-                Monzo already provides <a href="https://docs.monzo.com" target="_blank" rel="noopener noreferrer">APIs to move money into and out of pots</a>,
+                Monzo already provides <ExternalLink href="https://docs.monzo.com">APIs to move money into and out of pots</ExternalLink>,
                 so this felt like a good place to start.
               </p>
             </div>
@@ -193,7 +193,7 @@ export function LandingPage() {
           </div>
         </section>
       </main>
-      <Footer openLinksInNewTab />
+      <Footer />
     </div>
   );
 }
