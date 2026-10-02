@@ -5,10 +5,12 @@
 This is a Next.js App Router frontend for authenticating with Monzo, browsing
 accounts and pots, and managing scheduled pot transfers.
 
-- `/` displays a login link when signed out. When signed in, it shows the user
+- `/` introduces the project with a pot preview, story, features, and open-source links,
+  and a link to the console. The preview uses static example data.
+- `/console` displays a login link when signed out. When signed in, it shows the user
   ID, accounts, balances, and a logout action.
-- `/account/[accountId]` displays an account balance and its pots.
-- `/account/[accountId]/pot/[potId]` displays a pot balance and supports listing,
+- `/console/account/[accountId]` displays an account balance and its pots.
+- `/console/account/[accountId]/pot/[potId]` displays a pot balance and supports listing,
   filtering, paginating, creating, and cancelling scheduled transfers.
 - `/callback` validates OAuth `code` and `state` parameters and calls the
   same-origin callback API.
@@ -150,7 +152,7 @@ For authentication changes, also test:
 - Missing `code` or `state` returns an error without calling the backend.
 - Backend failures do not set a session cookie.
 - Successful callbacks set the cookie without exposing the JWT in the response body.
-- The landing page recognizes the configured session cookie.
+- The console page recognizes the configured session cookie.
 
 ## Scope and safety
 

@@ -4,7 +4,7 @@ import {useMoneyVisibility} from "@/components/providers/money-visibility-provid
 import {formatMoneyParts} from "@/lib/formatting/money";
 import {MONEY_MASK} from "@/lib/money/constants";
 import {useEffect, useState} from "react";
-import {EyeIcon, EyeOffIcon} from "./visibility-icons";
+import {EyeIcon, EyeOffIcon} from "@/components/ui/icons/visibility-icons";
 import styles from "./money.module.css";
 
 type MoneyProps = {

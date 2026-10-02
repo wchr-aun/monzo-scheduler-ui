@@ -1,17 +1,11 @@
-import {AccountsPreloader} from "@/components/accounts/accounts-preloader";
-import {Footer} from "@/components/layout/footer";
-import {Navbar} from "@/components/layout/navbar";
-import {DataProvider} from "@/components/providers/data-provider";
-import {MoneyVisibilityProvider} from "@/components/providers/money-visibility-provider";
 import {THEME_STORAGE_KEY} from "@/lib/theme/constants";
 import type {Metadata} from "next";
-import {cookies} from "next/headers";
 import type {ReactNode} from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Monzo Scheduler",
-  description: "Sign in to Monzo Scheduler",
+  description: "A project for managing scheduled Monzo pot transfers",
   icons: {
     icon: "/favicon.ico",
   },
@@ -31,28 +25,15 @@ const themeInitializationScript = `
   }
 `;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const cookieStore = await cookies();
-  const sessionCookieName = process.env.SESSION_COOKIE_NAME ?? "session";
-  const isLoggedIn = Boolean(cookieStore.get(sessionCookieName)?.value);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
       </head>
-      <body>
-        <MoneyVisibilityProvider>
-          <Navbar />
-          <DataProvider>
-            {isLoggedIn ? <AccountsPreloader /> : null}
-            {children}
-          </DataProvider>
-          <Footer />
-        </MoneyVisibilityProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

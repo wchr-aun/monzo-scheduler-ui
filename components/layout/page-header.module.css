@@ -1,4 +1,7 @@
 .backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   width: fit-content;
   color: var(--color-interactive);
   font-weight: 700;
@@ -21,7 +24,10 @@
 
 .header .eyebrow {
   margin: 0 0 var(--space-1);
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: .12rem;
+  text-transform: uppercase;
 }
 
 .header p {

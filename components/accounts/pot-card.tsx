@@ -11,7 +11,7 @@ export function PotCard({ accountId, pot }: { accountId: string; pot: Pot }) {
     <li>
       <BalanceCard
         title={potName}
-        href={`/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
+        href={`/console/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
         linkLabel={`View ${potName}`}
         disabled={pot.deleted}
         badge={

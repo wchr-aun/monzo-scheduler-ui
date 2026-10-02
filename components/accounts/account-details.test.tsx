@@ -163,7 +163,7 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Holiday")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
-      "/account/acc_123/pot/pot_active",
+      "/console/account/acc_123/pot/pot_active",
     );
     expect(screen.queryByText("Old pot")).not.toBeInTheDocument();
 
@@ -178,6 +178,10 @@ describe("AccountDetails", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Current Account" })).toBeInTheDocument();
     expect(screen.getByText("Your account")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Back to accounts/ })).toHaveAttribute(
+      "href",
+      "/console",
+    );
     expect(screen.queryByText("acc_123")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Balance" })).not.toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(3);

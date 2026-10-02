@@ -31,7 +31,7 @@ export function AccountCard({
     <li>
       <BalanceCard
         title={accountName}
-        href={`/account/${encodeURIComponent(account.id)}`}
+        href={`/console/account/${encodeURIComponent(account.id)}`}
         linkLabel={`View ${accountName}`}
         balance={
           <div className={styles.total} aria-live="polite">

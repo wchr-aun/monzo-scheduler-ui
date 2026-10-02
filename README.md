@@ -23,15 +23,26 @@ accounts and pots, and managing scheduled transfers.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Login when signed out; user identity, account list, balances, and logout when signed in |
+| `/` | Project landing page with a pot preview, story, features, and open-source links, and console access |
+| `/console` | Login when signed out; user identity, account list, balances, and logout when signed in |
 | `/callback` | Validate OAuth callback parameters and complete login through the same-origin API |
-| `/account/[accountId]` | Show account balances and pots |
-| `/account/[accountId]/pot/[potId]` | Show a pot and create, filter, paginate, or cancel scheduled transfers |
+| `/console/account/[accountId]` | Show account balances and pots |
+| `/console/account/[accountId]/pot/[potId]` | Show a pot and create, filter, paginate, or cancel scheduled transfers |
 
 The browser only calls narrow, same-origin Route Handlers under `/api`. Those
 handlers read the JWT from the session cookie, send it to the configured backend
 as `Authorization: Bearer <jwt>`, and validate untrusted backend responses before
 returning data to the UI. The JWT is never exposed to client-side JavaScript.
+
+The phone preview renders the existing `Navbar`, `PotDetails`, and `ScheduledTransfers`
+components with sample data
+from an isolated SWR cache. Revalidation is disabled, so it makes no authenticated
+account requests. The preview is inert, with disabled
+controls and a not-allowed cursor. The landing page explains the motivation,
+illustrates a pot withdrawal followed by a payment scheduled in Monzo,
+shows three features and example Monzo notifications, and links to both public
+repositories. Its Explore the code button links to the on-page open-source section.
+Landing page copy is editable in `components/landing/landing-page.tsx`.
 
 ## Run locally
 
@@ -54,7 +65,8 @@ The login link navigates to `${BASE_URL}/monzo-redirect`. After authorization,
 the callback page calls `/api/auth/callback`, which forwards validated `code` and
 `state` values to `${BASE_URL}/monzo-callback`. The backend response must contain
 `{ "token": "<jwt>" }` and may include `expiresIn` in seconds. Without
-`expiresIn`, the cookie lasts for the browser session.
+`expiresIn`, the cookie lasts for the browser session. Successful login returns
+to `/console`.
 
 ## Development commands
 
@@ -68,8 +80,11 @@ Tests use Vitest and Testing Library. TypeScript runs in strict mode.
 
 ## Project structure
 
-- `app/` contains pages, layouts, global tokens, and server-side Route Handlers.
-- `components/` contains UI primitives, layout components, and account,
+- `app/` contains the landing page, global tokens, and server-side Route
+  Handlers. Application pages live under `app/console/`; `/callback` stays at its
+  existing path for OAuth. The console and callback layouts share application
+  navigation, providers, and the footer.
+- `components/` contains the project landing page, UI primitives, layout components, and account,
   authentication, and scheduled-transfer features.
 - `lib/` contains request clients, cache keys, runtime validation, domain types,
   money formatting, session helpers, and UK date-time handling.

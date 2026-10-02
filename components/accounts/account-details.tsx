@@ -15,7 +15,7 @@ export function AccountDetails({ accountId, userId }: { accountId: string; userI
   return (
     <>
       <PageHeader
-        backHref="/"
+        backHref="/console"
         backLabel="Back to accounts"
         eyebrow="Your account"
         title={account ? getAccountName(account, userId) : "Account"}

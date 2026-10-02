@@ -1,0 +1,54 @@
+.flow {
+  zoom: 1;
+  width: min(100%, 420px);
+  margin: var(--space-8) 0 0;
+}
+
+.steps,
+.transferPreview ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.stepLabel {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.transferPreview {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  cursor: not-allowed;
+}
+
+.transferPreview :disabled,
+.transferPreview :disabled * {
+  cursor: not-allowed;
+}
+
+.arrow {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-3);
+  color: var(--color-primary);
+  font-size: 1.5rem;
+}
+
+.flow figcaption {
+  margin-top: var(--space-4);
+  color: var(--color-heading);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.flow figcaption span {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+}

@@ -24,7 +24,7 @@ export function PotDetails({
   const pot = pots?.find((candidate) => candidate.id === potId);
   const header = (
     <PageHeader
-      backHref={`/account/${encodeURIComponent(accountId)}`}
+      backHref={`/console/account/${encodeURIComponent(accountId)}`}
       backLabel="Back to account"
       eyebrow="Your pot"
       title={pot ? pot.name || "Unnamed pot" : "Pot"}

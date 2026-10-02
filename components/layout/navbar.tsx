@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./navbar.module.css";
 
-export function Navbar() {
+export function Navbar({ logoHref = "/console" }: { logoHref?: string }) {
   return (
     <nav className={styles.navbar} aria-label="Site controls">
       <div className={styles.content}>
-        <Link className={styles.brand} href="/" aria-label="Monzo Scheduler home">
+        <Link className={styles.brand} href={logoHref} aria-label="Monzo Scheduler home">
           <Image
             className={`${styles.logo} ${styles.lightLogo}`}
             src="/logo.png"

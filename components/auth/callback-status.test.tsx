@@ -25,7 +25,7 @@ describe("CallbackStatus", () => {
     vi.useRealTimers();
   });
 
-  it("redirects to the homepage three seconds after login succeeds", async () => {
+  it("redirects to the console three seconds after login succeeds", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     render(<CallbackStatus />);
@@ -39,7 +39,7 @@ describe("CallbackStatus", () => {
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
     expect(
-      screen.getByText("Redirecting you back to the homepage…"),
+      screen.getByText("Redirecting you to the console…"),
     ).toBeInTheDocument();
     expect(screen.getByRole("status")).toBeInTheDocument();
 
@@ -47,6 +47,35 @@ describe("CallbackStatus", () => {
     expect(replace).not.toHaveBeenCalled();
 
     act(() => vi.advanceTimersByTime(1));
-    expect(replace).toHaveBeenCalledWith("/");
+    expect(replace).toHaveBeenCalledWith("/console");
   });
+
+  it.each(["code", "state"])("rejects a callback without %s", async (parameter) => {
+    searchParams.delete(parameter);
+
+    render(<CallbackStatus />);
+
+    expect(
+      screen.getByText("Invalid callback: code and state are required."),
+    ).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(3_000));
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("shows an error and stays on the callback page when login fails", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 502 }));
+
+    render(<CallbackStatus />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(
+      screen.getByText("Could not complete login. Please try logging in again."),
+    ).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(3_000));
+    expect(replace).not.toHaveBeenCalled();
+  });
+
 });

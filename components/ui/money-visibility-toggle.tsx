@@ -1,7 +1,7 @@
 "use client";
 
 import { useMoneyVisibility } from "@/components/providers/money-visibility-provider";
-import { EyeIcon, EyeOffIcon } from "./visibility-icons";
+import { EyeIcon, EyeOffIcon } from "@/components/ui/icons/visibility-icons";
 import styles from "./money-visibility-toggle.module.css";
 
 export function MoneyVisibilityToggle() {
