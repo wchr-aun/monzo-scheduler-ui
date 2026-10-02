@@ -1,13 +1,11 @@
 "use client";
 
-import { fetchAccounts } from "@/lib/accounts/client";
-import {
-  ACCOUNTS_KEY,
-  getBalanceKey,
-  getBalanceLoadedAtKey,
-} from "@/lib/accounts/keys";
-import { useCallback } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import {AccessNotApprovedError, fetchAccounts,} from "@/lib/accounts/client";
+import {ACCOUNTS_KEY, getBalanceKey, getBalanceLoadedAtKey,} from "@/lib/accounts/keys";
+import {useCallback} from "react";
+import useSWR, {useSWRConfig} from "swr";
+
+const APPROVAL_RETRY_INTERVAL = 5_000;
 
 export function useAccounts() {
   const { mutate } = useSWRConfig();
@@ -35,5 +33,16 @@ export function useAccounts() {
 
   return useSWR(ACCOUNTS_KEY, fetchAccountsAndCacheBalances, {
     revalidateIfStale: false,
+    shouldRetryOnError: (error) => error instanceof AccessNotApprovedError,
+    onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
+      if (!(error instanceof AccessNotApprovedError)) {
+        return;
+      }
+
+      setTimeout(
+        () => revalidate({ retryCount }),
+        APPROVAL_RETRY_INTERVAL,
+      );
+    },
   });
 }

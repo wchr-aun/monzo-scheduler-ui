@@ -43,6 +43,27 @@ export async function GET() {
       if (
         typeof errorPayload === "object" &&
         errorPayload !== null &&
+        "detail" in errorPayload &&
+        typeof errorPayload.detail === "object" &&
+        errorPayload.detail !== null &&
+        "code" in errorPayload.detail &&
+        typeof errorPayload.detail.code === "string"
+      ) {
+        return NextResponse.json(
+          {
+            code: errorPayload.detail.code,
+            ...("message" in errorPayload.detail &&
+              typeof errorPayload.detail.message === "string"
+              ? { message: errorPayload.detail.message }
+              : {}),
+          },
+          { status },
+        );
+      }
+
+      if (
+        typeof errorPayload === "object" &&
+        errorPayload !== null &&
         "code" in errorPayload &&
         typeof errorPayload.code === "string"
       ) {

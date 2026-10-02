@@ -1,23 +1,37 @@
 import type { Account, Balance } from "./types";
 import { getAccounts, isBalance } from "./validation";
 
-export class AccessNotApprovedError extends Error {}
+export class AccessNotApprovedError extends Error {
+  constructor(message?: string) {
+    super(
+      message ||
+        "You have not yet allowed access to your data. Please allow access in the Monzo app.",
+    );
+    this.name = "AccessNotApprovedError";
+  }
+}
 
-function isAccessNotApproved(value: unknown): boolean {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "code" in value &&
-    value.code === "forbidden.insufficient_permissions"
-  );
+function getAccessNotApprovedMessage(value: unknown): string | null {
+  if (typeof value !== "object" || value === null || !("code" in value)) {
+    return null;
+  }
+
+  if (value.code !== "monzo_approval_required") {
+    return null;
+  }
+
+  return "message" in value && typeof value.message === "string"
+    ? value.message
+    : "";
 }
 
 export async function fetchAccounts(url: string): Promise<Account[]> {
   const response = await fetch(url, { cache: "no-store" });
   const payload: unknown = await response.json();
 
-  if (response.status === 403 && isAccessNotApproved(payload)) {
-    throw new AccessNotApprovedError();
+  const accessNotApprovedMessage = getAccessNotApprovedMessage(payload);
+  if (response.status === 403 && accessNotApprovedMessage !== null) {
+    throw new AccessNotApprovedError(accessNotApprovedMessage);
   }
 
   if (!response.ok) {

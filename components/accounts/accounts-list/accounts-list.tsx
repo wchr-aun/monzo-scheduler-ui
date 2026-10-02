@@ -10,18 +10,17 @@ import styles from "./accounts-list.module.css";
 export function AccountsList({ userId }: { userId?: string | null }) {
   const { data: accounts, error, isLoading } = useAccounts();
 
-  if (isLoading || (!accounts && !error)) {
-    return (
-      <LoadingIndicator label="Loading accounts" />
-    );
-  }
-
   if (error instanceof AccessNotApprovedError) {
     return (
       <InlineMessage tone="error">
-        You have not yet allowed access to your data. Please allow access to your
-        data in the Monzo app.
+        {error.message}
       </InlineMessage>
+    );
+  }
+
+  if (isLoading || (!accounts && !error)) {
+    return (
+      <LoadingIndicator label="Loading accounts" />
     );
   }
 
