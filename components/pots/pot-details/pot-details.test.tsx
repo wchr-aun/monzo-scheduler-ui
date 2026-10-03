@@ -1,5 +1,7 @@
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
 import { textContent } from "@/test-utils/text";
-import { render, screen } from "@testing-library/react";
+import { render as testingRender, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { PotDetails } from "./pot-details";
@@ -61,3 +63,7 @@ describe("PotDetails", () => {
     );
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

@@ -1,5 +1,7 @@
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
 import { formatLocalDateTime } from "@/lib/scheduled-transfers/date-time";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render as testingRender, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
@@ -342,3 +344,7 @@ describe("CreateScheduledTransfer", () => {
     expect(screen.getByLabelText("UK date and time")).toBeInTheDocument();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

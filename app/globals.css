@@ -19,6 +19,9 @@
   --color-surface: #fff;
   --color-surface-hover: #f0faf8;
   --color-surface-muted: #f4f6f8;
+  --color-toast-background: #fff;
+  --color-toast-text: var(--brand-slate-text);
+  --color-toast-control: var(--brand-ocean-blue);
   --color-text: var(--brand-slate-text);
   --color-text-muted: #55627a;
   --color-heading: var(--brand-deep-navy);
@@ -169,6 +172,11 @@ html,
 body {
   min-height: 100%;
   margin: 0;
+}
+
+html {
+  /* Keep centered content in place when navigation changes the page height. */
+  overflow-y: scroll;
 }
 
 @media (prefers-reduced-motion: no-preference) {

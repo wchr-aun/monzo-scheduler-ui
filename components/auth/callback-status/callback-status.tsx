@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/providers/toast-provider/toast-provider";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,6 +10,7 @@ type Status = "loading" | "redirecting" | "missing-params" | "request-error";
 
 export function CallbackStatus() {
   const router = useRouter();
+  const { show } = useToast();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("loading");
 
@@ -35,6 +37,8 @@ export function CallbackStatus() {
           throw new Error(`Callback failed with status ${response.status}`);
         }
 
+        if (controller.signal.aborted) return;
+        show({ tone: "success", message: "Logged in successfully." });
         setStatus("redirecting");
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
@@ -46,7 +50,7 @@ export function CallbackStatus() {
     void completeLogin();
 
     return () => controller.abort();
-  }, [searchParams]);
+  }, [searchParams, show]);
 
   useEffect(() => {
     if (status !== "redirecting") {

@@ -1,0 +1,85 @@
+.viewport {
+  --toast-spacing: var(--space-6);
+  position: fixed;
+  z-index: 1000;
+  right: max(var(--space-6), env(safe-area-inset-right));
+  top: calc(var(--navbar-height) + max(var(--toast-spacing), env(safe-area-inset-top)));
+  display: grid;
+  gap: var(--space-3);
+  width: min(400px, calc(100% - 48px));
+  max-height: calc(100dvh - var(--navbar-height) - max(var(--toast-spacing), env(safe-area-inset-top)) - max(var(--toast-spacing), env(safe-area-inset-bottom)));
+  overflow-x: hidden;
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--toast-accent);
+  border-radius: var(--radius-card);
+  color: var(--color-toast-text);
+  background: var(--color-toast-background);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-heading) 15%, transparent);
+  pointer-events: auto;
+  touch-action: pan-y;
+  overflow: hidden;
+}
+
+.primary {
+  --toast-accent: var(--color-primary);
+}
+.info {
+  --toast-accent: var(--color-status-pending);
+}
+.danger {
+  --toast-accent: var(--color-danger);
+}
+.message { flex: 1; min-width: 0; margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.close {
+  flex-shrink: 0;
+  min-width: 64px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-toast-control);
+  font: inherit;
+  cursor: pointer;
+}
+.close:hover { background: color-mix(in srgb, var(--color-toast-control) 8%, var(--color-toast-background)); }
+.close:focus-visible { outline: 3px solid var(--color-toast-control); outline-offset: 2px; }
+
+.countdown {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: color-mix(in srgb, var(--toast-accent) 15%, transparent);
+}
+
+.countdownFill {
+  height: 100%;
+  background: var(--toast-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .countdownFill { transition: width 100ms linear; }
+  .countdown[data-paused="true"] .countdownFill { transition: none; }
+  .toast { transition: transform 180ms ease, opacity 180ms ease; }
+  .toast[data-dragging="true"] { transition: none; }
+}
+
+@media (max-width: 560px) {
+  .viewport {
+    --toast-spacing: var(--space-4);
+    right: max(var(--space-4), env(safe-area-inset-right));
+    width: calc(100% - 32px);
+  }
+}

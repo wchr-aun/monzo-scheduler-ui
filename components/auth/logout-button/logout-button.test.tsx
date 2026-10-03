@@ -1,4 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
+import { fireEvent, render as testingRender, screen, waitFor } from "@testing-library/react";
 import { SWRConfig } from "swr";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LogoutButton } from "./logout-button";
@@ -36,6 +38,7 @@ describe("LogoutButton", () => {
     await waitFor(() => expect(refresh).toHaveBeenCalledOnce());
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/logout", { method: "POST" });
     expect(cache.size).toBe(0);
+    expect(screen.getByText("Logged out.")).toHaveAttribute("role", "status");
   });
 
   it("keeps cached data and reports an error when logout fails", async () => {
@@ -59,3 +62,7 @@ describe("LogoutButton", () => {
     expect(screen.getByRole("button", { name: "Log out" })).toBeEnabled();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

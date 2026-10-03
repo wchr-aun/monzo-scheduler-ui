@@ -1,5 +1,7 @@
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
 import { textContent } from "@/test-utils/text";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render as testingRender, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataProvider } from "@/components/providers/data-provider";
 import { ScheduledTransfers } from "./scheduled-transfers";
@@ -440,3 +442,7 @@ describe("ScheduledTransfers", () => {
     expect(screen.getByText("51–51 of 51")).toBeInTheDocument();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

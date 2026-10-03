@@ -1,7 +1,7 @@
 "use client";
 
 import {Button} from "@/components/ui/button/button";
-import {InlineMessage} from "@/components/ui/inline-message/inline-message";
+import {useToast} from "@/components/providers/toast-provider/toast-provider";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {useSWRConfig} from "swr";
@@ -11,11 +11,11 @@ export function LogoutButton() {
   const router = useRouter();
   const { cache, mutate } = useSWRConfig();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   async function logout() {
     setIsLoggingOut(true);
-    setError(null);
+    const toastId = toast.show({ tone: "progress", message: "Logging out…" });
 
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });
@@ -30,9 +30,10 @@ export function LogoutButton() {
         cache.delete(key);
       }
 
+      toast.update(toastId, { tone: "success", colour: "info", message: "Logged out." });
       router.refresh();
     } catch {
-      setError("Could not log out. Please try again.");
+      toast.update(toastId, { tone: "error", message: "Could not log out. Please try again." });
       setIsLoggingOut(false);
     }
   }
@@ -48,9 +49,6 @@ export function LogoutButton() {
       >
         {isLoggingOut ? "Logging out…" : "Log out"}
       </Button>
-      {error ? (
-        <InlineMessage tone="error">{error}</InlineMessage>
-      ) : null}
     </div>
   );
 }

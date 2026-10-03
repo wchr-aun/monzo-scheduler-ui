@@ -1,4 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
+import { render as testingRender, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MONEY_VISIBILITY_STORAGE_KEY } from "@/lib/money/constants";
 import { textContent } from "@/test-utils/text";
@@ -48,3 +50,7 @@ describe("PotPreview", () => {
     expect(screen.queryByText("Scheduled for")).not.toBeInTheDocument();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

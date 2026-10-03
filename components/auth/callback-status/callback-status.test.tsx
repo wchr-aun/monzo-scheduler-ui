@@ -1,4 +1,6 @@
-import { act, render, screen } from "@testing-library/react";
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
+import { act, render as testingRender, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CallbackStatus } from "./callback-status";
 
@@ -41,7 +43,7 @@ describe("CallbackStatus", () => {
     expect(
       screen.getByText("Redirecting you to the console…"),
     ).toBeInTheDocument();
-    expect(screen.getByRole("status")).toBeInTheDocument();
+    expect(screen.getByText("Logged in successfully.")).toHaveAttribute("role", "status");
 
     act(() => vi.advanceTimersByTime(2_999));
     expect(replace).not.toHaveBeenCalled();
@@ -59,6 +61,7 @@ describe("CallbackStatus", () => {
       screen.getByText("Invalid callback: code and state are required."),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.queryByText("Logged in successfully.")).not.toBeInTheDocument();
     act(() => vi.advanceTimersByTime(3_000));
     expect(replace).not.toHaveBeenCalled();
   });
@@ -74,8 +77,13 @@ describe("CallbackStatus", () => {
     expect(
       screen.getByText("Could not complete login. Please try logging in again."),
     ).toBeInTheDocument();
+    expect(screen.queryByText("Logged in successfully.")).not.toBeInTheDocument();
     act(() => vi.advanceTimersByTime(3_000));
     expect(replace).not.toHaveBeenCalled();
   });
 
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

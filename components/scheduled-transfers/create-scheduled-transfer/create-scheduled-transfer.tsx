@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/providers/toast-provider/toast-provider";
 import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
 
 import {Button} from "@/components/ui/button/button";
@@ -36,6 +37,7 @@ export function CreateScheduledTransfer({
   currency: string;
 }) {
   const { mutate } = useSWRConfig();
+  const toast = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDateTime, setSelectedDateTime] = useState("");
@@ -44,7 +46,7 @@ export function CreateScheduledTransfer({
   const [transferType, setTransferType] = useState<TransferType>("deposit");
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState<
-    { kind: "error" | "success"; text: string } | undefined
+    { kind: "error"; text: string } | undefined
   >();
 
   useEffect(() => {
@@ -76,6 +78,7 @@ export function CreateScheduledTransfer({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSubmitting) return;
     setMessage(undefined);
 
     const form = event.currentTarget;
@@ -105,6 +108,7 @@ export function CreateScheduledTransfer({
     }
 
     setIsSubmitting(true);
+    const toastId = toast.show({ tone: "progress", message: "Creating scheduled transfer…" });
 
     try {
       const response = await fetchWithSessionRefresh(getScheduledTransfersKey(accountId, potId), {
@@ -133,15 +137,12 @@ export function CreateScheduledTransfer({
       setTransferType("deposit");
       setAmount("");
       setIsExpanded(false);
-      setMessage({ kind: "success", text: "Scheduled transfer created." });
+      toast.update(toastId, { tone: "success", message: "Scheduled transfer created." });
       await mutate((key) =>
         isScheduledTransfersKey(key, accountId, potId),
       ).catch(() => undefined);
     } catch {
-      setMessage({
-        kind: "error",
-        text: "Could not create the scheduled transfer.",
-      });
+      toast.update(toastId, { tone: "error", message: "Could not create the scheduled transfer." });
     } finally {
       setIsSubmitting(false);
     }

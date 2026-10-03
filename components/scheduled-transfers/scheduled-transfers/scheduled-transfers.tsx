@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/providers/toast-provider/toast-provider";
 import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
 
 import {Section} from "@/components/layout/section/section";
@@ -55,12 +56,10 @@ export function ScheduledTransfers({
     fetchScheduledTransfers,
   );
   const { mutate } = useSWRConfig();
+  const toast = useToast();
   const [pendingSetupIds, setPendingSetupIds] = useState<Set<string>>(
     () => new Set(),
   );
-  const [cancelMessage, setCancelMessage] = useState<
-    { kind: "error" | "success"; text: string } | undefined
-  >();
 
   useEffect(() => {
     if (selectedStatuses.join(",") === debouncedStatuses.join(",")) {
@@ -80,7 +79,8 @@ export function ScheduledTransfers({
       return;
     }
 
-    setCancelMessage(undefined);
+    if (pendingSetupIds.has(transfer.setup_id)) return;
+    const toastId = toast.show({ tone: "progress", message: "Cancelling scheduled transfer…" });
     setPendingSetupIds((current) => new Set(current).add(transfer.setup_id));
 
     try {
@@ -99,15 +99,9 @@ export function ScheduledTransfers({
       await mutate((key) =>
         isScheduledTransfersKey(key, accountId, potId),
       ).catch(() => undefined);
-      setCancelMessage({
-        kind: "success",
-        text: "Scheduled transfer cancelled.",
-      });
+      toast.update(toastId, { tone: "success", colour: "info", message: "Scheduled transfer cancelled." });
     } catch {
-      setCancelMessage({
-        kind: "error",
-        text: "Could not cancel the scheduled transfer.",
-      });
+      toast.update(toastId, { tone: "error", message: "Could not cancel the scheduled transfer." });
     } finally {
       setPendingSetupIds((current) => {
         const next = new Set(current);
@@ -131,9 +125,6 @@ export function ScheduledTransfers({
       heading="Scheduled transfers"
       headingId="transfers-heading"
     >
-      {cancelMessage ? (
-        <InlineMessage tone={cancelMessage.kind}>{cancelMessage.text}</InlineMessage>
-      ) : null}
       {error ? (
         <InlineMessage tone="error">Could not load scheduled transfers.</InlineMessage>
       ) : null}
