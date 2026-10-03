@@ -34,8 +34,8 @@ export function AccountsList({ userId }: { userId?: string | null }) {
       {accounts.length === 0 ? (
         <InlineMessage>No accounts found.</InlineMessage>
       ) : (
-        <ul className={styles.list}>
-          {accounts.map((account) => (
+        <ul className={styles.stack}>
+          {accounts.slice().reverse().map((account) => (
             <AccountCard account={account} key={account.id} userId={userId} />
           ))}
         </ul>

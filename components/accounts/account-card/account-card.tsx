@@ -30,30 +30,20 @@ export function AccountCard({
   return (
     <li>
       <BalanceCard
+        stacked
         title={accountName}
         href={`/console/account/${encodeURIComponent(account.id)}`}
         linkLabel={`View ${accountName}`}
         balance={
           <div className={styles.total} aria-live="polite">
-            <span>Available balance</span>
             {balance ? (
-              <>
-                <strong>
-                  <Money
-                    amount={balance.balance}
-                    currency={balance.currency}
-                    label="available balance"
-                  />
-                </strong>
-                <small>
-                  Total balance:{" "}
-                  <Money
-                    amount={balance.total_balance}
-                    currency={balance.currency}
-                    label="total balance"
-                  />
-                </small>
-              </>
+              <strong>
+                <Money
+                  amount={balance.balance}
+                  currency={balance.currency}
+                  label="available balance"
+                />
+              </strong>
             ) : (
               <button
                 className={styles.retry}
@@ -65,6 +55,21 @@ export function AccountCard({
                 {isValidating ? <LoadingIndicator small /> : "Retry"}
               </button>
             )}
+          </div>
+        }
+        details={
+          <div className={styles.details} aria-live="polite">
+            <span>Available balance</span>
+            {balance ? (
+              <small>
+                Total balance:{" "}
+                <Money
+                  amount={balance.total_balance}
+                  currency={balance.currency}
+                  label="total balance"
+                />
+              </small>
+            ) : null}
           </div>
         }
       />

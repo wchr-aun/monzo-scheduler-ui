@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
 import styles from "./balance-card.module.css";
 
 type BalanceCardProps = {
@@ -9,6 +10,8 @@ type BalanceCardProps = {
   href?: string;
   linkLabel?: string;
   title: string;
+  stacked?: boolean;
+  details?: ReactNode;
 };
 
 export function BalanceCard({
@@ -18,10 +21,12 @@ export function BalanceCard({
   href,
   linkLabel,
   title,
+  stacked = false,
+  details,
 }: BalanceCardProps) {
   return (
     <div
-      className={`${styles.card}${disabled ? ` ${styles.disabled}` : ""}`}
+      className={`${styles.card}${stacked ? ` ${styles.stacked}` : ""}${disabled ? ` ${styles.disabled}` : ""}`}
       aria-disabled={disabled ? "true" : undefined}
     >
       {href && !disabled ? (
@@ -33,6 +38,14 @@ export function BalanceCard({
           {badge}
         </div>
         <div className={styles.balance}>{balance}</div>
+        {stacked && details ? (
+          <div className={styles.details}>{details}</div>
+        ) : null}
+        {stacked && href && !disabled ? (
+          <span className={styles.open} aria-hidden="true">
+            View details <ArrowIcon direction="up-right" />
+          </span>
+        ) : null}
       </div>
     </div>
   );

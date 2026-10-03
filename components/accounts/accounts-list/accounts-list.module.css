@@ -3,20 +3,56 @@
   text-align: center;
 }
 
-.list {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(min(100%, 300px), 1fr)
-  );
-  gap: var(--space-3);
+.stack {
+  --balance-card-overlap: 88px;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  width: 100%;
+  max-width: 560px;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   list-style: none;
 }
 
-.list > li {
-  justify-self: center;
-  width: 100%;
-  max-width: 400px;
+.stack > li {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  --balance-card-surface: var(--color-surface);
+}
+
+/* Count from the front card, which is last in the reversed account list. */
+.stack > li:nth-last-child(3n + 2) {
+  --balance-card-surface: var(--color-status-pending-background);
+}
+
+.stack > li:nth-last-child(3n + 1) {
+  --balance-card-surface: var(--color-status-completed-background);
+}
+
+.stack > li + li {
+  margin-top: calc(-1 * var(--balance-card-overlap));
+}
+
+.stack > li:not(:last-child):focus-within {
+  margin-bottom: var(--balance-card-overlap);
+}
+
+@media (hover: hover) {
+  .stack > li:not(:last-child):hover {
+    margin-bottom: var(--balance-card-overlap);
+  }
+}
+
+@media (max-width: 480px) {
+  .stack {
+    --balance-card-overlap: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stack > li {
+    transition: margin-bottom 180ms ease;
+  }
 }
