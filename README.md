@@ -73,9 +73,13 @@ stored in separate `HttpOnly` cookies. Both cookies expire according to
 `401` and refresh while the refresh token is valid. Successful login returns to
 `/console`.
 
-Authenticated BFF requests that receive a backend `401` call
-`${BASE_URL}/auth/refresh` server-side with `{ "refresh_token": "…" }`, update
-the cookies, and retry the backend request once.
+Authenticated browser requests that receive a `401` share one request to
+`/api/auth/refresh` per browser tab. That BFF route reads the refresh cookie,
+calls `${BASE_URL}/auth/refresh` server-side with `{ "refresh_token": "…" }`,
+and updates the cookies without returning tokens to JavaScript. Waiting
+requests retry once, concurrently. Delayed `401` responses reuse a completed
+refresh instead of starting another one. Separate tabs still require backend
+coordination for concurrent refreshes.
 
 ## Development commands
 

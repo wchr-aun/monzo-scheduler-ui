@@ -142,30 +142,14 @@ export async function refreshSession(): Promise<RefreshResult> {
   return result;
 }
 
-export async function fetchBackendWithRefresh(
+export async function fetchAuthenticatedBackend(
   url: string | URL,
   accessToken: string,
   init: RequestInit,
 ): Promise<Response> {
-  const makeRequest = (token: string) => {
-    const headers = {
-      ...(init.headers as Record<string, string> | undefined),
-      Authorization: `Bearer ${token}`,
-    };
-    return fetch(url, { ...init, headers, cache: "no-store" });
+  const headers = {
+    ...(init.headers as Record<string, string> | undefined),
+    Authorization: `Bearer ${accessToken}`,
   };
-
-  const response = await makeRequest(accessToken);
-
-  if (response.status !== 401) {
-    return response;
-  }
-
-  const refreshed = await refreshSession();
-
-  if (refreshed.status !== 204 || !refreshed.tokens) {
-    return response;
-  }
-
-  return makeRequest(refreshed.tokens.accessToken);
+  return fetch(url, { ...init, headers, cache: "no-store" });
 }

@@ -2,7 +2,7 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 
 import { getAccounts } from "@/lib/accounts/validation";
-import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
+import { fetchAuthenticatedBackend } from "@/lib/auth/backend-fetch.server";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -23,7 +23,7 @@ export async function GET() {
   }
 
   try {
-    const backendResponse = await fetchBackendWithRefresh(
+    const backendResponse = await fetchAuthenticatedBackend(
       `${baseUrl}/accounts-with-balances`,
       token,
       {

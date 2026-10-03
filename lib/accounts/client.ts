@@ -1,3 +1,4 @@
+import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
 import type { Account, Balance } from "./types";
 import { getAccounts, isBalance } from "./validation";
 
@@ -26,7 +27,7 @@ function getAccessNotApprovedMessage(value: unknown): string | null {
 }
 
 export async function fetchAccounts(url: string): Promise<Account[]> {
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithSessionRefresh(url, { cache: "no-store" });
   const payload: unknown = await response.json();
 
   const accessNotApprovedMessage = getAccessNotApprovedMessage(payload);
@@ -48,7 +49,7 @@ export async function fetchAccounts(url: string): Promise<Account[]> {
 }
 
 export async function fetchBalance(url: string): Promise<Balance> {
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithSessionRefresh(url, { cache: "no-store" });
   const payload: unknown = await response.json();
 
   if (!response.ok || !isBalance(payload)) {

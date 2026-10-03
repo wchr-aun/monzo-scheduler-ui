@@ -60,7 +60,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "callback_failed" }, { status });
     }
 
-    const payload = (await backendResponse.json()) as CallbackResponse;
+    const rawPayload: unknown = await backendResponse.json();
+    if (
+      typeof rawPayload !== "object" ||
+      rawPayload === null ||
+      Array.isArray(rawPayload)
+    ) {
+      return NextResponse.json(
+        { error: "invalid_callback_response" },
+        { status: 502 },
+      );
+    }
+    const payload = rawPayload as CallbackResponse;
 
     if (
       typeof payload.token !== "string" ||

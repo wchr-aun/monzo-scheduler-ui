@@ -7,7 +7,7 @@ import {
   type ScheduledTransferStatus,
 } from "@/lib/scheduled-transfers/types";
 import { isScheduledTransfer } from "@/lib/scheduled-transfers/validation";
-import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
+import { fetchAuthenticatedBackend } from "@/lib/auth/backend-fetch.server";
 
 type ScheduledTransfersResponse = {
   items: ScheduledTransfer[];
@@ -254,7 +254,7 @@ export async function GET(request: Request, context: RouteContext) {
     backendUrl.searchParams.set("offset", String(pagination.offset));
     backendUrl.searchParams.set("status", statuses.join(","));
 
-    const backendResponse = await fetchBackendWithRefresh(backendUrl, token, {
+    const backendResponse = await fetchAuthenticatedBackend(backendUrl, token, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(15_000),
     });
@@ -337,7 +337,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const backendResponse = await fetchBackendWithRefresh(
+    const backendResponse = await fetchAuthenticatedBackend(
       `${baseUrl}/schedule-transfer`,
       token,
       {

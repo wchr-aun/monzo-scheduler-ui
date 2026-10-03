@@ -1,5 +1,7 @@
 "use client";
 
+import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+
 import {Button} from "@/components/ui/button/button";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
 import {Select} from "@/components/ui/select/select";
@@ -105,7 +107,7 @@ export function CreateScheduledTransfer({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(getScheduledTransfersKey(accountId, potId), {
+      const response = await fetchWithSessionRefresh(getScheduledTransfersKey(accountId, potId), {
         method: "POST",
         headers: {
           Accept: "application/json",

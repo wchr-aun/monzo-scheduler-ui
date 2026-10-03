@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { getPots } from "@/lib/pots/validation";
-import { fetchBackendWithRefresh } from "@/lib/auth/backend-fetch.server";
+import { fetchAuthenticatedBackend } from "@/lib/auth/backend-fetch.server";
 
 type RouteContext = {
   params: Promise<{ accountId: string }>;
@@ -36,7 +36,7 @@ export async function GET(_request: Request, context: RouteContext) {
     const backendUrl = new URL(`${baseUrl}/pots`);
     backendUrl.searchParams.set("current_account_id", accountId);
 
-    const backendResponse = await fetchBackendWithRefresh(backendUrl, token, {
+    const backendResponse = await fetchAuthenticatedBackend(backendUrl, token, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(15_000),
     });

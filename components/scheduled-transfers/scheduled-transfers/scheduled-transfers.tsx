@@ -1,5 +1,7 @@
 "use client";
 
+import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+
 import {Section} from "@/components/layout/section/section";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
 import {LoadingIndicator} from "@/components/ui/loading-indicator/loading-indicator";
@@ -82,7 +84,7 @@ export function ScheduledTransfers({
     setPendingSetupIds((current) => new Set(current).add(transfer.setup_id));
 
     try {
-      const response = await fetch(
+      const response = await fetchWithSessionRefresh(
         `${scheduledTransfersKey}/${encodeURIComponent(transfer.setup_id)}`,
         {
           method: "DELETE",
