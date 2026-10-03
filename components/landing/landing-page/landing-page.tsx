@@ -209,6 +209,7 @@ export function LandingPage() {
                 description="The website and console for your accounts, pots, and scheduled transfers."
                 stack={['TypeScript', 'Next.js']}
                 stackLabel="Frontend language and framework"
+                license="MIT License"
               />
             </ScrollReveal>
             <ScrollReveal>
@@ -218,6 +219,7 @@ export function LandingPage() {
                 description="The scheduler that runs your transfers and sends updates to Monzo."
                 stack={['Python', 'FastAPI']}
                 stackLabel="Backend language and framework"
+                license="MIT License"
               />
             </ScrollReveal>
           </div>

@@ -197,3 +197,7 @@ Primary actions deliberately share the completed/success family, while
 secondary actions share the pending/info family. Coral is reserved for errors
 and dangerous actions. Light accent fills use Deep Navy text where needed to
 maintain accessible contrast.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
