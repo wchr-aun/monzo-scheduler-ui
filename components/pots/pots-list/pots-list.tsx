@@ -1,10 +1,11 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { Section } from "@/components/layout/section/section";
 import { InlineMessage } from "@/components/ui/inline-message/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Switch } from "@/components/ui/switch/switch";
-import { fetchPots } from "@/lib/pots/client";
 import { getPotsKey } from "@/lib/pots/keys";
 import { useState } from "react";
 import useSWR from "swr";
@@ -12,6 +13,7 @@ import { PotCard } from "@/components/pots/pot-card/pot-card";
 import styles from "./pots-list.module.css";
 
 export function PotsList({ accountId }: { accountId: string }) {
+  const { fetchPots } = useConsoleClient();
   const { data: pots, error, isLoading } = useSWR(
     getPotsKey(accountId),
     fetchPots,

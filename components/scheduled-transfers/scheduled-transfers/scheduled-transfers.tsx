@@ -1,13 +1,13 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { useToast } from "@/components/providers/toast-provider/toast-provider";
-import { request } from "@/lib/errors/request";
 
 import {Section} from "@/components/layout/section/section";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
 import {LoadingIndicator} from "@/components/ui/loading-indicator/loading-indicator";
 import {MultiSelect} from "@/components/ui/multi-select/multi-select";
-import {fetchScheduledTransfers} from "@/lib/scheduled-transfers/client";
 import {
   getScheduledTransfersKey,
   getScheduledTransfersPageKey,
@@ -37,6 +37,7 @@ export function ScheduledTransfers({
   accountId: string;
   potId: string;
 }) {
+  const { fetchScheduledTransfers, request } = useConsoleClient();
   const scheduledTransfersKey = getScheduledTransfersKey(accountId, potId);
   const [offset, setOffset] = useState(0);
   const [selectedStatuses, setSelectedStatuses] = useState<

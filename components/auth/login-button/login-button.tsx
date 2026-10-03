@@ -7,11 +7,16 @@ import { request, readJson } from "@/lib/errors/request";
 import Image from "next/image";
 import styles from "./login-button.module.css";
 
-export function LoginButton({ href }: { href: string }) {
+export function LoginButton({ href, onLogin }: { href: string; onLogin?: () => void }) {
   const [pending, setPending] = useState(false);
   const toast = useToast();
 
   async function login(event: MouseEvent<HTMLAnchorElement>) {
+    if (onLogin) {
+      event.preventDefault();
+      onLogin();
+      return;
+    }
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     if (pending) return;

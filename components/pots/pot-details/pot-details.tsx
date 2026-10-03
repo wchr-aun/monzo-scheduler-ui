@@ -1,11 +1,12 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { PageHeader } from "@/components/layout/page-header/page-header";
 import { CreateScheduledTransfer } from "@/components/scheduled-transfers/create-scheduled-transfer/create-scheduled-transfer";
 import { InlineMessage } from "@/components/ui/inline-message/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Money } from "@/components/ui/money/money";
-import { fetchPots } from "@/lib/pots/client";
 import { getPotsKey } from "@/lib/pots/keys";
 import useSWR from "swr";
 import styles from "./pot-details.module.css";
@@ -17,6 +18,7 @@ export function PotDetails({
   accountId: string;
   potId: string;
 }) {
+  const { fetchPots, basePath } = useConsoleClient();
   const { data: pots, error, isLoading } = useSWR(
     getPotsKey(accountId),
     fetchPots,
@@ -24,7 +26,7 @@ export function PotDetails({
   const pot = pots?.find((candidate) => candidate.id === potId);
   const header = (
     <PageHeader
-      backHref={`/console/account/${encodeURIComponent(accountId)}`}
+      backHref={`${basePath}/account/${encodeURIComponent(accountId)}`}
       backLabel="Back to account"
       eyebrow="Your pot"
       title={pot ? pot.name || "Unnamed pot" : "Pot"}

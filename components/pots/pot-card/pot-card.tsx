@@ -1,5 +1,7 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { useState } from "react";
 import Link from "next/link";
 import { OutlineIcon } from "@/components/ui/icons/outline-icon";
@@ -11,6 +13,7 @@ import { formatPotType } from "@/lib/pots/format-type";
 import styles from "./pot-card.module.css";
 
 export function PotCard({ accountId, pot }: { accountId: string; pot: Pot }) {
+  const { basePath } = useConsoleClient();
   const potName = pot.name || "Unnamed pot";
   const potType = formatPotType(pot.type);
   const title = potType ? `${potName} - ${potType}` : potName;
@@ -26,7 +29,7 @@ export function PotCard({ accountId, pot }: { accountId: string; pot: Pot }) {
         {!pot.deleted ? (
           <Link
             className={styles.link}
-            href={`/console/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
+            href={`${basePath}/account/${encodeURIComponent(accountId)}/pot/${encodeURIComponent(pot.id)}`}
             aria-label={`View ${potName}`}
           />
         ) : null}

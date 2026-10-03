@@ -1,6 +1,8 @@
 "use client";
 
-import {AccessNotApprovedError, fetchAccounts,} from "@/lib/accounts/client";
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
+import {AccessNotApprovedError} from "@/lib/accounts/client";
 import {ACCOUNTS_KEY, getBalanceKey, getBalanceLoadedAtKey,} from "@/lib/accounts/keys";
 import {useCallback} from "react";
 import useSWR, {useSWRConfig} from "swr";
@@ -8,6 +10,7 @@ import useSWR, {useSWRConfig} from "swr";
 const APPROVAL_RETRY_INTERVAL = 5_000;
 
 export function useAccounts() {
+  const { fetchAccounts } = useConsoleClient();
   const { mutate } = useSWRConfig();
   const fetchAccountsAndCacheBalances = useCallback(
     async (url: string) => {
@@ -28,7 +31,7 @@ export function useAccounts() {
 
       return loadedAccounts;
     },
-    [mutate],
+    [mutate, fetchAccounts],
   );
 
   return useSWR(ACCOUNTS_KEY, fetchAccountsAndCacheBalances, {

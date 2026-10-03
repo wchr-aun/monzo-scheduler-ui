@@ -8,13 +8,17 @@ import {useState} from "react";
 import {useSWRConfig} from "swr";
 import styles from "./logout-button.module.css";
 
-export function LogoutButton() {
+export function LogoutButton({ onLogout }: { onLogout?: () => void }) {
   const router = useRouter();
   const { cache, mutate } = useSWRConfig();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const toast = useToast();
 
   async function logout() {
+    if (onLogout) {
+      onLogout();
+      return;
+    }
     setIsLoggingOut(true);
     const toastId = toast.show({ tone: "progress", message: "Logging out…" });
 

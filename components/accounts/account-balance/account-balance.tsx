@@ -1,9 +1,10 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { InlineMessage } from "@/components/ui/inline-message/inline-message";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Money } from "@/components/ui/money/money";
-import { fetchBalance } from "@/lib/accounts/client";
 import {
   BALANCE_CACHE_WINDOW_MS,
   getBalanceKey,
@@ -14,6 +15,7 @@ import useSWR from "swr";
 import styles from "./account-balance.module.css";
 
 export function AccountBalance({ accountId }: { accountId: string }) {
+  const { fetchBalance } = useConsoleClient();
   const { data: balanceLoadedAt } = useSWR<number>(
     getBalanceLoadedAtKey(accountId),
     null,

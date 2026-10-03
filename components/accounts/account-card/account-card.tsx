@@ -1,10 +1,11 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import Link from "next/link";
 import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Money } from "@/components/ui/money/money";
-import { fetchBalance } from "@/lib/accounts/client";
 import { getBalanceKey } from "@/lib/accounts/keys";
 import { getAccountName } from "@/lib/accounts/name";
 import type { Account } from "@/lib/accounts/types";
@@ -18,6 +19,7 @@ export function AccountCard({
   account: Account;
   userId?: string | null;
 }) {
+  const { fetchBalance, basePath } = useConsoleClient();
   const accountName = getAccountName(account, userId);
   const {
     data: balance,
@@ -33,7 +35,7 @@ export function AccountCard({
       <div className={styles.card}>
         <Link
           className={styles.link}
-          href={`/console/account/${encodeURIComponent(account.id)}`}
+          href={`${basePath}/account/${encodeURIComponent(account.id)}`}
           aria-label={`View ${accountName}`}
         />
         <div className={styles.content}>

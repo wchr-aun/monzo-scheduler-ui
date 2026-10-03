@@ -1,10 +1,17 @@
 import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { MoneyVisibilityToggle } from "@/components/ui/money-visibility-toggle/money-visibility-toggle";
+import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./navbar.module.css";
 
-export function Navbar({ logoHref = "/console" }: { logoHref?: string }) {
+export function Navbar({
+  logoHref = "/console",
+  demoMode = false,
+}: {
+  logoHref?: string;
+  demoMode?: boolean;
+}) {
   return (
     <nav className={styles.navbar} aria-label="Site controls">
       <div className={styles.content}>
@@ -27,6 +34,19 @@ export function Navbar({ logoHref = "/console" }: { logoHref?: string }) {
           />
         </Link>
         <div className={styles.controls}>
+          {demoMode ? (
+            <Link
+              className={styles.exitDemoLink}
+              href="/"
+              aria-label="Exit demo and return to home"
+              title="Return to the landing page"
+            >
+              <span className={styles.exitDemoIcon}>
+                <ArrowIcon direction="left" />
+              </span>
+              <span>Exit demo</span>
+            </Link>
+          ) : null}
           <MoneyVisibilityToggle />
           <ThemeToggle />
         </div>

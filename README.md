@@ -25,11 +25,14 @@ accounts and pots, and managing scheduled transfers.
 | --- | --- |
 | `/` | Project landing page with a pot preview, story, features, and open-source links, and console access |
 | `/console` | Login when signed out; user identity, account list, balances, and logout when signed in |
+| `/demo` | Interactive console demo with simulated login and sample data |
+| `/demo/account/[accountId]` | Browse sample balances and pots |
+| `/demo/account/[accountId]/pot/[potId]` | Create, filter, paginate, and cancel simulated scheduled transfers |
 | `/callback` | Validate OAuth callback parameters and complete login through the same-origin API |
 | `/console/account/[accountId]` | Show account balances and pots |
 | `/console/account/[accountId]/pot/[potId]` | Show a pot and create, filter, paginate, or cancel scheduled transfers |
 
-The browser only calls narrow, same-origin Route Handlers under `/api`. Those
+The live console only calls narrow, same-origin Route Handlers under `/api`. Those
 handlers read the JWT from the session cookie, send it to the configured backend
 as `Authorization: Bearer <jwt>`, and validate untrusted backend responses before
 returning data to the UI. The JWT is never exposed to client-side JavaScript.
@@ -43,6 +46,17 @@ illustrates a pot withdrawal followed by a payment scheduled in Monzo,
 shows three features and example Monzo notifications, and links to both public
 repositories. Its Explore the code button links to the on-page open-source section.
 Landing page copy is editable in `components/landing/landing-page/landing-page.tsx`.
+
+The interactive demo at `/demo` reuses the live console components with an
+in-memory client and an isolated SWR cache. Login is immediate and requires no
+Monzo account or backend configuration. Main Account and Joint Account have
+separate fictional balances, pots, and transfer histories. The pots use neutral names and sample IDs, with Monzo's
+public cover images and a variety of pot types and deleted states. Most active
+pots include sample transfer history; Hobbies and the joint Groceries pot start
+with no schedules. Creating and cancelling schedules updates demo state across navigation without calling `/api` or the
+backend. No simulated transfers execute or move money. Refreshing or leaving
+the demo resets its login and data. Pot cover images still load from Monzo's
+public image URLs.
 
 ## Run locally
 

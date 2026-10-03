@@ -1,7 +1,8 @@
 "use client";
 
+import { useConsoleClient } from "@/components/providers/console-client-provider";
+
 import { useToast } from "@/components/providers/toast-provider/toast-provider";
-import { request } from "@/lib/errors/request";
 
 import {Button} from "@/components/ui/button/button";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
@@ -36,6 +37,7 @@ export function CreateScheduledTransfer({
   potId: string;
   currency: string;
 }) {
+  const { request } = useConsoleClient();
   const { mutate } = useSWRConfig();
   const toast = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
