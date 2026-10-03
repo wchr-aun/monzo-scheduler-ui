@@ -19,6 +19,8 @@ const activePot = {
   balance: 5_000,
   currency: "GBP",
   deleted: false,
+  cover_image_url: null,
+  type: "regular",
 };
 
 const deletedPot = {
@@ -162,18 +164,18 @@ describe("AccountDetails", () => {
     render(accountDetails());
 
     expect(await screen.findByText(textContent("£123.45"))).toBeInTheDocument();
-    expect(await screen.findByText("Holiday")).toBeInTheDocument();
+    expect(await screen.findByText("Holiday - Regular")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Holiday/ })).toHaveAttribute(
       "href",
       "/console/account/acc_123/pot/pot_active",
     );
-    expect(screen.queryByText("Old pot")).not.toBeInTheDocument();
+    expect(screen.queryByText("Old pot - Regular")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("switch", { name: "Hide deleted pots" }));
 
-    expect(screen.getByText("Old pot")).toBeInTheDocument();
+    expect(screen.getByText("Old pot - Regular")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Old pot/ })).not.toBeInTheDocument();
-    expect(screen.getByText("Old pot").closest("[aria-disabled='true']")).toHaveAttribute(
+    expect(screen.getByText("Old pot - Regular").closest("[aria-disabled='true']")).toHaveAttribute(
       "aria-disabled",
       "true",
     );

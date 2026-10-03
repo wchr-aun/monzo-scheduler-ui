@@ -75,12 +75,14 @@ export async function GET(_request: Request, context: RouteContext) {
 
     const response = NextResponse.json({
       pots: pots.map(
-        ({ id, name, balance, currency, deleted }) => ({
+        ({ id, name, balance, currency, deleted, cover_image_url, type }) => ({
           id,
           name,
           balance,
           currency,
           deleted,
+          cover_image_url,
+          type,
         }),
       ),
     });

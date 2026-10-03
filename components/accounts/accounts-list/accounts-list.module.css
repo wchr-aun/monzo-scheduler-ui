@@ -4,7 +4,7 @@
 }
 
 .stack {
-  --balance-card-overlap: 88px;
+  --account-card-overlap: 88px;
   display: flex;
   flex-direction: column;
   isolation: isolate;
@@ -19,35 +19,35 @@
   position: relative;
   isolation: isolate;
   min-width: 0;
-  --balance-card-surface: var(--color-surface);
+  --account-card-surface: var(--color-surface);
 }
 
 /* Count from the front card, which is last in the reversed account list. */
 .stack > li:nth-last-child(3n + 2) {
-  --balance-card-surface: var(--color-status-pending-background);
+  --account-card-surface: var(--color-status-pending-background);
 }
 
 .stack > li:nth-last-child(3n + 1) {
-  --balance-card-surface: var(--color-status-completed-background);
+  --account-card-surface: var(--color-status-completed-background);
 }
 
 .stack > li + li {
-  margin-top: calc(-1 * var(--balance-card-overlap));
+  margin-top: calc(-1 * var(--account-card-overlap));
 }
 
 .stack > li:not(:last-child):focus-within {
-  margin-bottom: var(--balance-card-overlap);
+  margin-bottom: var(--account-card-overlap);
 }
 
 @media (hover: hover) {
   .stack > li:not(:last-child):hover {
-    margin-bottom: var(--balance-card-overlap);
+    margin-bottom: var(--account-card-overlap);
   }
 }
 
 @media (max-width: 480px) {
   .stack {
-    --balance-card-overlap: 84px;
+    --account-card-overlap: 84px;
   }
 }
 

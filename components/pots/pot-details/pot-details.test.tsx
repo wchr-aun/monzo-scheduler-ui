@@ -32,6 +32,8 @@ describe("PotDetails", () => {
             balance: 5_000,
             currency: "GBP",
             deleted: false,
+            cover_image_url: null,
+            type: "regular",
           },
         ],
       }),

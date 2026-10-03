@@ -16,7 +16,11 @@ function isPot(value: unknown): value is Pot {
     typeof value.currency === "string" &&
     value.currency.length === 3 &&
     "deleted" in value &&
-    typeof value.deleted === "boolean"
+    typeof value.deleted === "boolean" &&
+    "cover_image_url" in value &&
+    (value.cover_image_url === null || typeof value.cover_image_url === "string") &&
+    "type" in value &&
+    typeof value.type === "string"
   );
 }
 

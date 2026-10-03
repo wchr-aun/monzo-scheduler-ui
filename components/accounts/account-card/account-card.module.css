@@ -6,6 +6,9 @@
 
 .total {
   display: grid;
+  justify-self: end;
+  min-width: 0;
+  overflow-wrap: anywhere;
   gap: 2px;
   text-align: right;
 }
@@ -17,6 +20,7 @@
 }
 
 .details {
+  grid-column: 1 / -1;
   display: grid;
   gap: 2px;
   min-height: 34px;
@@ -55,4 +59,79 @@
 .retry:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.card {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--space-8);
+  color: var(--color-text);
+  background: var(--account-card-surface, var(--color-surface));
+  box-shadow: 0 -3px 12px color-mix(in srgb, var(--color-navbar) 8%, transparent);
+}
+
+.card:hover {
+  border-color: var(--color-interactive);
+}
+
+.link {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto auto;
+  align-items: start;
+  gap: var(--space-2) var(--space-4);
+  min-height: 144px;
+  padding: var(--space-5);
+  pointer-events: none;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.heading h3 {
+  margin: 0;
+  font-size: clamp(1.125rem, 3vw, 1.5rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.open {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-interactive);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.open > svg {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .content {
+    min-height: 128px;
+    padding: var(--space-4) var(--space-5);
+    gap: var(--space-2) var(--space-3);
+  }
 }

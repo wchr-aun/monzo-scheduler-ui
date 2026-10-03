@@ -7,4 +7,6 @@ export const previewPot: Pot = {
   balance: 554_954,
   currency: "GBP",
   deleted: false,
+  cover_image_url: null,
+  type: "regular",
 };

@@ -1,6 +1,7 @@
 "use client";
 
-import { BalanceCard } from "@/components/ui/balance-card/balance-card";
+import Link from "next/link";
+import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { Money } from "@/components/ui/money/money";
 import { fetchBalance } from "@/lib/accounts/client";
@@ -29,12 +30,16 @@ export function AccountCard({
 
   return (
     <li>
-      <BalanceCard
-        stacked
-        title={accountName}
-        href={`/console/account/${encodeURIComponent(account.id)}`}
-        linkLabel={`View ${accountName}`}
-        balance={
+      <div className={styles.card}>
+        <Link
+          className={styles.link}
+          href={`/console/account/${encodeURIComponent(account.id)}`}
+          aria-label={`View ${accountName}`}
+        />
+        <div className={styles.content}>
+          <div className={styles.heading}>
+            <h3>{accountName}</h3>
+          </div>
           <div className={styles.total} aria-live="polite">
             {balance ? (
               <strong>
@@ -56,8 +61,6 @@ export function AccountCard({
               </button>
             )}
           </div>
-        }
-        details={
           <div className={styles.details} aria-live="polite">
             <span>Available balance</span>
             {balance ? (
@@ -71,8 +74,11 @@ export function AccountCard({
               </small>
             ) : null}
           </div>
-        }
-      />
+          <span className={styles.open} aria-hidden="true">
+            View details <ArrowIcon direction="up-right" />
+          </span>
+        </div>
+      </div>
     </li>
   );
 }

@@ -10,7 +10,10 @@ const context = { params: Promise.resolve({ accountId: "acc_123" }) };
 const request = new Request("http://localhost");
 const balance = { balance: 1000, total_balance: 3000, currency: "GBP" };
 const account = { id: "acc_123", description: "Personal", balance_details: balance };
-const pot = { id: "pot_123", name: "Rent", balance: 2000, currency: "GBP", deleted: false };
+const pot = {
+  id: "pot_123", name: "Rent", balance: 2000, currency: "GBP", deleted: false,
+  cover_image_url: "https://images.example/rent.jpg", type: "regular",
+};
 
 const routes = [
   {
@@ -30,7 +33,7 @@ const routes = [
   {
     name: "pots",
     get: () => getPots(request, context),
-    valid: { pots: [{ ...pot, private_field: "removed" }] },
+    valid: { pots: [{ ...pot, available_for_bills: true, private_field: "removed" }] },
     expected: { pots: [pot] },
     invalid: { pots: [{ ...pot, deleted: "false" }] },
   },
