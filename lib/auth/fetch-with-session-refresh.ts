@@ -1,6 +1,12 @@
 let refreshInFlight: Promise<boolean> | undefined;
 let refreshGeneration = 0;
 
+function redirectSignedOutConsole() {
+  if (typeof window !== "undefined" && window.location.pathname.startsWith("/console/account/")) {
+    window.location.replace("/console");
+  }
+}
+
 function refreshSession(): Promise<boolean> {
   if (!refreshInFlight) {
     refreshInFlight = fetch("/api/auth/refresh", {
@@ -9,7 +15,10 @@ function refreshSession(): Promise<boolean> {
       credentials: "same-origin",
     })
       .then((response) => {
-        if (!response.ok) return false;
+        if (!response.ok) {
+          if ([400, 401, 403].includes(response.status)) redirectSignedOutConsole();
+          return false;
+        }
         refreshGeneration += 1;
         return true;
       })
@@ -38,5 +47,7 @@ export async function fetchWithSessionRefresh(
   }
 
   init?.signal?.throwIfAborted();
-  return fetch(url, init);
+  const retriedResponse = await fetch(url, init);
+  if (retriedResponse.status === 401) redirectSignedOutConsole();
+  return retriedResponse;
 }

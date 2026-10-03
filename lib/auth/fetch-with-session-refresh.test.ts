@@ -82,4 +82,24 @@ describe("fetchWithSessionRefresh", () => {
     expect((await fetchWithSessionRefresh("/api/accounts")).status).toBe(403);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("redirects a private console page after refresh rejects the session", async () => {
+    const replace = vi.fn();
+    vi.stubGlobal("window", { location: { pathname: "/console/account/acc_123", replace } });
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(new Response(null, { status: 401 }));
+    const { fetchWithSessionRefresh } = await import("./fetch-with-session-refresh");
+    await fetchWithSessionRefresh("/api/accounts");
+    expect(replace).toHaveBeenCalledWith("/console");
+  });
+
+  it("does not redirect on a temporary refresh failure", async () => {
+    const replace = vi.fn();
+    vi.stubGlobal("window", { location: { pathname: "/console/account/acc_123", replace } });
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(new Response(null, { status: 502 }));
+    const { fetchWithSessionRefresh } = await import("./fetch-with-session-refresh");
+    await fetchWithSessionRefresh("/api/accounts");
+    expect(replace).not.toHaveBeenCalled();
+  });
 });

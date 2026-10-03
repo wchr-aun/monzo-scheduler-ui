@@ -55,15 +55,6 @@
   background: var(--color-interactive-hover);
 }
 
-.exitDemoLink:focus-visible {
-  outline: 3px solid var(--color-focus-navbar);
-  outline-offset: 1px;
-}
-
-.exitDemoIcon {
-  display: inline-flex;
-}
-
 .logo {
   display: block;
   width: 100%;
@@ -90,10 +81,6 @@
 
   .exitDemoLink {
     padding-inline: var(--space-2);
-  }
-
-  .exitDemoIcon {
-    display: none;
   }
 }
 

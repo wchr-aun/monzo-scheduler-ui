@@ -1,6 +1,5 @@
-import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
-import { MoneyVisibilityToggle } from "@/components/ui/money-visibility-toggle/money-visibility-toggle";
-import { ArrowIcon } from "@/components/ui/icons/arrow-icon";
+import {ThemeToggle} from "@/components/ui/theme-toggle/theme-toggle";
+import {MoneyVisibilityToggle} from "@/components/ui/money-visibility-toggle/money-visibility-toggle";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./navbar.module.css";
@@ -34,21 +33,18 @@ export function Navbar({
           />
         </Link>
         <div className={styles.controls}>
-          {demoMode ? (
-            <Link
-              className={styles.exitDemoLink}
-              href="/"
-              aria-label="Exit demo and return to home"
-              title="Return to the landing page"
-            >
-              <span className={styles.exitDemoIcon}>
-                <ArrowIcon direction="left" />
-              </span>
-              <span>Exit demo</span>
-            </Link>
-          ) : null}
           <MoneyVisibilityToggle />
           <ThemeToggle />
+          {demoMode ? (
+              <Link
+                  className={styles.exitDemoLink}
+                  href="/"
+                  aria-label="Exit demo and return to home"
+                  title="Return to the landing page"
+              >
+                <span>Exit demo</span>
+              </Link>
+          ) : null}
         </div>
       </div>
     </nav>
