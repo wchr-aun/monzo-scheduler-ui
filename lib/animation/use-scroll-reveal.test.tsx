@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useScrollReveal } from "./use-scroll-reveal";
 
@@ -12,7 +13,7 @@ let reducedMotion = false;
 
 function Reveal({ label }: { label: string }) {
   const { ref, entered, hidden } = useScrollReveal();
-  return <div ref={ref}><output aria-label={label}>{hidden ? "Hidden" : entered ? "Revealed" : "Visible"}</output></div>;
+  return <div ref={ref} data-hidden={hidden} data-entered={entered}><output aria-label={label}>{hidden ? "Hidden" : entered ? "Revealed" : "Visible"}</output></div>;
 }
 
 function scrollTo(position: number) {
@@ -47,6 +48,28 @@ describe("useScrollReveal", () => {
     cleanup();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it("renders the hidden starting state before hydration and preserves it until entry", () => {
+    const html = renderToString(<Reveal label="Content" />);
+    expect(html).toContain('data-hidden="true"');
+    expect(html).toContain('data-entered="false"');
+
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    const view = render(<Reveal label="Content" />, {container, hydrate: true});
+    expect(screen.getByLabelText("Content")).toHaveTextContent("Hidden");
+    enter(0);
+    expect(screen.getByLabelText("Content")).toHaveTextContent("Revealed");
+    view.unmount();
+    container.remove();
+  });
+
+  it("reveals content when IntersectionObserver is unavailable", () => {
+    vi.stubGlobal("IntersectionObserver", undefined);
+    render(<Reveal label="Content" />);
+    expect(screen.getByLabelText("Content")).toHaveTextContent("Revealed");
   });
 
   it("reveals all pending content near the bottom using one shared passive listener", () => {

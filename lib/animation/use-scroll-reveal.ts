@@ -31,7 +31,6 @@ function subscribeToPageBottom(reveal: () => void) {
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(trigger: "scroll" | "mount" = "scroll") {
   const ref = useRef<T>(null);
   const [entered, setEntered] = useState(false);
-  const [ready, setReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(trigger:
     const updatePreference = () => setReducedMotion(preference?.matches ?? false);
     updatePreference();
     preference?.addEventListener("change", updatePreference);
-    setReady(true);
 
     const element = ref.current;
     let observer: IntersectionObserver | undefined;
@@ -68,5 +66,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(trigger:
     };
   }, [trigger]);
 
-  return {ref, entered, reducedMotion, hidden: ready && !entered && !reducedMotion};
+  // Include the starting state in server HTML so hydration cannot flash visible content.
+  // CSS only hides it when scripting is enabled and reduced motion is not requested.
+  return {ref, entered, reducedMotion, hidden: !entered && !reducedMotion};
 }

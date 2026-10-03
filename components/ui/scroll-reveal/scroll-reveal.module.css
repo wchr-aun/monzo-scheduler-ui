@@ -2,7 +2,8 @@
   min-width: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Keep content visible without JavaScript or when this media feature is unsupported. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   .reveal[data-hidden="true"] {
     opacity: 0;
     transform: translateY(24px);
