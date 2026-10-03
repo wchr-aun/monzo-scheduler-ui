@@ -52,8 +52,10 @@ export function LandingPage() {
               Schedule money into and out of your Monzo pots, so there&apos;s one less
               thing to remember when life gets busy.
             </p>
-            <a className={styles.primaryLink} href="#code">Explore the code <ArrowIcon /></a>
-            <p className={styles.heroNote}>Curious how it works? Explore the code.</p>
+            <a className={styles.primaryLink} href="#demo">Try the demo <ArrowIcon /></a>
+            <p className={styles.heroNote}>
+              <a href="#code">Curious how it works? Explore the code.</a>
+            </p>
             <a className={styles.storyLink} href="#why">A little about the project <ArrowIcon direction="down" /></a>
           </ScrollReveal>
           <ScrollReveal delay={120}><PotPreview transfersPage={transfersPage} /></ScrollReveal>
@@ -173,9 +175,23 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section id="demo" className={styles.demoSection} aria-labelledby="demo-heading">
+          <ScrollReveal>
+            <p className={styles.eyebrow}>03 / Interactive demo</p>
+            <h2 id="demo-heading">Try it for yourself.</h2>
+            <p className={styles.demoDescription}>
+              Explore sample accounts and pots, create a schedule, or cancel a transfer.
+              No Monzo account needed, and no real money moves.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal>
+            <ExternalLink className={styles.primaryLink} href="/demo" aria-label="Open demo (opens in a new tab)" title="Opens in a new tab">Open demo</ExternalLink>
+          </ScrollReveal>
+        </section>
+
         <section id="code" className={styles.codeSection} aria-labelledby="code-heading">
           <ScrollReveal>
-            <p className={styles.eyebrow}>03 / Open source</p>
+            <p className={styles.eyebrow}>04 / Open source</p>
             <h2 id="code-heading">Built for my needs.<br />Open for yours.</h2>
           </ScrollReveal>
           <ScrollReveal className={styles.codeDescription}>

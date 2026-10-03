@@ -44,7 +44,11 @@ account requests. The preview is inert, with disabled
 controls and a not-allowed cursor. The landing page explains the motivation,
 illustrates a pot withdrawal followed by a payment scheduled in Monzo,
 shows three features and example Monzo notifications, and links to both public
-repositories. Its Explore the code button links to the on-page open-source section.
+repositories. The hero's Curious how it works? Explore the code text links to
+the on-page open-source section. Its Try the demo button scrolls to a demo section before
+open source, where the Open demo button opens `/demo` in a new tab. Scroll reveals animate
+this section; reaching the bottom of the page reveals any remaining hidden
+content, including the demo button.
 Landing page copy is editable in `components/landing/landing-page/landing-page.tsx`.
 
 The interactive demo at `/demo` reuses the live console components with an

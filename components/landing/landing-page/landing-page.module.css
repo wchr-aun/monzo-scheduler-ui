@@ -124,7 +124,8 @@
 .hero,
 .storySection,
 .buildSection,
-.codeSection {
+.codeSection,
+.demoSection {
   width: min(100% - 80px, 1160px);
   margin-inline: auto;
   scroll-margin-top: 112px;
@@ -187,6 +188,15 @@
   margin: var(--space-4) 0 48px;
   color: var(--color-text-muted);
   font-size: 0.75rem;
+}
+
+.heroNote a {
+  color: var(--color-interactive);
+  text-underline-offset: 3px;
+}
+
+.heroNote a:hover {
+  color: var(--color-interactive-hover);
 }
 
 .storyLink {
@@ -377,6 +387,27 @@
   text-align: left;
 }
 
+.demoSection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-8);
+  padding-block: 48px 80px;
+  border-top: 1px solid var(--color-border);
+}
+
+.demoSection h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.demoDescription {
+  max-width: 640px;
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme])) .brand .lightLogo { display: none; }
   :global(:root:not([data-theme])) .brand .darkLogo { display: block; }
@@ -394,7 +425,8 @@
   .hero,
   .storySection,
   .buildSection,
-  .codeSection { width: calc(100% - 40px); }
+  .codeSection,
+  .demoSection { width: calc(100% - 40px); }
   .navigation { min-height: 76px; }
   .brand img { width: 44px; height: 44px; }
   .brand > span { font-size: 0.8125rem; }
@@ -413,6 +445,7 @@
   .notificationFeature { grid-template-columns: 1fr; gap: var(--space-6); }
   .repositories { grid-template-columns: 1fr; }
   .codeSection { padding: 48px var(--space-5); margin-bottom: 48px; }
+  .demoSection { grid-template-columns: 1fr; padding-block: var(--space-8) 48px; }
 }
 
 @media (max-width: 560px) {

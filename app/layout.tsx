@@ -2,11 +2,12 @@ import {THEME_STORAGE_KEY} from "@/lib/theme/constants";
 import type {Metadata} from "next";
 import type {ReactNode} from "react";
 import "./globals.css";
-import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import {ToastProvider} from "@/components/providers/toast-provider/toast-provider";
 
 export const metadata: Metadata = {
-  title: "Schedzo",
-  description: "A project for managing scheduled Monzo pot transfers",
+  title: "Schedzo - On schedule.",
+  description:
+    "Schedule transfers into and out of your Monzo pots with Schedzo. Automate recurring deposits and withdrawals, track upcoming transfers, and manage your saving plans.",
   icons: {
     icon: "/favicon.ico",
   },
