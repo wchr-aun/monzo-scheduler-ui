@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 
@@ -10,13 +11,13 @@ export async function GET() {
   const token = cookieStore.get(sessionCookieName)?.value;
 
   if (!token) {
-    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    return apiError({ error: "not_authenticated" }, { status: 401 });
   }
 
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -50,7 +51,7 @@ export async function GET() {
         "code" in errorPayload.detail &&
         typeof errorPayload.detail.code === "string"
       ) {
-        return NextResponse.json(
+        return apiError(
           {
             code: errorPayload.detail.code,
             ...("message" in errorPayload.detail &&
@@ -68,10 +69,10 @@ export async function GET() {
         "code" in errorPayload &&
         typeof errorPayload.code === "string"
       ) {
-        return NextResponse.json({ code: errorPayload.code }, { status });
+        return apiError({ code: errorPayload.code }, { status });
       }
 
-      return NextResponse.json({ error: "accounts_failed" }, { status });
+      return apiError({ error: "accounts_failed" }, { status });
     }
 
     const payload: unknown = await backendResponse.json();
@@ -79,7 +80,7 @@ export async function GET() {
     const validatedAccounts = getAccounts(payload);
 
     if (!validatedAccounts) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_accounts_response" },
         { status: 502 },
       );
@@ -102,6 +103,6 @@ export async function GET() {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json({ error: "accounts_unavailable" }, { status: 502 });
+    return apiError({ error: "accounts_unavailable" }, { status: 502 });
   }
 }

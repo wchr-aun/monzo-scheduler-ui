@@ -63,7 +63,7 @@ describe.each(routes)("$name response validation", ({ name, get, valid, expected
     fetchMock.mockResolvedValue(Response.json(invalid));
     const response = await get();
     expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ error: `invalid_${name}_response` });
+    expect(await response.json()).toEqual({ source: "backend", error: `invalid_${name}_response` });
   });
 
   it("does not request backend data when signed out", async () => {
@@ -77,14 +77,14 @@ describe.each(routes)("$name response validation", ({ name, get, valid, expected
     fetchMock.mockResolvedValue(Response.json({ code: "forbidden.insufficient_permissions" }, { status: 403 }));
     const response = await get();
     expect(response.status).toBe(403);
-    expect(await response.json()).toEqual({ code: "forbidden.insufficient_permissions" });
+    expect(await response.json()).toEqual({ source: "backend", code: "forbidden.insufficient_permissions" });
   });
 
   it("handles unavailable backends", async () => {
     fetchMock.mockRejectedValue(new Error("Unavailable"));
     const response = await get();
     expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ error: `${name}_unavailable` });
+    expect(await response.json()).toEqual({ source: "backend", error: `${name}_unavailable` });
   });
 });
 

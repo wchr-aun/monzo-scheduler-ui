@@ -1,12 +1,15 @@
 "use client";
 
 import { MONEY_VISIBILITY_STORAGE_KEY } from "@/lib/money/constants";
+import { useToast } from "@/components/providers/toast-provider/toast-provider";
+import { AppError } from "@/lib/errors/app-error";
 import {
   createContext,
   type ReactNode,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -21,8 +24,10 @@ const MoneyVisibilityContext = createContext<MoneyVisibilityContextValue>({
 });
 
 export function MoneyVisibilityProvider({ children }: { children: ReactNode }) {
+  const { reportError } = useToast();
   const [isMoneyHidden, setIsMoneyHidden] = useState(false);
   const [hasRestoredPreference, setHasRestoredPreference] = useState(false);
+  const hasChangedPreference = useRef(false);
 
   useEffect(() => {
     try {
@@ -30,14 +35,15 @@ export function MoneyVisibilityProvider({ children }: { children: ReactNode }) {
         localStorage.getItem(MONEY_VISIBILITY_STORAGE_KEY) === "true",
       );
     } catch {
-      // No preference can be restored, but toggling still works in memory.
+      reportError(new AppError("frontend", "restore browser preferences", "preference_restore_failed"));
     } finally {
       setHasRestoredPreference(true);
     }
-  }, []);
+  }, [reportError]);
 
   useEffect(() => {
-    if (!hasRestoredPreference) {
+    // Do not overwrite an unreadable saved preference with defaults on startup.
+    if (!hasRestoredPreference || !hasChangedPreference.current) {
       return;
     }
 
@@ -47,14 +53,17 @@ export function MoneyVisibilityProvider({ children }: { children: ReactNode }) {
         String(isMoneyHidden),
       );
     } catch {
-      // The in-memory visibility state is unaffected.
+      reportError(new AppError("frontend", "save browser preferences", "preference_save_failed"));
     }
-  }, [hasRestoredPreference, isMoneyHidden]);
+  }, [hasRestoredPreference, isMoneyHidden, reportError]);
 
   const value = useMemo(
     () => ({
       isMoneyHidden,
-      toggleMoneyVisibility: () => setIsMoneyHidden((hidden) => !hidden),
+      toggleMoneyVisibility: () => {
+        hasChangedPreference.current = true;
+        setIsMoneyHidden((hidden) => !hidden);
+      },
     }),
     [isMoneyHidden],
   );

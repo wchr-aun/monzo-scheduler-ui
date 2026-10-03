@@ -339,9 +339,35 @@ describe("CreateScheduledTransfer", () => {
     );
 
     expect(
-      await screen.findByText("Could not create the scheduled transfer."),
+      await screen.findByText("Backend error: Could not create the scheduled transfer. Please try again."),
     ).toHaveAttribute("role", "alert");
     expect(screen.getByLabelText("UK date and time")).toBeInTheDocument();
+  });
+
+  it.each(["success", "backend", "connection"])("handles %s after the progress toast is dismissed", async (outcome) => {
+    let resolve!: (value: Response) => void;
+    let reject!: (reason: unknown) => void;
+    fetchMock.mockReturnValue(new Promise<Response>((res, rej) => { resolve = res; reject = rej; }));
+    render(createScheduledTransfer());
+    fireEvent.click(screen.getByRole("button", { name: "Schedule a transfer" }));
+    fireEvent.change(screen.getByLabelText("UK date and time"), { target: { value: "2099-01-01T09:30" } });
+    fireEvent.change(screen.getByLabelText("Amount (pence)"), { target: { value: "100" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create scheduled transfer" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss notification: Creating scheduled transfer…" }));
+    expect(screen.queryByText("Creating scheduled transfer…")).not.toBeInTheDocument();
+    await act(async () => {
+      if (outcome === "connection") reject(new TypeError("private connection detail"));
+      else resolve(response(outcome === "success"));
+    });
+    if (outcome === "success") {
+      expect(screen.queryByText("Scheduled transfer created.")).not.toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("UK date and time")).not.toBeInTheDocument();
+    } else {
+      expect(screen.getAllByRole("alert")).toHaveLength(1);
+      expect(screen.getByRole("alert")).toHaveTextContent(outcome === "connection" ? "Connection error:" : "Backend error:");
+      expect(screen.getByLabelText("UK date and time")).toBeInTheDocument();
+    }
   });
 });
 

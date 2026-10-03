@@ -132,7 +132,7 @@ describe("scheduled transfers route", () => {
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ error: "invalid_status" });
+    expect(await response.json()).toEqual({ source: "backend", error: "invalid_status" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -143,7 +143,7 @@ describe("scheduled transfers route", () => {
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ error: "invalid_pagination" });
+    expect(await response.json()).toEqual({ source: "backend", error: "invalid_pagination" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -161,7 +161,7 @@ describe("scheduled transfers route", () => {
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({
-      error: "invalid_scheduled_transfers_response",
+      source: "backend", error: "invalid_scheduled_transfers_response",
     });
   });
 
@@ -174,7 +174,7 @@ describe("scheduled transfers route", () => {
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({
-      error: "invalid_scheduled_transfers_response",
+      source: "backend", error: "invalid_scheduled_transfers_response",
     });
   });
 
@@ -261,7 +261,7 @@ describe("scheduled transfers route", () => {
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ error: "invalid_request" });
+    expect(await response.json()).toEqual({ source: "backend", error: "invalid_request" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -293,7 +293,7 @@ describe("scheduled transfers route", () => {
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({
-      error: "invalid_schedule_transfer_response",
+      source: "backend", error: "invalid_schedule_transfer_response",
     });
   });
 

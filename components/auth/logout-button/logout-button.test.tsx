@@ -56,7 +56,7 @@ describe("LogoutButton", () => {
 
     expect(
       await screen.findByRole("alert", { name: "" }),
-    ).toHaveTextContent("Could not log out. Please try again.");
+    ).toHaveTextContent("Backend error: Could not log out. Please try again.");
     expect(cache.size).toBe(1);
     expect(refresh).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Log out" })).toBeEnabled();

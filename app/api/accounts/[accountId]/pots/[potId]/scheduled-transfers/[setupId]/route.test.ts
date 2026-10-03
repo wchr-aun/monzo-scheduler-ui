@@ -67,7 +67,7 @@ describe("cancel scheduled transfer route", () => {
     const response = await DELETE(new Request("http://localhost"), context);
 
     expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({ error: "cancel_transfer_failed" });
+    expect(await response.json()).toEqual({ source: "backend", error: "cancel_transfer_failed" });
   });
 
   it("rejects an unexpected backend success status", async () => {
@@ -79,7 +79,7 @@ describe("cancel scheduled transfer route", () => {
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({
-      error: "invalid_cancel_transfer_response",
+      source: "backend", error: "invalid_cancel_transfer_response",
     });
   });
 

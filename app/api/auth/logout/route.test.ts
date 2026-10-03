@@ -91,7 +91,7 @@ describe("logout route", () => {
     const response = await POST();
 
     expect(response.status).toBe(status < 500 ? status : 502);
-    expect(await response.json()).toEqual({ error: "logout_failed" });
+    expect(await response.json()).toEqual({ source: "backend", error: "logout_failed" });
     expect(response.headers.get("set-cookie")).toBeNull();
   });
 
@@ -101,7 +101,7 @@ describe("logout route", () => {
     const response = await POST();
 
     expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ error: "logout_unavailable" });
+    expect(await response.json()).toEqual({ source: "backend", error: "logout_unavailable" });
     expect(response.headers.get("set-cookie")).toBeNull();
   });
 });

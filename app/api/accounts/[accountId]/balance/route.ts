@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -12,7 +13,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { accountId } = await context.params;
 
   if (!accountId.trim()) {
-    return NextResponse.json({ error: "account_id_required" }, { status: 400 });
+    return apiError({ error: "account_id_required" }, { status: 400 });
   }
 
   const cookieStore = await cookies();
@@ -20,13 +21,13 @@ export async function GET(_request: Request, context: RouteContext) {
   const token = cookieStore.get(sessionCookieName)?.value;
 
   if (!token) {
-    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    return apiError({ error: "not_authenticated" }, { status: 401 });
   }
 
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -56,16 +57,16 @@ export async function GET(_request: Request, context: RouteContext) {
         "code" in errorPayload &&
         typeof errorPayload.code === "string"
       ) {
-        return NextResponse.json({ code: errorPayload.code }, { status });
+        return apiError({ code: errorPayload.code }, { status });
       }
 
-      return NextResponse.json({ error: "balance_failed" }, { status });
+      return apiError({ error: "balance_failed" }, { status });
     }
 
     const payload: unknown = await backendResponse.json();
 
     if (!isBalance(payload)) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_balance_response" },
         { status: 502 },
       );
@@ -79,6 +80,6 @@ export async function GET(_request: Request, context: RouteContext) {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json({ error: "balance_unavailable" }, { status: 502 });
+    return apiError({ error: "balance_unavailable" }, { status: 502 });
   }
 }

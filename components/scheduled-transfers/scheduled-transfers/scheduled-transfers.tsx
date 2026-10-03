@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/components/providers/toast-provider/toast-provider";
-import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+import { request } from "@/lib/errors/request";
 
 import {Section} from "@/components/layout/section/section";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
@@ -84,24 +84,21 @@ export function ScheduledTransfers({
     setPendingSetupIds((current) => new Set(current).add(transfer.setup_id));
 
     try {
-      const response = await fetchWithSessionRefresh(
+      await request(
         `${scheduledTransfersKey}/${encodeURIComponent(transfer.setup_id)}`,
         {
           method: "DELETE",
           headers: { Accept: "application/json" },
         },
+        "cancel the scheduled transfer",
       );
-
-      if (!response.ok) {
-        throw new Error("Cancel scheduled transfer request failed");
-      }
 
       await mutate((key) =>
         isScheduledTransfersKey(key, accountId, potId),
-      ).catch(() => undefined);
+      ).catch((error) => toast.reportError(error, { operation: "load scheduled transfers" }));
       toast.update(toastId, { tone: "success", colour: "info", message: "Scheduled transfer cancelled." });
-    } catch {
-      toast.update(toastId, { tone: "error", message: "Could not cancel the scheduled transfer." });
+    } catch (error) {
+      toast.reportError(error, { operation: "cancel the scheduled transfer", toastId });
     } finally {
       setPendingSetupIds((current) => {
         const next = new Set(current);

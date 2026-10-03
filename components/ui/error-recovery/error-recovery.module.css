@@ -1,0 +1,2 @@
+.recovery { display: grid; gap: var(--space-4); justify-items: start; }
+.recovery h1, .recovery p { margin: 0; }

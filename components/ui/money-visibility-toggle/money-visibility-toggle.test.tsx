@@ -1,6 +1,9 @@
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
 import { textContent } from "@/test-utils/text";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render as testingRender, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ThemeToggle } from "@/components/ui/theme-toggle/theme-toggle";
 import { MoneyVisibilityProvider } from "@/components/providers/money-visibility-provider";
 import {
   MONEY_MASK,
@@ -13,6 +16,7 @@ describe("MoneyVisibilityToggle", () => {
   beforeEach(() => {
     localStorage.clear();
   });
+  afterEach(() => vi.restoreAllMocks());
 
   it("masks and reveals every money value", () => {
     render(
@@ -130,6 +134,8 @@ describe("MoneyVisibilityToggle", () => {
       </MoneyVisibilityProvider>,
     );
 
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not restore saved preferences.");
+    expect(setItem).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
 
     expect(
@@ -138,7 +144,24 @@ describe("MoneyVisibilityToggle", () => {
     expect(screen.getByText(MONEY_MASK)).toBeInTheDocument();
     expect(screen.queryByText(textContent("£123.45"))).not.toBeInTheDocument();
 
+    expect(screen.getByText("Frontend error: Could not save your preferences. Your changes still apply for this visit.")).toHaveAttribute("role", "alert");
+
     getItem.mockRestore();
     setItem.mockRestore();
   });
+
+  it("reports write failures once across theme and money preferences", () => {
+    document.documentElement.dataset.theme = "light";
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("Storage blocked"); });
+    render(<MoneyVisibilityProvider><MoneyVisibilityToggle /><ThemeToggle /></MoneyVisibilityProvider>);
+    fireEvent.click(screen.getByRole("button", { name: "Hide money values" }));
+    expect(screen.getByRole("button", { name: "Show money values" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Toggle color theme" }));
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

@@ -53,7 +53,7 @@ describe("callback route", () => {
   it("identifies invalid duration types without setting cookies", async () => {
     fetchMock.mockResolvedValueOnce(Response.json({ ...payload, refreshExpiresIn: "600" }));
     const response = await GET(request());
-    expect(await response.json()).toEqual({ error: "invalid_callback_response" });
+    expect(await response.json()).toEqual({ source: "backend", error: "invalid_callback_response" });
     expect(response.headers.get("set-cookie")).toBeNull();
   });
 
@@ -64,7 +64,7 @@ describe("callback route", () => {
       json: async () => { throw new SyntaxError("private-access-token private-code"); },
     } as unknown as Response);
     const response = await GET(request());
-    expect(await response.json()).toEqual({ error: "callback_unavailable" });
+    expect(await response.json()).toEqual({ source: "backend", error: "callback_unavailable" });
     expect(response.headers.get("set-cookie")).toBeNull();
   });
 });

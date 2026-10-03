@@ -1,16 +1,17 @@
-import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+import { request, readJson } from "@/lib/errors/request";
+import { AppError } from "@/lib/errors/app-error";
 import type { ScheduledTransfersPage } from "./types";
 import { getScheduledTransfers } from "./validation";
 
 export async function fetchScheduledTransfers(
   url: string,
 ): Promise<ScheduledTransfersPage> {
-  const response = await fetchWithSessionRefresh(url, { cache: "no-store" });
-  const payload: unknown = await response.json();
+  const response = await request(url, { cache: "no-store" }, "load scheduled transfers");
+  const payload = await readJson(response, "load scheduled transfers");
   const transfers = getScheduledTransfers(payload);
 
-  if (!response.ok || !transfers) {
-    throw new Error("Scheduled transfers response was invalid");
+  if (!transfers) {
+    throw new AppError("backend", "load scheduled transfers", "invalid_scheduled_transfers_response");
   }
 
   return transfers;

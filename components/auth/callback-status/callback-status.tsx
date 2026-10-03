@@ -1,5 +1,7 @@
 "use client";
 
+import { request } from "@/lib/errors/request";
+import { isAborted } from "@/lib/errors/app-error";
 import { useToast } from "@/components/providers/toast-provider/toast-provider";
 import { LoadingIndicator } from "@/components/ui/loading-indicator/loading-indicator";
 import { useEffect, useState } from "react";
@@ -10,7 +12,7 @@ type Status = "loading" | "redirecting" | "missing-params" | "request-error";
 
 export function CallbackStatus() {
   const router = useRouter();
-  const { show } = useToast();
+  const { show, reportError } = useToast();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("loading");
 
@@ -29,19 +31,16 @@ export function CallbackStatus() {
       try {
         const params = new URLSearchParams({ code, state });
 
-        const response = await fetch(`/api/auth/callback?${params}`, {
+        await request(`/api/auth/callback?${params}`, {
           signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Callback failed with status ${response.status}`);
-        }
+        }, "complete login", false);
 
         if (controller.signal.aborted) return;
         show({ tone: "success", message: "Logged in successfully." });
         setStatus("redirecting");
       } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
+        if (!controller.signal.aborted && !isAborted(error)) {
+          reportError(error, { operation: "complete login" });
           setStatus("request-error");
         }
       }
@@ -50,7 +49,7 @@ export function CallbackStatus() {
     void completeLogin();
 
     return () => controller.abort();
-  }, [searchParams, show]);
+  }, [searchParams, show, reportError]);
 
   useEffect(() => {
     if (status !== "redirecting") {

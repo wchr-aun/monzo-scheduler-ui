@@ -1,4 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
+import { render as testingRender, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ConsolePage from "./page";
 
@@ -47,3 +49,7 @@ describe("ConsolePage", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

@@ -1,5 +1,7 @@
+import { ToastProvider } from "@/components/providers/toast-provider/toast-provider";
+import type { ReactElement } from "react";
 import { textContent } from "@/test-utils/text";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render as testingRender, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AccountDetails } from "./account-details";
 import { AccountsList } from "@/components/accounts/accounts-list/accounts-list";
@@ -309,3 +311,7 @@ describe("AccountDetails", () => {
     expect(await screen.findByText("Could not load pots.")).toBeInTheDocument();
   });
 });
+
+function render(ui: ReactElement) {
+  return testingRender(ui, { wrapper: ToastProvider });
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { request } from "@/lib/errors/request";
 import {Button} from "@/components/ui/button/button";
 import {useToast} from "@/components/providers/toast-provider/toast-provider";
 import {useRouter} from "next/navigation";
@@ -18,11 +19,7 @@ export function LogoutButton() {
     const toastId = toast.show({ tone: "progress", message: "Logging out…" });
 
     try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
-
-      if (!response.ok) {
-        throw new Error(`Logout request failed with status ${response.status}`);
-      }
+      await request("/api/auth/logout", { method: "POST" }, "log out", false);
 
       await mutate(() => true, undefined, { revalidate: false });
 
@@ -32,8 +29,8 @@ export function LogoutButton() {
 
       toast.update(toastId, { tone: "success", colour: "info", message: "Logged out." });
       router.refresh();
-    } catch {
-      toast.update(toastId, { tone: "error", message: "Could not log out. Please try again." });
+    } catch (error) {
+      toast.reportError(error, { operation: "log out", toastId });
       setIsLoggingOut(false);
     }
   }

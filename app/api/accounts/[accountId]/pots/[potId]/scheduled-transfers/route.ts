@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
@@ -217,7 +218,7 @@ export async function GET(request: Request, context: RouteContext) {
   const { accountId, potId } = await context.params;
 
   if (!accountId.trim() || !potId.trim()) {
-    return NextResponse.json(
+    return apiError(
       { error: "account_and_pot_ids_required" },
       { status: 400 },
     );
@@ -227,7 +228,7 @@ export async function GET(request: Request, context: RouteContext) {
   const statuses = getStatuses(request);
 
   if (!pagination || !statuses) {
-    return NextResponse.json(
+    return apiError(
       { error: !pagination ? "invalid_pagination" : "invalid_status" },
       { status: 400 },
     );
@@ -236,11 +237,11 @@ export async function GET(request: Request, context: RouteContext) {
   const { token, baseUrl } = await getBackendDetails();
 
   if (!token) {
-    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    return apiError({ error: "not_authenticated" }, { status: 401 });
   }
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -264,7 +265,7 @@ export async function GET(request: Request, context: RouteContext) {
         backendResponse.status >= 400 && backendResponse.status < 500
           ? backendResponse.status
           : 502;
-      return NextResponse.json({ error: "scheduled_transfers_failed" }, { status });
+      return apiError({ error: "scheduled_transfers_failed" }, { status });
     }
 
     const payload: unknown = await backendResponse.json();
@@ -274,7 +275,7 @@ export async function GET(request: Request, context: RouteContext) {
       payload.limit !== pagination.limit ||
       payload.offset !== pagination.offset
     ) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_scheduled_transfers_response" },
         { status: 502 },
       );
@@ -290,7 +291,7 @@ export async function GET(request: Request, context: RouteContext) {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json(
+    return apiError(
       { error: "scheduled_transfers_unavailable" },
       { status: 502 },
     );
@@ -301,7 +302,7 @@ export async function POST(request: Request, context: RouteContext) {
   const { accountId, potId } = await context.params;
 
   if (!accountId.trim() || !potId.trim()) {
-    return NextResponse.json(
+    return apiError(
       { error: "account_and_pot_ids_required" },
       { status: 400 },
     );
@@ -312,7 +313,7 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     payload = await request.json();
   } catch {
-    return NextResponse.json({ error: "invalid_request" }, { status: 400 });
+    return apiError({ error: "invalid_request" }, { status: 400 });
   }
 
   if (
@@ -320,17 +321,17 @@ export async function POST(request: Request, context: RouteContext) {
     payload.account_id !== accountId ||
     payload.pot_id !== potId
   ) {
-    return NextResponse.json({ error: "invalid_request" }, { status: 400 });
+    return apiError({ error: "invalid_request" }, { status: 400 });
   }
 
   const { token, baseUrl } = await getBackendDetails();
 
   if (!token) {
-    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    return apiError({ error: "not_authenticated" }, { status: 401 });
   }
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -357,13 +358,13 @@ export async function POST(request: Request, context: RouteContext) {
           ? backendResponse.status
           : 502;
 
-      return NextResponse.json({ error: "schedule_transfer_failed" }, { status });
+      return apiError({ error: "schedule_transfer_failed" }, { status });
     }
 
     const backendPayload: unknown = await backendResponse.json();
 
     if (!isScheduledTransfer(backendPayload)) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_schedule_transfer_response" },
         { status: 502 },
       );
@@ -375,7 +376,7 @@ export async function POST(request: Request, context: RouteContext) {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json(
+    return apiError(
       { error: "schedule_transfer_unavailable" },
       { status: 502 },
     );

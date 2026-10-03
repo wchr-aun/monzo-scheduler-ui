@@ -301,7 +301,7 @@ describe("ScheduledTransfers", () => {
     );
 
     expect(
-      await screen.findByText("Could not cancel the scheduled transfer."),
+      await screen.findByText("Backend error: Could not cancel the scheduled transfer. Please try again."),
     ).toHaveAttribute("role", "alert");
     expect(
       screen.getByRole("button", {

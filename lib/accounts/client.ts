@@ -1,59 +1,41 @@
-import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+import { request, readJson } from "@/lib/errors/request";
+import { AppError } from "@/lib/errors/app-error";
 import type { Account, Balance } from "./types";
 import { getAccounts, isBalance } from "./validation";
 
-export class AccessNotApprovedError extends Error {
+export class AccessNotApprovedError extends AppError {
   constructor(message?: string) {
-    super(
-      message ||
-        "You have not yet allowed access to your data. Please allow access in the Monzo app.",
-    );
+    super("backend", "load accounts", "monzo_approval_required", 403);
+    this.message = message || "You have not yet allowed access to your data. Please allow access in the Monzo app.";
     this.name = "AccessNotApprovedError";
   }
 }
 
-function getAccessNotApprovedMessage(value: unknown): string | null {
-  if (typeof value !== "object" || value === null || !("code" in value)) {
-    return null;
-  }
-
-  if (value.code !== "monzo_approval_required") {
-    return null;
-  }
-
-  return "message" in value && typeof value.message === "string"
-    ? value.message
-    : "";
-}
-
 export async function fetchAccounts(url: string): Promise<Account[]> {
-  const response = await fetchWithSessionRefresh(url, { cache: "no-store" });
-  const payload: unknown = await response.json();
-
-  const accessNotApprovedMessage = getAccessNotApprovedMessage(payload);
-  if (response.status === 403 && accessNotApprovedMessage !== null) {
-    throw new AccessNotApprovedError(accessNotApprovedMessage);
+  let response: Response;
+  try {
+    response = await request(url, { cache: "no-store" }, "load accounts");
+  } catch (error) {
+    if (error instanceof AppError && error.status === 403 && error.code === "monzo_approval_required") throw new AccessNotApprovedError();
+    throw error;
   }
-
-  if (!response.ok) {
-    throw new Error(`Accounts request failed with status ${response.status}`);
-  }
+  const payload = await readJson(response, "load accounts");
 
   const accounts = getAccounts(payload);
 
   if (!accounts) {
-    throw new Error("Accounts response was invalid");
+    throw new AppError("backend", "load accounts", "invalid_accounts_response");
   }
 
   return accounts;
 }
 
 export async function fetchBalance(url: string): Promise<Balance> {
-  const response = await fetchWithSessionRefresh(url, { cache: "no-store" });
-  const payload: unknown = await response.json();
+  const response = await request(url, { cache: "no-store" }, "load the balance");
+  const payload = await readJson(response, "load the balance");
 
-  if (!response.ok || !isBalance(payload)) {
-    throw new Error("Balance response was invalid");
+  if (!isBalance(payload)) {
+    throw new AppError("backend", "load the balance", "invalid_balance_response");
   }
 
   return payload;

@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { fetchAuthenticatedBackend } from "@/lib/auth/backend-fetch.server";
@@ -13,13 +14,13 @@ export async function POST() {
     const userId = getUserId(token);
 
     if (!userId) {
-      return NextResponse.json({ error: "invalid_session" }, { status: 401 });
+      return apiError({ error: "invalid_session" }, { status: 401 });
     }
 
     const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
     if (!baseUrl) {
-      return NextResponse.json(
+      return apiError(
         { error: "authentication_not_configured" },
         { status: 500 },
       );
@@ -42,10 +43,10 @@ export async function POST() {
           backendResponse.status >= 400 && backendResponse.status < 500
             ? backendResponse.status
             : 502;
-        return NextResponse.json({ error: "logout_failed" }, { status });
+        return apiError({ error: "logout_failed" }, { status });
       }
     } catch {
-      return NextResponse.json({ error: "logout_unavailable" }, { status: 502 });
+      return apiError({ error: "logout_unavailable" }, { status: 502 });
     }
   }
 

@@ -1,10 +1,11 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -20,7 +21,7 @@ export async function GET() {
     const location = backendResponse.headers.get("location");
 
     if (backendResponse.status < 300 || backendResponse.status >= 400 || !location) {
-      return NextResponse.json(
+      return apiError(
         { error: "login_redirect_failed" },
         { status: 502 },
       );
@@ -28,7 +29,7 @@ export async function GET() {
 
     const redirectUrl = new URL(location, `${baseUrl}/`);
     if (redirectUrl.protocol !== "https:" && redirectUrl.protocol !== "http:") {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_login_redirect" },
         { status: 502 },
       );
@@ -40,13 +41,15 @@ export async function GET() {
       .find((value) => value !== undefined);
 
     if (oauthStateCookie === undefined) {
-      return NextResponse.json(
+      return apiError(
         { error: "oauth_state_cookie_missing" },
         { status: 502 },
       );
     }
 
-    const response = NextResponse.redirect(redirectUrl, 302);
+    const response = new URL(request.url).searchParams.get("format") === "json"
+      ? NextResponse.json({ url: redirectUrl.href })
+      : NextResponse.redirect(redirectUrl, 302);
     response.cookies.set({
       name: "monzo_oauth_state",
       value: oauthStateCookie,
@@ -59,6 +62,6 @@ export async function GET() {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json({ error: "login_unavailable" }, { status: 502 });
+    return apiError({ error: "login_unavailable" }, { status: 502 });
   }
 }

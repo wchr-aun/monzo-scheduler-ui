@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { NextRequest, NextResponse } from "next/server";
 import { REFRESH_TOKEN_COOKIE_NAME } from "@/lib/auth/cookie-names";
 
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   const state = request.nextUrl.searchParams.get("state")?.trim();
 
   if (!code || !state) {
-    return NextResponse.json(
+    return apiError(
       { error: "code_and_state_required" },
       { status: 400 },
     );
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
   const oauthStateCookie = request.cookies.get("monzo_oauth_state")?.value;
 
   if (!oauthStateCookie) {
-    return NextResponse.json(
+    return apiError(
       { error: "oauth_state_cookie_required" },
       { status: 400 },
     );
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
           ? backendResponse.status
           : 502;
 
-      return NextResponse.json({ error: "callback_failed" }, { status });
+      return apiError({ error: "callback_failed" }, { status });
     }
 
     const rawPayload: unknown = await backendResponse.json();
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       rawPayload === null ||
       Array.isArray(rawPayload)
     ) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_callback_response" },
         { status: 502 },
       );
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
       !Number.isSafeInteger(payload.refreshExpiresIn) ||
       payload.refreshExpiresIn <= 0
     ) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_callback_response" },
         { status: 502 },
       );
@@ -124,6 +125,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch {
-    return NextResponse.json({ error: "callback_unavailable" }, { status: 502 });
+    return apiError({ error: "callback_unavailable" }, { status: 502 });
   }
 }

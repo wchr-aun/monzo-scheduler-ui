@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/errors/api-error.server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { fetchAuthenticatedBackend } from "@/lib/auth/backend-fetch.server";
@@ -14,7 +15,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { accountId, potId, setupId } = await context.params;
 
   if (!accountId.trim() || !potId.trim() || !setupId.trim()) {
-    return NextResponse.json(
+    return apiError(
       { error: "account_pot_and_setup_ids_required" },
       { status: 400 },
     );
@@ -25,13 +26,13 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const token = cookieStore.get(sessionCookieName)?.value;
 
   if (!token) {
-    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    return apiError({ error: "not_authenticated" }, { status: 401 });
   }
 
   const baseUrl = process.env.BASE_URL?.replace(/\/+$/, "");
 
   if (!baseUrl) {
-    return NextResponse.json(
+    return apiError(
       { error: "authentication_not_configured" },
       { status: 500 },
     );
@@ -56,11 +57,11 @@ export async function DELETE(_request: Request, context: RouteContext) {
           ? backendResponse.status
           : 502;
 
-      return NextResponse.json({ error: "cancel_transfer_failed" }, { status });
+      return apiError({ error: "cancel_transfer_failed" }, { status });
     }
 
     if (backendResponse.status !== 204) {
-      return NextResponse.json(
+      return apiError(
         { error: "invalid_cancel_transfer_response" },
         { status: 502 },
       );
@@ -70,7 +71,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
-    return NextResponse.json(
+    return apiError(
       { error: "cancel_transfer_unavailable" },
       { status: 502 },
     );

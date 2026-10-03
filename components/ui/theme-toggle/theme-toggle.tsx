@@ -1,10 +1,13 @@
 "use client";
 
 import { THEME_STORAGE_KEY } from "@/lib/theme/constants";
+import { useToast } from "@/components/providers/toast-provider/toast-provider";
+import { AppError } from "@/lib/errors/app-error";
 import {MoonIcon, SunIcon} from "@/components/ui/icons/theme-icons";
 import styles from "./theme-toggle.module.css";
 
 export function ThemeToggle() {
+  const { reportError } = useToast();
   function toggleTheme() {
     const root = document.documentElement;
     const isDark = root.dataset.theme
@@ -17,7 +20,7 @@ export function ThemeToggle() {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     } catch {
-      // The active theme still applies when browser storage is unavailable.
+      reportError(new AppError("frontend", "save browser preferences", "preference_save_failed"));
     }
   }
 

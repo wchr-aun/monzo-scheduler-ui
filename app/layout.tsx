@@ -19,7 +19,8 @@ const themeInitializationScript = `
       document.documentElement.dataset.theme = storedTheme;
     }
   } catch {
-    // CSS follows the system preference when no manual theme is set.
+    // Report once the toast provider mounts; CSS still follows the system theme.
+    document.documentElement.dataset.themeStorageUnavailable = "true";
   }
 `;
 

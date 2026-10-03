@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/components/providers/toast-provider/toast-provider";
-import { fetchWithSessionRefresh } from "@/lib/auth/fetch-with-session-refresh";
+import { request } from "@/lib/errors/request";
 
 import {Button} from "@/components/ui/button/button";
 import {InlineMessage} from "@/components/ui/inline-message/inline-message";
@@ -111,7 +111,7 @@ export function CreateScheduledTransfer({
     const toastId = toast.show({ tone: "progress", message: "Creating scheduled transfer…" });
 
     try {
-      const response = await fetchWithSessionRefresh(getScheduledTransfersKey(accountId, potId), {
+      await request(getScheduledTransfersKey(accountId, potId), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -125,11 +125,7 @@ export function CreateScheduledTransfer({
           pot_id: potId,
           account_id: accountId,
         }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Schedule transfer request failed");
-      }
+      }, "create the scheduled transfer");
 
       form.reset();
       setSelectedDateTime("");
@@ -140,9 +136,9 @@ export function CreateScheduledTransfer({
       toast.update(toastId, { tone: "success", message: "Scheduled transfer created." });
       await mutate((key) =>
         isScheduledTransfersKey(key, accountId, potId),
-      ).catch(() => undefined);
-    } catch {
-      toast.update(toastId, { tone: "error", message: "Could not create the scheduled transfer." });
+      ).catch((error) => toast.reportError(error, { operation: "load scheduled transfers" }));
+    } catch (error) {
+      toast.reportError(error, { operation: "create the scheduled transfer", toastId });
     } finally {
       setIsSubmitting(false);
     }
